@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>Firstyear&#x27;s blog-a-log</title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>MacOS PIV Setup Guide</h1>
+        <div class="border"></div>
+        <time datetime="2024-05-16" class="date" itemprop="datePublished">
+            16 May 2024
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <p>A somewhat hidden feature of MacOS is that it has excellent builtin support for PIV (smartcard)
+authentication. In this guide, we'll go through how to set that up.</p>
+<p>In this example we'll be using yubikey 5's as our smartcards. This may require you to alter some
+commands used in this guide.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>If you are using yubico's piv tool you should install it from <a href="https://developers.yubico.com/yubico-piv-tool/Releases/">yubico's site</a>
+for the signed binaries rather than installing from homebrew.</p>
+<p>You should also have a plan for how you want to use your key. Do you want it just for SSH? Do you want
+to login to your laptop with the key? Are you happy to install and use tools from brew over the
+default MacOS tools?</p>
+<h2 id="setup-the-smartcard">Setup the Smartcard</h2>
+<p>When you first setup the smartcard you need to configure the management key, the personal identification
+number (PIN) and the PIN unblock key (PUK). To do this we will reset the smartcard, clearing all existing
+keys from it's storage.</p>
+<blockquote>
+<p>NOTE: This is a destructive action, if you have keys already on the smartcard they can not be recovered.</p>
+</blockquote>
+<p>First reset the PIV applet. To do this you need the PIN and PUK to both be blocked.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># Repeat until the PIN is blocked
+</span><span>yubico-piv-tool -a verify-puk --puk aaaaaa
+</span><span># Repeat until the PUK is blocked
+</span><span>yubico-piv-tool -a unblock-pin -P aaaaaa -N aaaaaa
+</span></code></pre>
+<p>If done correctly you will see:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>The puk code is blocked, you will have to reinitialize the application.
+</span></code></pre>
+<p>The device can now be reset with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yubico-piv-tool -a reset
+</span></code></pre>
+<h3 id="management-key">Management Key</h3>
+<p>The <a href="https://developers.yubico.com/PIV/Introduction/Admin_access.html">management key</a> is responsible
+for authorising key generation, deletion and importing new certificates. This prevents a holder from
+changing or modifying the keys of the smartcard even if they know the PIN.</p>
+<p>You can now configure the management key. The management key should consist of only 0-9a-f and be 32
+characters in length. An example is <code>1f45846d1c47debd2274f9f48a96f196</code>.</p>
+<blockquote>
+<p>NOTE: Optionally append <code>--touch-policy=always</code> if you want to enforce the key must be touched
+for management operations.</p>
+</blockquote>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># yubico-piv-tool -a set-mgm-key --new-key-algo=AES128
+</span><span>Enter new management key:
+</span></code></pre>
+<h3 id="pin">PIN</h3>
+<p>The <a href="https://developers.yubico.com/PIV/Introduction/Admin_access.html">PIN</a> is used by the person
+(holder) of the smartcard to authenticate to the device proving their identity. The PIN is used
+to authorise signatures and decryption of data. Importantly, knowledge of the PIN allows changing
+the PIN as well.</p>
+<p>After the card is reset, the default PIN is inuse.</p>
+<blockquote>
+<p>⚠️ WARNING: Some clients (such as MacOS) will only accept numeric PINs. Yubikeys <em>will</em> work with
+alphanumeric PINs but setting one <em>may</em> break applications.</p>
+</blockquote>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yubico-piv-tool -a change-pin -P 123456
+</span><span>Enter new pin:
+</span></code></pre>
+<h3 id="puk">PUK</h3>
+<p>The <a href="https://developers.yubico.com/PIV/Introduction/Admin_access.html">PUK</a> has a single function -
+allow reseting the PIN in the case that it is lost or forgotten. By default, an incorrect
+PIN can be supplied up to 3 times before the PIN is blocked. If both the PUK and PIN are forgotten
+then the device must be reset. This makes it important that you keep the PUK secure in case this occurs.</p>
+<p>After the card is reset, the default PUK is inuse.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yubico-piv-tool -a change-puk -P 12345678
+</span><span>Enter new puk:
+</span></code></pre>
+<h3 id="chuid">CHUID</h3>
+<p>The Card Holder Unique IDentifier is used by MacOS and other applications to identify the
+user. If not set, a number of PIV elements will not work. The CHUID can be generated with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yubico-piv-tool -k -a set-chuid
+</span></code></pre>
+<h2 id="configure-smartcard-slots">Configure Smartcard Slots</h2>
+<p>Smartcards have many credential slots, but there are only 4 slots that we will concern ourselves
+with in this guide. Yubico <a href="https://docs.yubico.com/yesdk/users-manual/application-piv/slots.html">has complete documentation</a>
+their purposes.</p>
+<ul>
+<li><code>9A</code> - PIV Authentication - Authenticate the user for login to systems</li>
+<li><code>9C</code> - Digital Signature - Sign files or executables for the user</li>
+<li><code>9D</code> - Key Management - decrypt files for the user</li>
+<li><code>9E</code> - Card Authentication - Authenticate the smartcard, generally for physical system access</li>
+</ul>
+<blockquote>
+<p>IMPORTANT: Do not alter or modify the content of slot <code>F9</code> as modifications can NOT be undone
+even with a complete device reset.</p>
+</blockquote>
+<p>For the purposes of MacOS we only require slots <code>9A</code> and <code>9D</code> to be configured.</p>
+<p>Generate a key in slot <code>9A</code>. We set the pin policy and touch policy to once and cached
+respectively so that multiple authentications in quick succession do not require repetitive
+user input.</p>
+<blockquote>
+<p>NOTE: Remember to touch your key when it blinks as required!</p>
+</blockquote>
+<blockquote>
+<p>IMPORTANT: If you plan to use the default MacOS ssh agent, you MUST set the algorithm to RSA2048 for slot <code>9A</code>.</p>
+</blockquote>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>SLOT=9a
+</span><span>yubico-piv-tool -k -s ${SLOT} -a generate \
+</span><span>  --pin-policy=once --touch-policy=cached --algorithm=ECCP384 \
+</span><span>  -o /tmp/${SLOT}-pub.pem
+</span></code></pre>
+<p>Generate a key in slot <code>9D</code>.</p>
+<blockquote>
+<p>NOTE: If you aren't planning to use this key for MacOS login, then you can skip configuration
+of slot <code>9D</code>.</p>
+</blockquote>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>SLOT=9d
+</span><span>yubico-piv-tool -k -s ${SLOT} ... # as-above
+</span></code></pre>
+<p>Now you can either self-sign these certificates. ensure you perform this for all slots you generated
+keys in. You will need to enter your PIN and management key to authorise this.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>SLOT=9a
+</span><span>yubico-piv-tool -a verify-pin -a selfsign-certificate -s ${SLOT} \
+</span><span>  --valid-days=7300 -S &quot;/CN=PIV/&quot; -i /tmp/${SLOT}-pub.pem -o /tmp/${SLOT}-cert.pem
+</span><span>yubico-piv-tool -k -a import-certificate -s ${SLOT} -i /tmp/${SLOT}-cert.pem
+</span></code></pre>
+<p>Or you can generate a CSR and submit it to a CA for signing. Once signed, you can import the certificate.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>SLOT=9a
+</span><span>yubico-piv-tool -a verify-pin -a request-certificate -s ${SLOT} \
+</span><span>    -S &quot;/C=AU/ST=Queensland/L=Outback/O=Farmin/CN=Stevo/&quot; \
+</span><span>    -i /tmp/${SLOT}-pub.pem -o /tmp/${SLOT}-csr.pem
+</span><span>
+</span><span># If attestation is required, you need to also submit:
+</span><span>yubico-piv-tool -s ${SLOT} -a attest &gt; /tmp/${SLOT}.attest.pem
+</span><span>yubico-piv-tool -a read-certificate -s f9 &gt; /tmp/${SLOT}.attest.chain.pem
+</span><span>
+</span><span># The CA will sign and return the cert now.
+</span><span>
+</span><span>yubico-piv-tool -k -a import-certificate -s ${SLOT}
+</span><span>    -i /tmp/${SLOT}-cert.pem
+</span></code></pre>
+<p>If this has been performed correctly, you should see the following:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yubico-piv-tool -a status
+</span><span>Version:	5.4.3
+</span><span>Serial Number:	18412815
+</span><span>CHUID:	3019d4e739da739ced39ce739d836858210842108421c84210c3eb34101a9673b0f5c0e802eb95e82fc814353a350832303330303130313e00fe00
+</span><span>CCC:	No data available
+</span><span>Slot 9a:
+</span><span>	Algorithm:	ECCP384
+</span><span>	Subject DN:	CN=PIV
+</span><span>	Issuer DN:	CN=PIV
+</span><span>	Fingerprint:	77b330ac8969b2e073fd89ca3eb429472143d857c17320130c5eeb5c42e4ab0a
+</span><span>	Not Before:	May 16 07:49:53 2024 GMT
+</span><span>	Not After:	May 11 07:49:53 2044 GMT
+</span><span>Slot 9d:
+</span><span>	Algorithm:	ECCP384
+</span><span>	Subject DN:	CN=PIV
+</span><span>	Issuer DN:	CN=PIV
+</span><span>	Fingerprint:	63219930432f508c14f199b83e83fd1bfc2592cfb5a556e8152e416b3429b273
+</span><span>	Not Before:	May 16 07:50:04 2024 GMT
+</span><span>	Not After:	May 11 07:50:04 2044 GMT
+</span><span>PIN tries left:	3
+</span></code></pre>
+<h2 id="macos-piv-login">MacOS PIV Login</h2>
+<p>MacOS allows you to login to your machine and unlock your full disk encryption with your smartcard.
+This is why slot <code>9D</code> is required, for decrypting the filevault key. The security differences of this
+compared to standard system login are left an an exercise to the reader however, but I'd like to
+think this is a pretty excellent way to authenticate to you Mac given the PIN bruteforce limits.</p>
+<p>To allow a smartcard to authenticate a user it must be paired to the account.</p>
+<p>You can list smartcards available for pairing with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># sc_auth identities
+</span><span>SmartCard: com.apple.pivtoken:1A9673B0F5C0E802EB95E82FC814353A
+</span><span>Unpaired identities:
+</span><span>47937AF53DD028F1C338DFA6472D5AACD8D5A61E	Certificate For PIV Authentication (PIV)
+</span></code></pre>
+<p>The identity can be added for the user with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sc_auth pair -u &lt;local user name&gt; -h &lt;card hash&gt;
+</span><span>sc_auth pair -u firstyear -h 47937AF53DD028F1C338DFA6472D5AACD8D5A61E
+</span></code></pre>
+<p>Inversely this can be undone with</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sc_auth unpair -u &lt;local user name&gt; -h &lt;card hash&gt;
+</span></code></pre>
+<p>Alternately a pairing UI is available. You can enable it with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sc_auth pairing_ui -s enable
+</span></code></pre>
+<p>By removing and reinserting your key, it will prompt you to enroll the smartcard.</p>
+<p>You can (and should) have at least 2 smartcards paired to your account such that one can act as
+a backup.</p>
+<h2 id="requiring-smartcard-on-macos">Requiring Smartcard on MacOS</h2>
+<blockquote>
+<p>⚠️  WARNING: Requiring smartcard authentication on your device MAY cause your account to be locked
+out and your data to become inaccessible. YOU MUST be aware of this before proceeding. DO NOT
+enable this lightly!</p>
+</blockquote>
+<p>To require a user can only authenticate with a smartcard you should review the <a href="https://support.apple.com/en-gb/guide/deployment/depfce8de48b/1/web/1.0">apple documentation</a>.
+Older <a href="https://support.apple.com/en-us/101438">documentation</a> is also available.</p>
+<p>It is important to note for Apple Silicon Macs that when a machine is shutdown, the <em>last</em> smartcard
+that was used for the user is the only smartcard that can unlock the disk. This means if you have
+two yubikeys/smartcards and you reboot, only the card that was last used can unlock the disk.</p>
+<p>It may be more prudent on personal machines to set the user password to a long random password
+which can act as a recovery key rather than enabling smartcard only authentication. If you choose
+this, ensure you disable touch id for unlocking the machine.</p>
+<h2 id="ssh-keys">SSH Keys</h2>
+<p>The key in slot <code>9A</code> can be used for SSH. This is achieved with <code>/usr/lib/ssh-keychain.dylib</code> as
+a pkcs11 module, or the yubico pkcs11 module from <code>/usr/local/lib/libykcs11.dylib</code>. The primary
+difference between these two is that ssh agent forwarding <em>only</em> works with <code>/usr/lib/ssh-keychain.dylib</code>.</p>
+<p>We want to note that generally ssh agent forwarding should be avoided due to potential security issues.
+Only perform ssh agent forwarding to machines you have high levels of trust in.</p>
+<h3 id="configure-usr-local-lib-libykcs11-dylib">Configure <code>/usr/local/lib/libykcs11.dylib</code></h3>
+<p>You will need to install and use ssh from brew. This is because <code>libykcs11.dylib</code> is not a system
+library, so it is not able to be loaded in the default MacOS ssh install as part of system integrity protection.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>brew install openssh
+</span></code></pre>
+<p>In <code>~/.ssh/config</code> set the value:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>PKCS11Provider /usr/local/lib/libykcs11.dylib
+</span><span>IdentitiesOnly yes
+</span><span>IdentityFile ~/.ssh/id_ecdsa_piv.pub
+</span></code></pre>
+<p>Now list the keys on your device with <code>ssh-keygen -D /usr/local/lib/libykcs11.dylib</code>: One value should end
+with the text <code>Public key for PIV Authentication</code>. This is the line you should copy into <code>~/.ssh/id_ecdsa_piv.pub</code>.</p>
+<p>You can repeat the <code>IdentityFile</code> line and have multiple smartcards available.</p>
+<blockquote>
+<p>Why do we need <code>IdentitiesOnly yes</code>?</p>
+</blockquote>
+<p>Because <code>libykcs11.dylib</code> shows all keys and certificates on the smartcard, if we don't limit
+to <code>IdentitiesOnly</code> which we define in our <code>IdentityFile</code> declarations, then the smartcard can
+send 4 keys to a remote host at once. If you have multiple cards attached you can send many more
+keys. Some hosts will reject authentication from clients that send more than 5 possible certifictes
+at once, which can cause authentication failures.</p>
+<h3 id="configure-ssh-keychain-dylib">Configure <code>ssh-keychain.dylib</code></h3>
+<p>In <code>~/.ssh/config</code> set the value:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>PKCS11Provider /usr/lib/ssh-keychain.dylib
+</span><span>IdentitiesOnly yes
+</span><span>IdentityFile ~/.ssh/id_rsa_piv.pub
+</span></code></pre>
+<p><code>ssh-keychain.dylib</code> only works with keys in slot <code>9A</code>, so you can create the .pub file with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -D /usr/lib/ssh-keychain.dylib &gt; ~/.ssh/id_rsa_piv.pub
+</span></code></pre>
+<p>To use ssh-agent now, you will need an ask pass application. We recommend the
+<a href="https://github.com/theseal/ssh-askpass">askpass script by theseal</a> which can be
+installed with brew.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>brew install theseal/ssh-askpass/ssh-askpass
+</span></code></pre>
+<p>Now clear the agent first with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-add -e /usr/lib/ssh-keychain.dylib
+</span></code></pre>
+<p>Then add our smartcard to the agent</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-add -cs /usr/lib/ssh-keychain.dylib
+</span></code></pre>
+<p>You should now be prompted for your PIN. After this, the ssh-agent should work as expected, and
+can be used for agent forwarding if you desire.</p>
+<blockquote>
+<p>Again, be warned that ssh agent forwarding should only be performed to hosts you absolutely trust.</p>
+</blockquote>
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>Thanks to Micolous for working with me on this guide</p>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>

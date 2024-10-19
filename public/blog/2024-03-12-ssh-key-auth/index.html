@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>Firstyear&#x27;s blog-a-log</title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>SSH Key Authentication Basics</h1>
+        <div class="border"></div>
+        <time datetime="2024-03-12" class="date" itemprop="datePublished">
+            12 Mar 2024
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <h1 id="ssh-key-authentication-basics">SSH Key Authentication Basics</h1>
+<p>SSH (Secure Shell) allows remotely accessing the command line interface (cli) of a remote machine.
+This is very useful for administration of a machine that may be in a completely different country
+or building.</p>
+<p>Because of this SSH is a very attractive target for attackers.</p>
+<h2 id="defaults">Defaults</h2>
+<p>The default is to login with a username and password.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌───────┐                         ┌───────┐
+</span><span>│       │                         │       │
+</span><span>│       │───────Username─────────▶│       │
+</span><span>│       │                         │       │
+</span><span>│  SSH  │◀────Request Password────│  SSH  │
+</span><span>│Client │                         │Server │
+</span><span>│       │───────Password─────────▶│       │
+</span><span>│       │                         │       │
+</span><span>│       │◀────────Success!────────│       │
+</span><span>│       │                         │       │
+</span><span>└───────┘                         └───────┘
+</span></code></pre>
+<p>The problem with this model is that passwords can be bruteforced (weak passwords), they can be
+reused and then leaked in password breaches (credential stuffing). Generally SSH with only passwords
+is not a great idea.</p>
+<h2 id="asymmetric-key-cryptography">Asymmetric Key Cryptography</h2>
+<p>The basis of SSH keys lies in asymmetric key cryptography. This is where you have a private key and
+a public key.</p>
+<p>Given a piece of data, the private key can create a signature. The signature can be verified by
+the public key and the original data. However the public key can not create it's own signature.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌─────────┐                                        ┌──────────┐
+</span><span>│         │                                        │          │
+</span><span>│         │               ┌─────────┐              │          │
+</span><span>│ Private │     Signs     │         │              │  Public  │
+</span><span>│   Key   │───────┬─────▶ │Signature│              │   Key    │
+</span><span>│         │       │       │         │              │          │
+</span><span>│         │       │       └─────────┘              │          │
+</span><span>└─────────┘       │                                └──────────┘
+</span><span>                  │                                            
+</span><span>              ┌────────┐                                       
+</span><span>              │        │                                       
+</span><span>              │  Data  │                                       
+</span><span>              │        │                                       
+</span><span>              └────────┘                                       
+</span><span>                                                               
+</span><span>                                                               
+</span><span>┌─────────┐                                        ┌──────────┐
+</span><span>│         │                                        │          │
+</span><span>│         │               ┌─────────┐              │          │
+</span><span>│ Private │               │         │    Verifies  │  Public  │
+</span><span>│   Key   │               │Signature│───────┬─────▶│   Key    │
+</span><span>│         │               │         │       │      │          │
+</span><span>│         │               └─────────┘       │      │          │
+</span><span>└─────────┘                                 │      └──────────┘
+</span><span>                                            │                  
+</span><span>                                       ┌────────┐              
+</span><span>                                       │        │              
+</span><span>                                       │  Data  │              
+</span><span>                                       │        │              
+</span><span>                                       └────────┘              
+</span><span>                                                               
+</span><span>                                                               
+</span><span>                                                               
+</span><span>┌─────────┐                                        ┌──────────┐
+</span><span>│         │                                        │          │
+</span><span>│         │               ┌─────────┐              │          │
+</span><span>│ Private │               │         │    Error!    │  Public  │
+</span><span>│   Key   │               │Signature│ X ◀───┬──────│   Key    │
+</span><span>│         │               │         │       │      │          │
+</span><span>│         │               └─────────┘       │      │          │
+</span><span>└─────────┘                                 │      └──────────┘
+</span><span>                                            │                  
+</span><span>                                       ┌────────┐              
+</span><span>                                       │        │              
+</span><span>                                       │  Data  │              
+</span><span>                                       │        │              
+</span><span>                                       └────────┘              
+</span></code></pre>
+<p>These signatures are design to be mathematically infeasible to bruteforce or forge, meaning that
+they are very strong compared to passwords.</p>
+<h2 id="ssh-key-pairs">SSH Key Pairs</h2>
+<p>Using this knowledge we can now see how an SSH key works. The user (client) who wishes to authenticate
+to a server holds the private key, and the SSH server has the public key to verify the key is legitimate.</p>
+<p>In reverse, the server with the public key can't use that to authenticate since it is only able
+to verify signatures - not create them.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌───────┐                         ┌───────┐
+</span><span>│       │                         │       │
+</span><span>│       │───────Username─────────▶│       │
+</span><span>│       │                         │       │
+</span><span>│       │◀────────Challenge───────│       │
+</span><span>│       │                         │       │
+</span><span>│       │────┐                    │       │
+</span><span>│       │ Private                 │       │
+</span><span>│       │Key Signs                │       │
+</span><span>│  SSH  │◀───┘                    │  SSH  │
+</span><span>│Client │                         │Server │
+</span><span>│       │──────Signature─────────▶│       │
+</span><span>│       │                         │       │
+</span><span>│       │                   ┌─────│       │
+</span><span>│       │              Public Key │       │
+</span><span>│       │               Verifies  │       │
+</span><span>│       │                   └────▶│       │
+</span><span>│       │◀────────Success!────────│       │
+</span><span>│       │                         │       │
+</span><span>└───────┘                         └───────┘
+</span></code></pre>
+<h2 id="practical-setup-guide-linux-macos">Practical Setup Guide (Linux, MacOS)</h2>
+<blockquote>
+<p>These commands should all be performed as your regular user account, unless otherwise stated.</p>
+</blockquote>
+<h3 id="creating-the-ssh-key-pair">Creating the SSH Key Pair</h3>
+<p>On your SSH client (your destkop, laptop etc). Create a new ssh key pair in the default location
+(<code>/home/$USER/.ssh/id_ecdsa</code>). You will be prompted
+for a passphrase. This is a passphrase to encrypt the private key when not in use.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -t ecdsa
+</span></code></pre>
+<blockquote>
+<p>⚠️  <code>/home/$USER/.ssh/id_ecdsa</code> is the private key. Never reveal this to anyone!</p>
+</blockquote>
+<h3 id="add-the-public-key-to-the-server-ssh-copy-id">Add the Public Key to the Server (ssh-copy-id)</h3>
+<p>From the client you can automatically add the public key to the server. You will need to enter
+your username and password for this operation.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-copy-id -f -i /home/$USER/.ssh/id_ecdsa.pub username@server-hostname
+</span></code></pre>
+<h3 id="add-the-public-key-to-the-server-manual">Add the Public Key to the Server (manual)</h3>
+<p>On the ssh client, view the public key. You may wish to copy-paste this files content.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cat /home/$USER/.ssh/id_ecdsa.pub
+</span></code></pre>
+<p>ssh to the server and run the following on the server.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cd ~
+</span><span>mkdir .ssh
+</span><span>touch .ssh/authorized_keys
+</span><span>chmod 600 .ssh/authorized_keys
+</span><span>$EDITOR .ssh/authorized_keys
+</span></code></pre>
+<p>In the editor, paste your ssh public key (one per line) and then save and quit.</p>
+<h3 id="ssh-to-the-server">SSH to the server</h3>
+<p>Now type <code>ssh username@hostname</code> and you will use your key to authenticate!</p>
+<h2 id="hardening-the-server">Hardening the Server</h2>
+<p>Now that you have ssh key authentication configured you can harden your ssh server to only
+allow authentication with ssh keys.</p>
+<p>As root (<code>sudo -s</code>) add the following content to <code>/etc/ssh/sshd_config.d/hardening.conf</code></p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>UsePAM yes
+</span><span>PermitRootLogin no
+</span><span>PermitEmptyPasswords no
+</span><span>PasswordAuthentication no
+</span><span>AllowAgentForwarding no
+</span></code></pre>
+<p>Then restart sshd</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>systemctl restart sshd
+</span></code></pre>
+<p>Before logging out of root, ensure you can ssh to the server with key only. Try logging in with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh -o PreferredAuthentications=password username@hostname
+</span></code></pre>
+<p>to ensure that password authentication is rejected correctly.</p>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>

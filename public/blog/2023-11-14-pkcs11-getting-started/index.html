@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>Firstyear&#x27;s blog-a-log</title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>Getting Started with PKCS11</h1>
+        <div class="border"></div>
+        <time datetime="2023-11-14" class="date" itemprop="datePublished">
+            14 Nov 2023
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <h1 id="getting-started-with-pkcs11">Getting Started with PKCS11</h1>
+<p>PKCS11 is one of those horrible mystery technologies, that just seems to have no good starting place
+or reference on how to make it work. But it's also a technology that you see commonly around for
+hardware security modules (HSM), trusted platform modules (TPM) and other high impact cryptographic environments. This makes it
+an annoying chasm to cross for developers and administrators alike who want to configure these
+important tools for key security.</p>
+<p>So I decided to spend some time to learn about how this all works - scouring a variety of sources
+I hope to put together something that can help make it easier in future for others.</p>
+<h2 id="concepts">Concepts</h2>
+<p>PKCS11 is a specification defined by OASIS. The <a href="https://docs.oasis-open.org/pkcs11/pkcs11-spec/v3.1/cs01/pkcs11-spec-v3.1-cs01.html">specification</a>
+isn't very informative for a new user.</p>
+<p>What PKCS11 defines is an <em>abstraction</em> between an application and a security module. This allows
+the security module to be swapped with an alternative and the application requires no changes.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌─────────────────┐
+</span><span>│                 │
+</span><span>│   Application   │
+</span><span>│                 │
+</span><span>└─────────────────┘
+</span><span>         │         
+</span><span>         ▼         
+</span><span>┌─────────────────┐
+</span><span>│  PKCS11 Aware   │
+</span><span>│  Cryptographic  │
+</span><span>│     Library     │
+</span><span>└─────────────────┘
+</span><span>         │         
+</span><span>   Cryptoki API    
+</span><span>         │         
+</span><span>         ▼         
+</span><span>┌─────────────────┐
+</span><span>│                 │
+</span><span>│  PKCS11 Module  │
+</span><span>│                 │
+</span><span>└─────────────────┘
+</span><span>         │         
+</span><span>         ▼         
+</span><span>┌─────────────────┐
+</span><span>│                 │
+</span><span>│       HSM       │
+</span><span>│                 │
+</span><span>└─────────────────┘
+</span></code></pre>
+<p>Commonly PKCS11 modules will provide an abstraction for an HSM or a TPM, but there are also software
+HSM that are useful for testing. This also means that if you have a vendor who provides you a HSM they
+will commonly also provide you a PKCS11 module to allow your application to communicate with it.</p>
+<p>The PKCS11 module itself is just a dynamic library (so, dll, or dylib) which implements and exposes
+the Cryptoki C API. This is how an application can dynamically load the module and use it with no
+changes.</p>
+<p>Since this is an abstraction it also means that the cryptographic material stored in our HSM has
+a standard layout and structure that applications can expect.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>                                                     ┌─────────────────┐
+</span><span>                                                   ┌─┴───────────────┐ │
+</span><span>                           ┌─────────────────┐    ┌┴────────────────┐│ │
+</span><span>                           │                 │    │                 ││ │
+</span><span>                      ┌───▶│  Token / Slot   │───▶│     Object      │├─┘
+</span><span>                      │    │                 │    │                 ├┘
+</span><span>┌─────────────────┐   │    └─────────────────┘    └─────────────────┘
+</span><span>│                 │   │
+</span><span>│  PKCS11 Module  │───┤                              ┌─────────────────┐
+</span><span>│                 │   │                            ┌─┴───────────────┐ │
+</span><span>└─────────────────┘   │    ┌─────────────────┐    ┌┴────────────────┐│ │
+</span><span>                      │    │                 │    │                 ││ │
+</span><span>                      └───▶│  Token / Slot   ├───▶│     Object      │├─┘
+</span><span>                           │                 │    │                 ├
+</span><span>                           └─────────────────┘    └─────────────────┘
+</span></code></pre>
+<p>Each module has a number of tokens (also called slots). Then for each token, these have many
+objects associated which can be private keys, public keys, x509 certificates and more.</p>
+<p>Authentication is performed from the application to the token. There are two authentication values:
+the security officer PIN, and the user PIN. Generally this allows separation between the ability
+to write/destroy objects, and the ability to use them in an application.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>The easiest way to "test" this is with a virtual machine configured with a softtpm. You can add this
+in libvirt with the xml:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&lt;domain type=&#39;kvm&#39;&gt;
+</span><span>  &lt;devices&gt;
+</span><span>    &lt;tpm model=&#39;tpm-crb&#39;&gt;
+</span><span>      &lt;backend type=&#39;emulator&#39; version=&#39;2.0&#39;/&gt;
+</span><span>    &lt;/tpm&gt;
+</span><span>  &lt;/devices&gt;
+</span><span>&lt;/domain&gt;
+</span></code></pre>
+<p>If using virt-manager you can add a tpm under the add hardware menu. Ensure you set this to CRB (command
+request buffer) and version 2.0.</p>
+<p>If you are using OpenSUSE you will need the following packages:</p>
+<ul>
+<li>tpm2-pkcs11 - the module exposing TPMs via the cryptoki api</li>
+<li>opensc - a library for interacting with and administering pkcs11 modules</li>
+<li>openssl-3 - generic cryptographic library</li>
+<li>pkcs11-provider - a pkcs11 provider for openssl-3 allowing it to use our pkcs11 modules</li>
+</ul>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper install openssl-3 pkcs11-provider tpm2-pkcs11 opensc
+</span></code></pre>
+<p>This certainly isn't an exhaustive or limited list - there are plenty of other tools that can
+interact with pkcs11, for example p11-kit.</p>
+<h2 id="setting-up-our-device">Setting Up Our Device</h2>
+<p>pkcs11 modules are generally installed into <code>/usr/lib64/pkcs11</code>. opensc does not have a way to list
+the module that are available. (p11-kit does with <code>p11-kit list-modules</code>)</p>
+<p>For our example we're going to use the tpm pkcs11 provider at <code>/usr/lib64/pkcs11/libtpm2_pkcs11.so</code></p>
+<p>We can show info about the module with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --show-info
+</span></code></pre>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Cryptoki version 2.40
+</span><span>Manufacturer     tpm2-software.github.io
+</span><span>Library          TPM2.0 Cryptoki (ver 1.9)
+</span><span>Using slot 0 with a present token (0x1)
+</span></code></pre>
+<p>We can now list all the slots with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --list-slots
+</span></code></pre>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Available slots:
+</span><span>Slot 0 (0x1):
+</span><span>  token state:   uninitialized
+</span></code></pre>
+<p>We can see that we have a single slot and it's not initialised yet. So lets initialise it. You'll
+notice that we use "--slot 1" even though the output above says "Slot 0". This is because we are
+using the slot id in hex. Off by one errors are everywhere :)</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --init-token --slot 1 --label dev
+</span></code></pre>
+<p>You should be prompted to setup the security office (SO) PIN. At this point we can list our
+slots again and see:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Available slots:
+</span><span>Slot 0 (0x1): dev
+</span><span>  token label        : dev
+</span><span>  token manufacturer : IBM
+</span><span>  token model        : SW   TPM
+</span><span>  token flags        : login required, rng, token initialized, PIN initialized
+</span><span>  hardware version   : 1.62
+</span><span>  firmware version   : 25.35
+</span><span>  serial num         : 0000000000000000
+</span><span>  pin min/max        : 0/128
+</span><span>Slot 1 (0x2):
+</span><span>  token state:   uninitialized
+</span></code></pre>
+<p>The number of slots will keep growing as we add more slots.</p>
+<blockquote>
+<p>TIP: <code>libtpm2_pkcs11</code> is actually storing it's keys in an sqlite database on your system and
+dynamically loading and unloading them from the TPM as required. These keys are stored sealed
+with a TPM internal key so that only this TPM can use the keys. This means you don't have to
+worry about running out of space on your TPM.</p>
+</blockquote>
+<p>We can now also setup our user pin, using the SO to trigger the PIN change.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --slot 1 --login --login-type so --init-pin
+</span></code></pre>
+<h2 id="managing-objects">Managing Objects</h2>
+<p>We can show the objects in our slot with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --login --slot 1 --list-objects
+</span></code></pre>
+<p>Initially this output should be empty - we haven't made anything yet!</p>
+<p>We can create a new ECDSA key. This key will have a label and an ID associated so that we can
+reference the key uniquely.</p>
+<blockquote>
+<p>NOTE: If you don't set --id here, then some pkcs11 providers will fail to use your key. Ensure
+you set both a label and an ID!</p>
+</blockquote>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --login --slot 1 --keypairgen \
+</span><span>    --key-type EC:prime256v1 --label &quot;my_key&quot; --usage-sign --id 01
+</span></code></pre>
+<p>Now we can see our objects with <code>list-objects</code></p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Public Key Object; EC  EC_POINT 256 bits
+</span><span>  EC_POINT:   04410430bb3c90d2caae1a848e99e3cfb265bfcc969274d478a57050fff94749cc04c23e84aa11a86b500d0c888da331c20abecf8cc1b4ed15ef5535561f0678cc580f
+</span><span>  EC_PARAMS:  06082a8648ce3d030107
+</span><span>  label:      my_key
+</span><span>  ID:         01
+</span><span>  Usage:      encrypt, verify
+</span><span>  Access:     local
+</span><span>Private Key Object; EC
+</span><span>  label:      my_key
+</span><span>  ID:         01
+</span><span>  Usage:      decrypt, sign
+</span><span>  Access:     sensitive, always sensitive, never extractable, local
+</span><span>  Allowed mechanisms: ECDSA,ECDSA-SHA1,ECDSA-SHA256,ECDSA-SHA384,ECDSA-SHA512
+</span></code></pre>
+<p>We have two objects - An ECDSA public key, and the ECDSA private key. We can also see what the key
+can be used for and allowed algorithms. Finally we have some attributes that defined properties
+of the key.</p>
+<ul>
+<li>local - the content of the key was generated inside a HSM</li>
+<li>sensitive - means that the content of the key can not be disclosed in plaintext</li>
+<li>always sensitive - the key has never been disclosed outside of a HSM</li>
+<li>extractable - the key can be extracted from this device in an encrypted manner</li>
+<li>never extractable - the key has never been extracted from this device</li>
+</ul>
+<p>These properties allow us to see useful things:</p>
+<ul>
+<li>A local, always sensitive and never extractable key shows us that this key was generated and used only in this HSM</li>
+<li>A sensitive only key that is extractable may have been shared between other HSMs with a wrapping key</li>
+<li>A sensitive key that does NOT have the always sensitive and local properties was likely imported from an external source</li>
+</ul>
+<p>If we wanted now we could delete these objects:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --login --slot 1 --delete-object \
+</span><span>    --label my_key --type privkey
+</span><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --login --slot 1 --delete-object \
+</span><span>    --label my_key --type pubkey
+</span></code></pre>
+<p>Notice we have to do this twice? Once for the public key, once for the private key.</p>
+<h2 id="using-our-keys-with-openssl">Using Our Keys with OpenSSL</h2>
+<p>At this point we may wish to use our key with openssl, perhaps we want to request a certificate to
+be signed or some other operation.</p>
+<p>First we need to configure openssl to understand where our pkcs11 modules are:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># provider.conf
+</span><span>openssl_conf = openssl_init
+</span><span>
+</span><span>[openssl_init]
+</span><span>providers = provider_sect
+</span><span>
+</span><span>[provider_sect]
+</span><span>default = default_sect
+</span><span>pkcs11 = pkcs11_sect
+</span><span>
+</span><span>[default_sect]
+</span><span>activate = 1
+</span><span>
+</span><span>[pkcs11_sect]
+</span><span>module = /usr/lib64/ossl-modules/pkcs11.so
+</span><span>pkcs11-module-path = /usr/lib64/pkcs11/libtpm2_pkcs11.so
+</span><span>activate = 1
+</span></code></pre>
+<p>We can check this worked with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>OPENSSL_CONF=provider.conf openssl list -providers -provider pkcs11
+</span></code></pre>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Providers:
+</span><span>  default
+</span><span>    name: OpenSSL Default Provider
+</span><span>    version: 3.1.4
+</span><span>    status: active
+</span><span>  pkcs11
+</span><span>    name: PKCS#11 Provider
+</span><span>    version: 3.1.3
+</span><span>    status: active
+</span></code></pre>
+<p>We can now show details about our key with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>OPENSSL_CONF=provider.conf openssl pkey -provider pkcs11 -noout -text \
+</span><span>    -in &quot;pkcs11:token=dev;label=my_key&quot;
+</span></code></pre>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>PKCS11 EC Private Key (256 bits)
+</span><span>[Can&#39;t export and print private key data]
+</span><span>URI pkcs11:model=SW%20%20%20TPM;manufacturer=IBM;serial=0000000000000000;token=dev;id=%01;object=my_key;type=private
+</span></code></pre>
+<p>You'll notice a new concept here - pkcs11 supports URI's to reference specific objects. This allows you
+to have many providers, with many slots and objects, and still uniquely interact with specific objects.</p>
+<p>As you can see from our URI of <code>pkcs11:token=dev;label=my_key</code> we are referencing our key by
+its token name <code>dev</code> and the <code>label</code> we gave it earlier during key creation. The openssl display
+shows a number of other possible elements in the URI that we could use. For a full list
+see <a href="https://www.rfc-editor.org/rfc/rfc7512#section-2.3">rfc7512 section 2.3</a>.</p>
+<p>At this point openssl can see our key and so now we can make a CSR.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>OPENSSL_CONF=provider.conf openssl req -provider pkcs11 \
+</span><span>    -new -days 1 -subj &#39;/CN=my_key/&#39; -out csr.pem
+</span><span>    -key &quot;pkcs11:token=dev;label=my_key&quot;
+</span></code></pre>
+<p>Once this is signed we can load this into our pkcs11 module:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pkcs11-tool --module  /usr/lib64/pkcs11/libtpm2_pkcs11.so --write-object cert.pem \
+</span><span>    --label &quot;my_key&quot; --id 01 --type cert --login --login-type so
+</span></code></pre>
+<p>Notice we use the same label and id as the key and public key? This way the URI only needs to change
+to specify the type of the object to find the correct associated key and public key.</p>
+<p>Now when we list our objects we can see:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Public Key Object; EC  EC_POINT 256 bits
+</span><span>  EC_POINT:   04410430bb3c90d2caae1a848e99e3cfb265bfcc969274d478a57050fff94749cc04c23e84aa11a86b500d0c888da331c20abecf8cc1b4ed15ef5535561f0678cc580f
+</span><span>  EC_PARAMS:  06082a8648ce3d030107
+</span><span>  label:      my_key
+</span><span>  ID:         01
+</span><span>  Usage:      encrypt, verify
+</span><span>  Access:     local
+</span><span>Private Key Object; EC
+</span><span>  label:      my_key
+</span><span>  ID:         01
+</span><span>  Usage:      decrypt, sign
+</span><span>  Access:     sensitive, always sensitive, never extractable, local
+</span><span>  Allowed mechanisms: ECDSA,ECDSA-SHA1,ECDSA-SHA256,ECDSA-SHA384,ECDSA-SHA512
+</span><span>Certificate Object; type = X.509 cert
+</span><span>  label:      my_key
+</span><span>  subject:    DN: CN=my_key
+</span><span>  serial:     57812D09A3503723F038BA407CD7D2E965289FC1
+</span><span>  ID:         01
+</span></code></pre>
+<h2 id="application-integration">Application Integration</h2>
+<p>Once we have our key and certificate in the TPM, most applications that use openssl require very
+little modification.</p>
+<ul>
+<li>Ensure that we have the <code>OPENSSL_CONF=</code> with the pkcs11 provider in the environment of the application</li>
+<li>Change the private key file to a pkcs11 url</li>
+</ul>
+<p>Over time I'll add more examples here as I work on them.</p>
+<h2 id="using-a-wrap-key-to-move-objects">Using a Wrap Key to Move Objects</h2>
+<p>TBD</p>
+<h2 id="debugging">DEBUGGING</h2>
+<p>As with anything, these tools can break and we need to be able to debug them.</p>
+<ul>
+<li><code>TPM2_PKCS11_LOG_LEVEL=1</code> - set the log level of the <code>tpm2_pkcs11</code> module. Values are 0, 1, 2</li>
+<li><code>PKCS11_PROVIDER_DEBUG=file:/dev/stderr,level:1</code> - set the log level of the openssl pkcs11 provider. Values are 0, 1, 2</li>
+</ul>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>Firstyear&#x27;s blog-a-log</title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>Reproducible Builds</h1>
+        <div class="border"></div>
+        <time datetime="2024-05-24" class="date" itemprop="datePublished">
+            24 May 2024
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <p>As the maintainer of Rust in openSUSE I am often asked to support build reproducibility in our
+supply chain. I've spent countless hours researching the problem, and discussing it with security
+experts to understand details.</p>
+<p>Thanks to <a href="../2024-04-10-xz/">the XZ incident</a> this topic has once again come up, since after any
+security incident people always use the attention to further their own agendas. As a result, I'd
+like to write my very not scientific thoughts about reproducible builds.</p>
+<h2 id="before-we-begin">Before We Begin</h2>
+<p>Let's perform a small exercise. The next line describes my summary of reproducible builds.</p>
+<blockquote>
+<p>Reproducible builds have no impact on the security of a supply chain, and come at a significant
+cost in time, energy and resources.</p>
+</blockquote>
+<p>Now stop. What's that feeling in your body? What emotions are you experiencing right now?</p>
+<p>If you agree with the above you might be feeling vindicated or positive toward me, the author.</p>
+<p>If this is your first time hearing about reproducible builds maybe you're feeling curious to read
+more and see what I write next.</p>
+<p>However if you're highly invested in the topic, you likely feel anger or frustration. "How could
+this person be so stupid! Why can't they see how good and correct this is!".</p>
+<p>The strength of that reaction is proportional to your own emotional investment in the topic.
+I know this, because it happens to me just as much as anyone. Being a white man myself, something
+that we often don't talk about in our society is that many of us have been conditioned to believe our
+<em>emotional</em> decisions and thoughts are <em>logical</em> ones. This is probably tied with those feelings
+you're experiencing right now.</p>
+<p>It's likely that some of our dear readers will have strong emotional connections to the topic we
+are about to discuss. This emotional investment clouds and blocks scientific and logical discussion
+of the situation. We need to put that to the side and focus on evidence, not our feelings.</p>
+<h2 id="scientific-method">Scientific Method</h2>
+<blockquote>
+<p>"Science is a rigorous, systematic endeavor that builds and organizes knowledge in the form of testable explanations and predictions about the world."</p>
+</blockquote>
+<p>If we are going to have a <a href="https://en.wikipedia.org/wiki/Science">scientific</a> discussion about
+reproducible builds, we need to define our predictions (hypothesis) but importantly we must also
+define the <a href="https://en.wikipedia.org/wiki/Null_hypothesis">null hypothesis</a>.</p>
+<p>Which would mean that our hypothesis is:</p>
+<ul>
+<li>Reproducible builds would have impacted or prevented historical and current threats against supply chains.</li>
+</ul>
+<p>For the remainder of this blog we will consider that the null hypothesis is:</p>
+<ul>
+<li>Reproducible builds would not prevent historical or current threats against supply chains.</li>
+</ul>
+<h2 id="what-is-a-software-supply-chain">What is a Software Supply Chain?</h2>
+<p>A software supply chain is everything in between a developer typing out code on their machine to
+that application running on a consumer machine. There are a huge number of steps, and they vary from
+project to project. For the sake of this discussion, I'll describe the supply chain of a hypothetical
+application that is being submitted to openSUSE.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span> ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+</span><span>   ┌───────────────────┐                                  
+</span><span> │ │     Developer     │       Developer Workstation     │
+</span><span>   └───────────────────┘                                  
+</span><span> │           │                                           │
+</span><span>        Writes Code                                       
+</span><span> │           │                                           │
+</span><span>             ▼                                            
+</span><span> │ ┌───────────────────┐                                 │
+</span><span>   │    Workstation    │                                  
+</span><span> │ └───────────────────┘                                 │
+</span><span>             │                                            
+</span><span> │       Submits                                         │
+</span><span>┌ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
+</span><span>             ▼                                           │
+</span><span>│  ┌───────────────────┐                                  
+</span><span>   │   Pull Request    │       Code Repository           │
+</span><span>│  └───────────────────┘                                  
+</span><span>             │                                           │
+</span><span>│         Merge                                           
+</span><span>             │                                           │
+</span><span>│            ▼                                            
+</span><span>   ┌───────────────────┐                                 │
+</span><span>│  │     Git Main      │───Build and Test────┐            
+</span><span>   └───────────────────┘                     ▼           │
+</span><span>│            │                     ┌───────────────────┐  
+</span><span>         Publish                   │       CI/CD       │ │
+</span><span>│            │                     └───────────────────┘  
+</span><span>             ▼                                           │
+</span><span>│  ┌───────────────────┐                                  
+</span><span>   │ Release Artefacts │                                 │
+</span><span>│  └───────────────────┘                                  
+</span><span>             │                                           │
+</span><span>├ ─ ─ ─ ─Submits─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
+</span><span>             │                                           │
+</span><span>│            ▼                                            
+</span><span>   ┌───────────────────┐        Build Service            │
+</span><span>│  │Open Build Service │                                  
+</span><span>   └───────────────────┘                                 │
+</span><span>│            │                                            
+</span><span> ┌ ─ ─Begins Building─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─             │
+</span><span>│            │                              │             
+</span><span> │           ▼               Offline                     │
+</span><span>│  ┌───────────────────┐     Build Host     │             
+</span><span> │ │ Signature Checked │                                 │
+</span><span>│  └───────────────────┘                    │             
+</span><span> │           │                                           │
+</span><span>│        Unpacks                            │             
+</span><span> │           │                                           │
+</span><span>│            ▼                              │             
+</span><span> │ ┌───────────────────┐                                 │
+</span><span>│  │ Build Application │                    │             
+</span><span> │ └───────────────────┘                                 │
+</span><span>│            │                              │             
+</span><span> │       Packages                                        │
+</span><span>│            │                              │             
+</span><span> │           ▼                                           │
+</span><span>│  ┌───────────────────┐                    │             
+</span><span> │ │        RPM        │                                 │
+</span><span>│  └───────────────────┘                    │             
+</span><span> │           │                                           │
+</span><span>│         Signs                             │             
+</span><span> │           │                                           │
+</span><span>│            ▼                              │             
+</span><span> │ ┌───────────────────┐                                 │
+</span><span>│  │  Signed Package   │                    │             
+</span><span> │ └───────────────────┘                                 │
+</span><span>│            │                              │             
+</span><span> ┼ ─ ─ ─Distributes─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤
+</span><span>             │                                            
+</span><span> │           ▼                    Package Mirrors        │
+</span><span>   ┌───────────────────┐                                  
+</span><span> │ │      Mirrors      │                                 │
+</span><span>   └───────────────────┘                                  
+</span><span> │           │                                           │
+</span><span>┌ ─ ─ ─ ─Provides ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
+</span><span>             │                                           │
+</span><span>│            ▼                    Consumer Workstation    
+</span><span>   ┌───────────────────┐                                 │
+</span><span>│  │Downloaded Package │                                  
+</span><span>   └───────────────────┘                                 │
+</span><span>│        Verifies                                         
+</span><span>        Signature                                        │
+</span><span>│            │                                            
+</span><span>             ▼                                           │
+</span><span>│  ┌───────────────────┐                                  
+</span><span>   │ Verified Package  │                                 │
+</span><span>│  └───────────────────┘                                  
+</span><span>             │                                           │
+</span><span>│        Installs                                         
+</span><span>             │                                           │
+</span><span>│            ▼                                            
+</span><span>   ┌───────────────────┐                                 │
+</span><span>│  │ Application Runs  │                                  
+</span><span>   └───────────────────┘                                 │
+</span><span>└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
+</span></code></pre>
+<p>Phew, that's a lot of steps to get from some code to a users machine! This is not even a complete
+or exhaustive diagram either, I'm sure there are more steps I've missed or could add.</p>
+<h2 id="the-attacker-s-view">The Attacker's View</h2>
+<p>Before we can discuss potential security improvements, we always need to discuss our attackers
+and their motivations.</p>
+<p>When we are discussing something like supply chain security, the goal of an attacker is to have
+attacker controlled code running in the context of the consumers workstation. This could be for
+something as base as buttcoin mining, it could be to distribute malware, or it could be targetted to
+exfiltrate documents or access privileged government or corporate systems.</p>
+<p>So what are some ways that an attacker could achieve this in our supply chain we demonstrated above?
+Each step on our diagram is a potential area to be attacked and compromised, and each of these has
+different methods and approaches.</p>
+<p>I would hope that you can alredy see that there is a very large surface area here to defend, and that
+surface area has a lot of variation and complexity over it. Just from the top of my head, here are
+some potential attacks:</p>
+<ul>
+<li>Accidental or intentional addition of bugs into a code base causing code execution vulnerabilities.</li>
+<li>Malware on the developers workstation to allow injecting attacker code.</li>
+<li>Theft of the developers keys/tokens allowing them to submit code to the repository.</li>
+<li>Social engineering allowing an attacker direct access to merge code.</li>
+<li>Compromise of the code repository allowing injection of code to the repository.</li>
+<li>Theft of CI/CD tokens allowing code to be submitted to a repository.</li>
+<li>Alteration of release artefacts on the repository.</li>
+<li>Submitting altered release artefacts to a distro build service</li>
+<li>Addition of malicious patches or build scripts in the distro build service.</li>
+<li>Modification of sources/binaries during the package build process.</li>
+<li>Theft of the package signing keys allowing package forgery.</li>
+<li>Compromise of a mirror allowing malicious content to be served.</li>
+<li>Alteration of consumer workstation trust roots allowing attacker signed packages.</li>
+</ul>
+<p>This is hardly exhaustive either. I'm sure that there are many more attacks that could be carried out.</p>
+<h2 id="reproducible-builds">Reproducible Builds</h2>
+<p>A reproducible build is where given the same <em>source artefacts</em> the resulting <em>binary artefacts</em>
+will always be byte for byte identical. It takes an astounding amount of work to achieve this
+because even variations in filesystem inode ordering, tarball generation, or even system clocks
+can alter a single bit of the build breaking the reproducibility.</p>
+<p>What this allows is validation that if the source or binaries are altered before packaging and
+signing that these changes can be detected.</p>
+<h2 id="what-do-these-protect">What Do These Protect?</h2>
+<p>So within our supply chain, what section is protected by these properties?</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>             │                                           │               
+</span><span>│            ▼                                                           
+</span><span>   ┌───────────────────┐        Build Service            │               
+</span><span>│  │Open Build Service │                                                 
+</span><span>   └───────────────────┘                                 │               
+</span><span>│            │                                                           
+</span><span> ┌ ─ ─Begins Building─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─             │               
+</span><span>│            │                              │                            
+</span><span> │           ▼               Offline                     │               
+</span><span>│  ┌───────────────────┐     Build Host     │                            
+</span><span> │ │ Signature Checked │                                 │               
+</span><span>│  └───────────────────┘                    │                            
+</span><span> │           │          ◀────────────────────────────────┼───┐           
+</span><span>│        Unpacks                            │                │           
+</span><span> │           │                                           │   │           
+</span><span>│            ▼                              │                │           
+</span><span> │ ┌───────────────────┐                                 │   │           
+</span><span>│  │ Build Application │                    │                │           
+</span><span> │ └───────────────────┘                                 │   │           
+</span><span>│            │                              │                │           
+</span><span> │       Packages                                        │   │           
+</span><span>│            │                              │                │           
+</span><span> │           ▼                                           │   ├──── HERE
+</span><span>│  ┌───────────────────┐                    │                │           
+</span><span> │ │        RPM        │                                 │   │           
+</span><span>│  └───────────────────┘                    │                │           
+</span><span> │           │                                           │   │           
+</span><span>│         Signs                             │                │           
+</span><span> │           │                                           │   │           
+</span><span>│            ▼                              │                │           
+</span><span> │ ┌───────────────────┐                                 │   │           
+</span><span>│  │  Signed Package   │                    │                │           
+</span><span> │ └───────────────────┘                                 │   │           
+</span><span>│            │          ◀───────────────────┼────────────────┘           
+</span><span> ┼ ─ ─ ─Distributes─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤               
+</span><span>             │                                                           
+</span><span> │           ▼                    Package Mirrors        │               
+</span><span>   ┌───────────────────┐                                                 
+</span><span> │ │      Mirrors      │                                 │               
+</span><span>   └───────────────────┘                                                 
+</span></code></pre>
+<p>To add to this, to achieve this protection <em>properly</em> you actually need to build the package multiple
+times in parallel to compare the differences. This is discussed further in
+<a href="https://web.archive.org/web/20230517095028/https://blog.cmpxchg8b.com/2020/07/you-dont-need-reproducible-builds.html">Tavis Ormandy's blog</a></p>
+<p>This makes reproducible builds expensive from human time and labour to meticulously maintain
+the needed invariants of their software always being binary identical, it is expensive on resources
+requiring multiple parallel hardware/software stacks to isolate build processes, and it is expensive
+on energy as we require double to triple the electricity to compile things in duplicate/triplicate.</p>
+<p>From our list above, what threats are mitigated by reproducible builds?</p>
+<ul>
+<li>Modification of sources/binaries during the package build process.</li>
+<li>Theft of the package signing keys allowing package forgery.</li>
+</ul>
+<h2 id="historical-attacks">Historical Attacks</h2>
+<p>Lets now examine a number of recent attacks and how they were carried out, what could have mitigated
+these attacks, and if reproducible builds was one of those things.</p>
+<h3 id="xz">XZ</h3>
+<p>The <a href="https://boehs.org/node/everything-i-know-about-the-xz-backdoor">XZ incident</a> was the discovery
+of a backdoor added to the XZ decompression library. This library was indirectly included in SSH
+processes on certain distros which would have allowed an attacker to remotely access a system.</p>
+<p>This attack was carried out through an extended social engineering campaign. The backdoor was then
+inserted into autotools scripts and test artefacts.</p>
+<p>Reproducible builds would <em>not</em> have detected this backdoor, since reproducing the build from the
+same compromised autotools outputs would have resulted in two identical compromised binaries.</p>
+<h3 id="solar-winds">Solar Winds</h3>
+<p><a href="https://en.wikipedia.org/wiki/SolarWinds#2019%E2%80%932020_supply_chain_attacks">Solar Winds</a> was
+subject to a supply chain attack in 2019-2020. The documented and suspected access vector was "the
+attackers might have compromised internal build or distribution systems of SolarWinds". A second attack
+was then discovered which relied on injected code into a http library.</p>
+<p>In both cases it would appear that reproducible builds would not have detected this attack as the
+compromise of the build host and the injection of code would mean that hosts are reproducing the
+same compromised binaries in each case.</p>
+<h3 id="other-attacks">Other Attacks</h3>
+<p>The CNCF maintains a <a href="https://github.com/cncf/tag-security/tree/main/supply-chain-security/compromises">list of supply chain attacks</a>.
+This is likely not comprehensive, but it gives us a good over view to analyse. There are 78 attacks here
+and they are helpfully <a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/compromise-definitions.md">categorised by attack type</a>.</p>
+<p>Within this set of attacks, only three may have been detected by reproducible builds.</p>
+<ul>
+<li><a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/2017/ccleaner.md">CCleaner</a></li>
+</ul>
+<p>Developer signing keys were stolen.</p>
+<p>This application is not opensource, so users would be unable to rebuild and validate the results.</p>
+<p>CCleaner would be able to prevent this by using HSM bound signing keys, or using something like AIDE
+to detect alterations to mirror content without needing reproducible builds. An interesting idea could
+be certificate transparency style logs that are issued in parallel which list the signatures that
+a signing key has made such that an attacker would not be able to upload their signatures into
+the CT log, or if they were, that it would allow notification and detection of the compromise.</p>
+<ul>
+<li><a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/2003/kernel-repository.md">Kernel Alternate Mirror</a></li>
+</ul>
+<p>A mirror of the source code had alterations.</p>
+<p>This would rely on a user downloading and building the kernel from <em>different</em> mirrors. At this point
+the illusion would already be discovered without reproducible builds as the <em>source tarballs</em> would
+not match nor would other elements. Again, reproducible builds could find this, but there are also
+easier ways to detect this in the first place such as signed archives or only using trust mirrors
+with https.</p>
+<ul>
+<li><a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/2016/keydnap.md">Transmission / Keydnap</a></li>
+</ul>
+<p>The developers signing keys were stolen allowing fake builds to be uploaded.</p>
+<p>The user would be able to detect the subterfuge by building transmission themself, however as
+<a href="https://web.archive.org/web/20230517095028/https://blog.cmpxchg8b.com/2020/07/you-dont-need-reproducible-builds.html">Tavis Ormandy's blog</a>
+points out "The only way to verify that the untrusted binary is bit-for-bit identical to the binary that would be produced by building the source code, is to produce your own trusted binary first and then compare it. At that point you already have a trusted binary you can use, so what value did reproducible builds provide?"</p>
+<p>Additionally the same applies as to CCleaner where key handling improvements would have helped
+prevent or detect this compromise.</p>
+<p><code>--</code></p>
+<p>Of the 78 listed compromises in this list only 3 (~4%) would be impacted by reproducible
+builds, and of those 3, all of them have alternate paths to defend and detect compromise that doesn't
+involve reproducible builds. This reduces reproducible builds to a statistically insignificant
+counter measure.</p>
+<p>When the attacker does attempt to attack a binary artefact it occurs
+when that attacker has access to the private signing keys allowing them to sign malicious artefacts
+outside of the build environment.</p>
+<p>For this to be relevant to reproducible builds, this would rely on randomised inspection intervals
+over packaged and signed artefacts. However, there are simpler processes that can be undertaken
+rather than randomised rebuilds and assertions, such as maintaining a merkle tree of signed packages
+akin to a certificate transparency log.</p>
+<p>To contrast, from the 78 compromises in this document, 30 (~40%) of them were from source code injection earlier in
+the supply chain, indicating that attackers prefer to compromise source code directly
+rather than binaries in subsequent build phases.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>From the research I have performed I believe that we are unable to prove our hypothesis:</p>
+<ul>
+<li>Reproducible builds would have impacted or prevented historical and current threats against supply chains.</li>
+</ul>
+<p>Nor can we reject the null hypothesis:</p>
+<ul>
+<li>Reproducible builds would not prevent historical or current threats against supply chains.</li>
+</ul>
+<p>Reproducible builds have a narrow scope of what they can detect and protect, yet it requires
+a staggering investment of time and resources to achieve. The scope of relevance that reproducbile
+builds cover is also not a target area for attackers.</p>
+<p>In addition, within the scope that reproducible builds do protect, there are alternative measures
+that can be undertaken to protect these elements of a build process. You may have already noticed
+things like the offline build hosts which limits the ability for an attacker to compromise these
+stages of a build in the first place.</p>
+<p>Finally, it is important that whenever we discuss a threat, we can not enter the discussion with solutions already in mind. We need
+to analyse the data, the possible attacks, and then derive solutions that protect from those attacks.</p>
+<p>We need to expend effort in places with meaningful outcomes based on risk assessment, rather than
+propose solutions and force them to stick.</p>
+<h2 id="special-mention">Special Mention</h2>
+<p>I noticed in the review of each compromise, the <a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/2016/mint.md">Linux Mint ISO compromise</a>.</p>
+<p>This attack would actually still be viable today because of how many distributions rely on third party
+mirrors that operate over http. Most of these distributions still attempt to ask users to perform
+complex and obtuse GPG verification steps of ISOs. Security must be accessible and usable to all
+persons, else it's just theatre.</p>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>Firstyear&#x27;s blog-a-log</title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>OpenSUSE on ZFS</h1>
+        <div class="border"></div>
+        <time datetime="2024-09-07" class="date" itemprop="datePublished">
+            07 Sep 2024
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <p>Due to a certain motherboard manufacturer having no quality control of their firmware updates, my
+previous home lab server had 4 of it's 12 DIMM slots fail. This necesitated a rapid replacement
+of the machine, as I use it heavily for work.</p>
+<p>While frustrating, rather than lift my existing OpenSUSE Leap install to the new machine, I decided
+to reinstall - this time, with ZFS as the root filesystem. I have had enough issues with BTRFS
+performance and reliability to finally commit to moving away from it, even if that means I won't
+get to access snapper or transactional update. I'd rather my systems be reliable, than flakey and
+featureful.</p>
+<p>But the catch here is that ZFS is not a supported root filesystem in OpenSUSE Leap. This means doing
+things the hardway. As a reformed <a href="https://www.shlomifish.org/humour/by-others/funroll-loops/Gentoo-is-Rice.html">Gentoo Ricer</a>
+I'm not one to shy away from this challenge.</p>
+<h2 id="existing-literature">Existing Literature</h2>
+<p>I am not the first to attempt this process - I was heavily inspired by the guide that is hosted
+on the <a href="https://openzfs.github.io/openzfs-docs/Getting%20Started/openSUSE/openSUSE%20Leap%20Root%20on%20ZFS.html">OpenZFS site for OpenSUSE Leap</a> installs.</p>
+<p>The steps for formatting NVME drives with the correct LBA size were from <a href="https://filers.blogspot.com/2018/12/how-to-format-nvme-drive.html">here</a></p>
+<h2 id="setup">Setup</h2>
+<h3 id="bootenv">BootEnv</h3>
+<p>Currently it's not possible to setup OpenSUSE+ZFS from a live image. The best way to proceed is to
+setup an OpenSUSE Leap install on a <em>separate disk</em> first and use that as your install environment.</p>
+<h3 id="secureboot">SecureBoot</h3>
+<p>I will be setting using EFI in this process. To avoid issues with kernel module signing, secure boot
+should be disabled. If you feel like getting the module signatures to work, then I'd love to hear
+how you did it.</p>
+<h2 id="warning">Warning</h2>
+<blockquote>
+<p>WARNING: A lot of the commands that follow involve partitioning, formatting devices, and generally
+mucking about with your system in a way that can cause data loss. Ensure that any data you care
+about is backed up to external media and <em>disconnected</em> from the system during the install process.</p>
+</blockquote>
+<h2 id="preparing-the-bootenv">Preparing the BootEnv</h2>
+<p>Boot your install environment, and if you prefer, SSH into it.</p>
+<p>Enable the filesystems repo which has the ZFS modules.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper addrepo -f https://download.opensuse.org/repositories/filesystems/15.6/filesystems.repo
+</span></code></pre>
+<p>To prevent zypper doing silly things, we need to unfuck it.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /etc/zypp/zypp.conf
+</span><span>## If you don&#39;t set this, zypper dl&#39;s one package at a time and it&#39;s so slow.
+</span><span>commit.downloadMode = DownloadInAdvance
+</span><span>## drpms are slower than full rpms.
+</span><span>download.use_deltarpm = false
+</span><span>
+</span><span># /etc/zypp/zypper.conf
+</span><span>[solver]
+</span><span># You don&#39;t need these unless you want all of Xorg dragged in randomly
+</span><span>installRecommends = no
+</span></code></pre>
+<p>Refresh your repos and ensure you're up to date. If not, ZFS won't play nicely.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper ref --force
+</span><span>zypper dup
+</span><span>reboot
+</span></code></pre>
+<h2 id="getting-started">Getting Started</h2>
+<p>Boot your install environment, and if you prefer, SSH into it.</p>
+<p>OPTIONAL: Setup tmux to shield yourself from connection drop outs.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper in tmux
+</span><span>tmux
+</span></code></pre>
+<p>Install the ZFS kernel module and partitioning tools</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper in zfs zfs-kmp-default gptfdisk nvme-cli
+</span></code></pre>
+<p>Load the ZFS module</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>modprobe zfs
+</span></code></pre>
+<h2 id="partitioning">Partitioning</h2>
+<p>Identify your disks to ensure you are using the correct ones for the install.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>lsblk
+</span></code></pre>
+<p>Identify your disk long names. These are used by ZFS.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ls -al /dev/disk/by-id/
+</span><span># You need to look for the name -&gt; dev in the output here
+</span></code></pre>
+<p>Setup an env var to make it easier for now.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>export DISK=/dev/vda
+</span><span>export DISK=/dev/disk/by-id/nvme-WD_BLACK_XXXXX....
+</span></code></pre>
+<p>If the disk is an nvme device, format it to use the 4Kb LBA if possible.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nvme id-ns /dev/nvme1n1 | grep lbaf
+</span><span># nlbaf   : 1
+</span><span># nulbaf  : 0
+</span><span># lbaf  0 : ms:0   lbads:9  rp:0x2
+</span><span># lbaf  1 : ms:0   lbads:12 rp:0x1 (in use)
+</span></code></pre>
+<ul>
+<li>lbaf - is the LBA format table.</li>
+<li>lbads - the "ashift". 9 == 512b, 12 == 4k, 13 == 8k</li>
+</ul>
+<p>In this example lbaf 1 is the 4k format. To select it:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nvme format /dev/nvme1n1 -l 0
+</span></code></pre>
+<p>Destroy the partitions on the disk.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sgdisk --zap-all $DISK
+</span></code></pre>
+<p>Create EFI part</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sgdisk -n1:1M:+512M -t1:EF00 $DISK
+</span></code></pre>
+<p>Create LVM for /boot and swap. At least 1G for /boot, and then choose what you need for swap.
+Ensure you have extra for LVM raid, about 1G. This example creates 8G for the PV, allowing a
+1G boot and 6G swap.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sgdisk -n2:0:+8G -t2:8E00 $DISK
+</span></code></pre>
+<p>Create for the root pool. replace +X with 0 to use all space.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sgdisk -n3:0:0 -t3:BF01 $DISK
+</span></code></pre>
+<blockquote>
+<p>HINT: Repeat this with another $DISK if you want to setup RAID1</p>
+</blockquote>
+<h2 id="format-time">Format Time</h2>
+<p>Setup env-vars for your disks. I did a mirrored install. Add more or less mirrors to suit your
+tasts.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>export DISK1_EFI=/dev/vda1
+</span><span>export DISK2_EFI=/dev/vdb1
+</span><span>
+</span><span>export DISK1_BOOT=/dev/vda2
+</span><span>export DISK2_BOOT=/dev/vdb2
+</span><span>
+</span><span>export DISK1_POOL=/dev/vda3
+</span><span>export DISK2_POOL=/dev/vdb3
+</span></code></pre>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>export DISK1_EFI=/dev/disk/by-id/nvme-WD_BLACK_SN850X_XXX-part1
+</span><span>export DISK2_EFI=/dev/disk/by-id/nvme-WD_BLACK_SN850X_XXX-part1
+</span><span>
+</span><span>export DISK1_BOOT=/dev/disk/by-id/nvme-WD_BLACK_SN850X_XXX-part2
+</span><span>export DISK2_BOOT=/dev/disk/by-id/nvme-WD_BLACK_SN850X_XXX-part2
+</span><span>
+</span><span>export DISK1_POOL=/dev/disk/by-id/nvme-WD_BLACK_SN850X_XXX-part3
+</span><span>export DISK2_POOL=/dev/disk/by-id/nvme-WD_BLACK_SN850X_XXX-part3
+</span></code></pre>
+<p>Create /boot/efi</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mkfs.fat -s 1 -F 32 $DISK1_EFI
+</span><span>mkfs.fat -s 1 -F 32 $DISK2_EFI
+</span></code></pre>
+<p>Setup LVM PV</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pvcreate $DISK1_BOOT
+</span><span>pvcreate $DISK2_BOOT
+</span></code></pre>
+<p>Create LVM VG</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>vgcreate vg_system $DISK1_BOOT $DISK2_BOOT
+</span></code></pre>
+<p>Create /boot</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>lvcreate -n lv_boot --type raid1 -L 1G vg_system
+</span><span>mkfs.xfs /dev/vg_system/lv_boot
+</span></code></pre>
+<p>Create swap</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>lvcreate -n lv_swap --type raid1 -L 6G vg_system
+</span><span>mkswap /dev/vg_system/lv_swap
+</span></code></pre>
+<p>Create ZFS pool</p>
+<blockquote>
+<p>HINT: Recordsize here defines the <em>max</em> recordsize. For random IO's we'll set a smaller size,
+for anything that changes infrequently and we want better read performance, we'll set a larger
+value.</p>
+</blockquote>
+<blockquote>
+<p>IMPORTANT: Ensure you set the ashift value to match your LBA size. 9 == 512b, 12 == 4k, 13 == 8k.</p>
+</blockquote>
+<blockquote>
+<p>NOTE: We have to setup grub2 compat here, because grub is stupid and won't allow you to setup
+EFI if your root pool isn't grub2 compatible - even though we don't even have /boot on ZFS!!!</p>
+<p>Thanks Grub. Thrub.</p>
+</blockquote>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zpool create \
+</span><span>    -o cachefile=/etc/zfs/zpool.cache \
+</span><span>    -o ashift=12 \
+</span><span>    -o compatibility=grub2 \
+</span><span>    -O atime=off \
+</span><span>    -O xattr=sa -O mountpoint=none \
+</span><span>    -O acltype=posixacl -O canmount=off -O compression=lz4 \
+</span><span>    -O normalization=formD \
+</span><span>    -R /mnt \
+</span><span>    rpool mirror $DISK1_POOL $DISK2_POOL
+</span></code></pre>
+<p>Create all our ZFS filesystems within the pool</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zfs create -o recordsize=128k -o canmount=noauto -o mountpoint=/ rpool/ROOT
+</span><span>zfs mount rpool/ROOT
+</span><span>
+</span><span>zfs create -o com.sun:auto-snapshot=false  rpool/ROOT/tmp
+</span><span>chmod 1777 /mnt/tmp
+</span><span>
+</span><span>zfs create  -o mountpoint=/home rpool/home
+</span><span>zfs create  -o mountpoint=/root rpool/home/root
+</span><span>chmod 700 /mnt/root
+</span><span>
+</span><span>zfs create -o mountpoint=/var -o recordsize=4k  rpool/var
+</span><span>zfs create                                 rpool/var/lib
+</span><span>zfs create                                 rpool/var/log
+</span><span>zfs create                                 rpool/var/spool
+</span><span>
+</span><span>zfs create -o com.sun:auto-snapshot=false  rpool/var/cache
+</span><span>zfs create -o com.sun:auto-snapshot=false  rpool/var/tmp
+</span><span>
+</span><span>zfs create -o recordsize=128k                rpool/var/lib/docker
+</span></code></pre>
+<p>Create /boot mountpoints</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mkdir /mnt/boot
+</span><span># Mount our /boot filesystem
+</span><span>mount /dev/vg_system/lv_boot /boot
+</span><span># Make the efi mount points
+</span><span>mkdir /mnt/boot/efi
+</span><span># Only if you have a second disk
+</span><span>mkdir /mnt/boot/efi-alt
+</span><span>
+</span><span># Mount the efi partitions
+</span><span>mount ${DISK1_EFI} /mnt/boot/efi
+</span><span>mount ${DISK2_EFI} /mnt/boot/efi-alt
+</span></code></pre>
+<p>Copy in the ZFS pool cache to the new system</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mkdir /mnt/etc/zfs -p
+</span><span>cp /etc/zfs/zpool.cache /mnt/etc/zfs/
+</span></code></pre>
+<h2 id="begin-the-install">Begin the Install</h2>
+<p>Add zypper repos to the new chroot</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper --root /mnt ar -f http://download.opensuse.org/distribution/leap/15.6/repo/non-oss  non-oss
+</span><span>zypper --root /mnt ar -f http://download.opensuse.org/distribution/leap/15.6/repo/oss oss
+</span><span>zypper --root /mnt ar -f http://download.opensuse.org/update/leap/15.6/oss  update-oss
+</span><span>zypper --root /mnt ar -f http://download.opensuse.org/update/leap/15.6/non-oss update-non-oss
+</span></code></pre>
+<p>Refresh repo data</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper --root /mnt refresh --force
+</span></code></pre>
+<p>Install the basesystem to the chroot</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper --root /mnt install -t pattern base
+</span></code></pre>
+<p>Install basic system tools</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper --root /mnt refresh --force
+</span><span>zypper --root /mnt install zypper tmux vim zsh nmap iputils iproute2 tcpdump bridge-utils sudo htop ntpd-rs less grep findutils system-group-wheel tuned
+</span></code></pre>
+<h2 id="setup-your-new-system">Setup Your New System</h2>
+<p>Set a hostname</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>echo my.sweet.hostname &gt; /mnt/etc/hostname
+</span></code></pre>
+<p>Create your filesystem mount table</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cat &lt;&lt; EOF &gt; /mnt/etc/fstab
+</span><span>/dev/vg_system/lv_boot /boot xfs defaults 0 0
+</span><span>/dev/vg_system/lv_swap swap swap defaults 0 0
+</span><span>UUID=$(blkid -s UUID -o value ${DISK1_EFI}) /boot/efi vfat defaults 0 0
+</span><span>UUID=$(blkid -s UUID -o value ${DISK2_EFI}) /boot/efi-alt vfat defaults 0 0
+</span><span>EOF
+</span></code></pre>
+<p>Copy DNS config from host</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>rm /mnt/etc/resolv.conf
+</span><span>cp /etc/resolv.conf /mnt/etc/
+</span></code></pre>
+<p>Setup bind mounts for the chroot</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mount --make-private --rbind /dev  /mnt/dev
+</span><span>mount --make-private --rbind /proc /mnt/proc
+</span><span>mount --make-private --rbind /sys  /mnt/sys
+</span><span>mount -t tmpfs tmpfs /mnt/run
+</span><span>mkdir /mnt/run/lock
+</span></code></pre>
+<p><em>hacker voice</em> "I'm in".</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>chroot /mnt zsh --login
+</span></code></pre>
+<p>Unfuck zypper again</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># Unfuck zypper again
+</span><span>
+</span><span># /etc/zypp/zypp.conf
+</span><span>commit.downloadMode = DownloadInAdvance
+</span><span>download.use_deltarpm = false
+</span><span>
+</span><span># /etc/zypp/zypper.conf
+</span><span>[solver]
+</span><span>installRecommends = no
+</span></code></pre>
+<p>Ensure the filesystems repo exists</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper addrepo -f https://download.opensuse.org/repositories/filesystems/15.6/filesystems.repo
+</span></code></pre>
+<p>Fix the releasever variable in repos</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sed -i -E &#39;s/15\.6/$releasever/g&#39; /etc/zypp/repos.d/*.repo
+</span><span>zypper refresh --force
+</span></code></pre>
+<p>Set a locale</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># List of locales available.
+</span><span>locale -a
+</span><span># Set the locale
+</span><span>localectl set-locale LANG=en_AU.UTF-8
+</span></code></pre>
+<p>Reinstall some base-packages that need it</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper install -f permissions-config iputils ca-certificates  ca-certificates-mozilla pam shadow libutempter0 suse-module-tools util-linux
+</span></code></pre>
+<h2 id="install-your-new-kernel-and-bootloader">Install Your New Kernel and Bootloader</h2>
+<p>Install your kernel</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper install kernel-default kernel-firmware lsb-release zfs zfs-kmp-default lvm2 grub2-x86_64-efi dosfstools man dmraid grub2-x86_64-efi-extras memtest86+
+</span></code></pre>
+<p>Setup your ZFS hostid</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zgenhostid
+</span><span>hostid
+</span></code></pre>
+<p>Configure the kernel modules</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>echo &#39;zfs&#39;&gt;&gt; /etc/modules-load.d/zfs.conf
+</span><span>
+</span><span>echo &quot;allow_unsupported_modules 1&quot; &gt; /etc/modprobe.d/10-unsupported-modules.conf
+</span><span>
+</span><span># If needed, configure options for modprobe in /etc/modprobe.d/zfs.conf
+</span></code></pre>
+<p>Configure GRUB2</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>grub2-probe /boot
+</span><span># Must show xfs
+</span></code></pre>
+<p>Edit grub options</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /etc/default/grub
+</span><span>
+</span><span>SUSE_REMOVE_LINUX_ROOT_PARAM=true
+</span><span>GRUB_CMDLINE_LINUX_DEFAULT=&quot;root=ZFS=rpool/ROOT preempt=full  &quot;
+</span><span>GRUB_TERMINAL=console
+</span><span>GRUB_DISABLE_OS_PROBER=false
+</span></code></pre>
+<p>Create the grub configuration</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>grub2-mkconfig -o /boot/grub2/grub.cfg
+</span></code></pre>
+<p>Check that <code>/boot/grub2/grub.cfg</code> has <code>root=ZFS=rpool/ROOT</code> on the kernel commandline</p>
+<p>Install EFI</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>grub2-install --target=x86_64-efi --efi-directory=/boot/efi \
+</span><span>    --bootloader-id=opensuse --recheck --no-floppy
+</span><span>
+</span><span>grub2-install --target=x86_64-efi --efi-directory=/boot/efi-alt \
+</span><span>    --bootloader-id=opensuse --recheck --no-floppy
+</span></code></pre>
+<h2 id="final-configuration">Final Configuration</h2>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mkdir /etc/zfs/zfs-list.cache
+</span><span>touch /etc/zfs/zfs-list.cache/rpool
+</span><span>zed -F &amp;
+</span></code></pre>
+<p>While zed is running, we need to for it to update the rpool cache.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># NO-OP
+</span><span>zfs set canmount=noauto rpool/ROOT
+</span></code></pre>
+<p>Check that the rpool file now is populated</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cat /etc/zfs/zfs-list.cache/rpool
+</span></code></pre>
+<p>Cancel zed, by foregrounding it and terminating it</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fg
+</span><span>&gt; ctrl -c
+</span></code></pre>
+<p>Clean up the rpool content</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sed -Ei &quot;s|/mnt/?|/|&quot; /etc/zfs/zfs-list.cache/*
+</span><span>cat /etc/zfs/zfs-list.cache/rpool
+</span></code></pre>
+<p>Setup firstboot network</p>
+<blockquote>
+<p>HINT: Check your device name ip with <code>ip link</code></p>
+</blockquote>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /etc/sysconfig/network/ifcfg-eth0
+</span><span>BOOTPROTO=&#39;dhcp&#39;
+</span><span>STARTMODE=&#39;auto&#39;
+</span></code></pre>
+<p>Set the root password</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>passwd
+</span></code></pre>
+<h2 id="reboot-into-the-system">Reboot Into the System</h2>
+<p>Exit the chroot</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>exit
+</span></code></pre>
+<p>Cleanly unmount</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mount | grep -v zfs | tac | awk &#39;/\/mnt/ {print $3}&#39; | \
+</span><span>    xargs -i{} umount -lf {}
+</span><span>zpool export -a -f
+</span><span># If export fails, rm the zpool cache to prevent the root importing on the
+</span><span># bootenv host.
+</span><span>rm /etc/zfs/zpool.cache
+</span></code></pre>
+<p>Reboot</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>reboot
+</span></code></pre>
+<h2 id="first-run">First run</h2>
+<p>Enable and run anything you want!</p>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>Firstyear&#x27;s blog-a-log</title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>Linux Filesystems</h1>
+        <div class="border"></div>
+        <time datetime="2024-08-13" class="date" itemprop="datePublished">
+            13 Aug 2024
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <p>Surprising absolutely no-one, I as an underachiving white man have <em>opinions</em> on things that
+are somewhat out of my normal subject matter areas. What is more surprising is that for some
+reason people want to hear them, so I have been bullied into writing a blog post to answer
+the general question: "What do I think about filesystems on linux".</p>
+<h2 id="what-currently-exists">What Currently Exists?</h2>
+<p>Today in August of 2024 the current discourse around linux filesystems generally revolves
+around the following culprits, presented in no specific order.</p>
+<ul>
+<li>ext3 / ext4</li>
+<li>xfs</li>
+<li>btrfs</li>
+<li>zfs</li>
+</ul>
+<p>For comparisons sake, I want to also include.</p>
+<ul>
+<li>apfs (MacOS)</li>
+</ul>
+<h2 id="what-do-we-expect-from-a-filesystem">What Do We Expect From A Filesystem?</h2>
+<p>In the past we didn't expect much - just a place to create folders and files, and trust that
+they will be there tomorrow when we come back to our computer.</p>
+<p>Of course life is never so simple, hardware fails, power abruptly cuts out, bit flips occur
+and more. As a result, we now demand that our filesystems survive these events and keep our
+cat pictures intact through all of it.</p>
+<p>Now dear reader, be careful when you read the preceeding paragraph. It's easy to start to
+ascribe <em>technical solutions</em> the the above problems (e.g. ecc for bit flip protection).
+But don't do that! We need to examine the expected <em>user experience</em>.</p>
+<p>Today consumers expect:</p>
+<ul>
+<li>Resilence to power loss</li>
+<li>Files not to be corrupted by bugs (either in userland software, or the filesystem itself)</li>
+<li>Low latency and high throughput to access data</li>
+</ul>
+<p>In addition, power users or heavily technical folk have a extended list of expectations:</p>
+<ul>
+<li>The ability to examine past versions of files.</li>
+<li>Ability to <em>boot</em> previous OS configurations in event of a bad update.</li>
+<li>Detection of and correction of corruption in files.</li>
+<li>Compression of certain file types to save space.</li>
+<li>Features to protect from catastrophic hardware failure.</li>
+</ul>
+<h2 id="how-do-our-current-filesystems-fit-in">How Do Our Current Filesystems Fit In?</h2>
+<table><thead><tr><th>Filesystem</th><th style="text-align: center">Resilence to Power Loss</th><th style="text-align: center">Corruption Protection</th><th style="text-align: center">Performance</th><th style="text-align: center">Versions</th><th style="text-align: center">Boot Versions</th><th style="text-align: center">Error Correction</th><th style="text-align: center">Compression</th><th style="text-align: center">Hardware Failure</th></tr></thead><tbody>
+<tr><td>Ext3/Ext4</td><td style="text-align: center">Minimal</td><td style="text-align: center">Partial</td><td style="text-align: center">High</td><td style="text-align: center">No</td><td style="text-align: center">No</td><td style="text-align: center">No</td><td style="text-align: center">No</td><td style="text-align: center">No</td></tr>
+<tr><td>Xfs</td><td style="text-align: center">High</td><td style="text-align: center">Partial</td><td style="text-align: center">High</td><td style="text-align: center">No</td><td style="text-align: center">No</td><td style="text-align: center">No</td><td style="text-align: center">No</td><td style="text-align: center">No</td></tr>
+<tr><td>Btrfs</td><td style="text-align: center">Partial</td><td style="text-align: center">Partial</td><td style="text-align: center">Low</td><td style="text-align: center">Yes</td><td style="text-align: center">Yes</td><td style="text-align: center">Partial</td><td style="text-align: center">No (1)</td><td style="text-align: center">Minimal</td></tr>
+<tr><td>Apfs</td><td style="text-align: center">Full</td><td style="text-align: center">Partial</td><td style="text-align: center">High</td><td style="text-align: center">Yes</td><td style="text-align: center">Yes</td><td style="text-align: center">Partial</td><td style="text-align: center">No</td><td style="text-align: center">Yes (2)</td></tr>
+<tr><td>ZFS</td><td style="text-align: center">Full</td><td style="text-align: center">Full</td><td style="text-align: center">High</td><td style="text-align: center">Yes</td><td style="text-align: center">Yes (3)</td><td style="text-align: center">Yes</td><td style="text-align: center">Yes</td><td style="text-align: center">Yes</td></tr>
+</tbody></table>
+<ol>
+<li>Btrfs does support compression, but it's obscure to access and use, it may as well not exist.</li>
+<li>Apfs doesn't support RAID, but it's integration with time machine gives it excellent hardware failure resilience.</li>
+<li>ZFS does support boot versions, they just aren't integrated in Linux yet.</li>
+</ol>
+<p>If you want to understand how I came to this assesment, go check out the Roasting Corner at the end
+of this blog.</p>
+<p>The main thing here is that every Linux filesystem falls short of both APFS and ZFS. You end up
+needing to make a trade between features vs performance and reliability.</p>
+<h2 id="how-did-we-get-here">How Did We Get Here?</h2>
+<p>When we look at any software development - filesystems, databases or anything else - you can
+often see that the software becomes a reflection of the developers priorities and attitudes.</p>
+<h3 id="ext4">Ext4</h3>
+<p>For example, ext4 was seen as a <a href="https://en.wikipedia.org/wiki/Ext3#ext4">"stop gap" until btrfs was ready</a>. This
+wasn't even just some outsider commentary, this was a statement from the principal developer of ext3/4
+themself.</p>
+<p>As a result ext4 was never about developing something good, but about adding extra features that
+were required circa 2005 while btrfs was being developed.</p>
+<p>A more damning reflection is that ext3/4 have been pushed for performance so much, that the default mode is data=ordered
+where only the metadata is written to the journal - this means that in the case of a partial write
+you <a href="https://danluu.com/deconstruct-files/">will end up with corrupted data</a>.</p>
+<h3 id="xfs">XFS</h3>
+<p>Where as when we look at XFS, we see a filesystem that prioritises robustness (which is reflected
+in the fact the xfs test suite has become <em>the</em> linux filesystem test suite.) and performance. XFS
+has it's origins in high performance computing and graphics, and so robustness and performance are
+critical to both of these.</p>
+<p>But we also see that the developers of XFS believe that issues like checksumming and raid are best
+performed at the <a href="https://lwn.net/Articles/476263/">block level or the application level</a>. This is
+why XFS has avoided these features for so long.</p>
+<h3 id="zfs">ZFS</h3>
+<p>ZFS was developed by SUN in 2001 and made available in Solaris in 2006. At the time Solaris was the
+Sega of Operating Systems - so far ahead of it's time it was doomed to be misunderstood.</p>
+<p>Solaris developed virutalised networking, containers, transactional system updates and more. A
+key piece of this was ZFS. ZFS unlike other filesystems preceding it was developed with the
+goal of "enabling admins to access advanced storage features, with a reliable and intuitive
+interface".</p>
+<p>This led to Solaris supporting features like parallel boot environments, snapshots, network
+incremental backups, high performance, compression and more. Each feature was designed with
+the user in mind, and <a href="https://youtu.be/MsY-BafQgj4?t=170">achieved a goal</a> in a way that
+protected the users data at all times.</p>
+<p>This has made ZFS the gold standard - ZFS is <em>the</em> bar to meet or exceed if you are now developing
+a filesystem.</p>
+<h3 id="apfs">APFS</h3>
+<p>APFS was developed by apple to replace the aging HFS+. HFS+ had a major issue which was that it
+liked to shit the bed if you had too many files in a single folder.</p>
+<p>Guess how timemachine worked at the time? That's right, hardlinks to files all stored in a single
+folder. You do the math.</p>
+<p>As a result Apple needed something better. Apple had previously attempted to include ZFS but the
+deal failed. This led to a need to make something new.</p>
+<p>Apple's developers <a href="https://arstechnica.com/gadgets/2016/06/a-zfs-developers-analysis-of-the-good-and-bad-in-apples-new-apfs-file-system/">opted to be solution driven</a>
+rather than to take inspiration from existing filesystems. This led to a production ready and
+robust filesystem that priorisited reliability and integrated features. Within the space of 4 years
+from inception, APFS became the default on MacOS 10.13.</p>
+<h3 id="btrfs">Btrfs</h3>
+<p>So lets tackle the elephant in the room.</p>
+<p><img src="/_static/btrfs-9047hr.jpg" alt="image" /></p>
+<p>Btrfs was created in 2007 and integrated to the Linux kernel in 2009. Btrfs was created to address
+the shortcomings of filesystems in Linux especially in light of the success of ZFS (and later APFS).
+Since APFS and ZFS took 4 and 5 years respectively to become mainline, reliable and mature
+implementations, surely btrfs has achieved this by 2013.</p>
+<p>Nope.</p>
+<p>Even now in 2024 btrfs is one of the slowest Linux filesystems, and it does not take long to find
+reports of ongoing data corruption issues.</p>
+<p>But most egregious, Btrfs is a reflection of the intent to prioritise <em>features</em> above all else.</p>
+<p>Remember how I said don't ascribe technical solutions before we describe the user experience? Well
+btrfs did the opposite. They said "here are the technical solutions we want" but never considered
+the user experience of those features.</p>
+<p>As a result, btrfs has every feature under the sun, but all of them <a href="https://arstechnica.com/gadgets/2021/09/examining-btrfs-linuxs-perpetually-half-finished-filesystem/">half baked in some way</a>.</p>
+<p>Lets look at <a href="https://www.man7.org/linux/man-pages/man8/btrfs-subvolume.8.html">subvolumes</a>.</p>
+<p>You'll notice that most administration commands refer to the <em>path</em> where the subvolume is mounted.
+This is a common source of confusion because btrfs administration doesn't have clear points of
+interaction. For example, if I have a btrfs volume, and it has:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/myvolume
+</span><span>/myvolume/root
+</span><span>/myvolume/other
+</span></code></pre>
+<p>And I mount <code>/myvolume/root</code> as my <code>/</code> filesystem, then I can no longer administer <code>/myvolume</code>
+or <code>/myvolume/other</code> <em>unless</em> I mount these somewhere. This in itself becomes weird because if I
+do mount <code>/myvolume</code> then I also can access <code>/myvolume/root</code> via it.</p>
+<p>Counter intuitively, snapshots on btrfs <em>aren't recursive</em>. So this means you can't take a snapshot
+that keeps two subvolumes precisely in lockstep.</p>
+<p>In btrfs raid 1, when a disk dies btrfs won't tell you which one died. Even btrfs' own documentation
+<a href="https://btrfs.readthedocs.io/en/latest/Volume-management.html">doesn't tell you how to replace a failed disk</a>.</p>
+<p>Btrfs data scrubbing uses easy to remember commands like <code>systemd-run -p "IOReadBandwidthMax=/dev/sdx 10M" btrfs scrub start -B /</code>
+which is needed because btrfs doesn't rate limit scrubs in the background like zfs does.</p>
+<p>I could go on, but every feature of btrfs has these papercuts - needless complexities, flaws
+where there should be none, half baked parts, and risks to the user while attempting to do basic tasks.</p>
+<p>But currently btrfs is the default in OpenSUSE/Fedora because it <em>looks good</em> on paper. Look at
+that list of features! So many features. How could it be bad?</p>
+<h2 id="why-don-t-we-all-just-move-to-zfs-if-you-like-it-so-much">Why Don't We All Just Move To ZFS If You Like It So Much</h2>
+<p>ZFS was developed by SUN for their Solaris Operating System. At the time, Solaris was afraid of
+being overtaken in the datacentre by Linux, and so in an attempt to garner interest from the
+opensource community they released Solaris under the CDDL license. The CDDL license <em>is</em>
+opensource, but it's written in such a way to prevent CDDL being used in the Linux Kernel. Since
+then Oracle bought SUN, and as a particularly hostile company, it's unlikely that Oracle will
+find it deep in the tiny black void that is their corporate conscience to attempt to fix the
+license issues with ZFS.</p>
+<p>It's worth noting this <em>doesn't</em> affect Illumos or FreeBSD which are developed under different
+license terms.</p>
+<h2 id="what-if-we-just-fixed-btr">What If We Just Fixed Btr...</h2>
+<p>You can't.</p>
+<p>Software projects are a reflection of their developers intents. We know that btrfs is the reflection
+of features at all costs, so how would you pivot to "user experience" or "reliability"? The issue is
+you can't tack those things on <em>later</em>. They need to be there from the start (like in ZFS).</p>
+<p>When you do attempt to tack on user experience, it ends up half baked in it's own way.</p>
+<p>Lets go back to the subvolume example. How would you fix btrfs to handle subvolumes in a way that
+doesn't require a mountpoint? The whole existing ecosystem is already deeply embedded in the idea
+of subvolumes being a magic-folder, so trying to unpick that into a clearer administrative structure
+would be an impossible task.</p>
+<p>To really "get this" watch the talk by <a href="https://youtu.be/MsY-BafQgj4?t=170">George Wilson and Matt Ahrens about ZFS</a>. It
+really shows the care and thought that has to exist from the start of development - not later.</p>
+<h2 id="can-we-add-snapshots-to-xfs-that-woul">Can We Add Snapshots To XFS That Woul....</h2>
+<p><a href="https://stratis-storage.github.io/">Stratis exists</a> as a direct <a href="https://lwn.net/Articles/747633/">implementation of this as envisioned by an XFS developer</a></p>
+<h2 id="what-filesystem-should-i-use-today">What Filesystem Should I Use Today?</h2>
+<blockquote>
+<p>Do you want to guarantee your data is free of corruption?</p>
+</blockquote>
+<p>ZFS for your data you care about (<code>/home</code>) and XFS on LVM for anything else.</p>
+<blockquote>
+<p>Do you want to avoid mucking about with kernel modules?</p>
+</blockquote>
+<p>XFS on LVM</p>
+<blockquote>
+<p>But why not btr...</p>
+</blockquote>
+<p>Do you value your data? Like seriously?</p>
+<blockquote>
+<p>But I really like snapshots</p>
+</blockquote>
+<p>Fine. Use btrfs on your root (<code>/</code>) volume. But at least make /home xfs.</p>
+<p>And have backups. <a href="https://www.borgbackup.org/">borg backup is good</a>.</p>
+<p>No btrfs snapshots aren't backups. Don't try that argument here.</p>
+<h2 id="the-roasting-corner-fire">The Roasting Corner 🔥</h2>
+<details>
+<p>Wherein I roast every filesystem for being shit except ZFS.</p>
+<h3 id="zfs-1">ZFS</h3>
+<p>ZFS is the gold standard. It sets the bar for every other filesystem to meet, and then fall well short of.</p>
+<p>ZFS is a high-performance copy-on-write voluming filesystem. Given a pool of disks, ZFS will
+create checksummed, redundant storage for you. Natively supporting fast inline transparent
+compression out of the box, snapshots that are fast and efficient, automatic healing of data
+if any corruption are found, ZFS not only stores your data, <em>it actively protects it from corruption</em>.</p>
+<p>The design of ZFS makes it <em>impervious</em> to filesystem corruption, even with catastrophic disk loss
+or power failure.</p>
+<p>In addition, the administration tools are second to none. Just look at this:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># zpool status tank
+</span><span>
+</span><span>  pool: tank
+</span><span> state: ONLINE
+</span><span>  scan: scrub repaired 0B in 18:47:51 with 0 errors on Thu Aug  8 14:47:53 2024
+</span><span>config:
+</span><span>
+</span><span>	NAME                                     STATE     READ WRITE CKSUM
+</span><span>	tank                                     ONLINE       0     0     0
+</span><span>	  mirror-0                               ONLINE       0     0     0
+</span><span>	    scsi-SATA_ST18000NM000J-2T_ZR5EWW2S  ONLINE       0     0     0
+</span><span>	    scsi-SATA_ST18000NM000J-2T_ZR5ER3PJ  ONLINE       0     0     0
+</span><span>	  mirror-2                               ONLINE       0     0     0
+</span><span>	    scsi-SATA_ST18000NM000J-2T_ZR5EY4RR  ONLINE       0     0     0
+</span><span>	    scsi-SATA_ST18000NM000J-2T_ZR5ERJNC  ONLINE       0     0     0
+</span><span>
+</span><span>errors: No known data errors
+</span></code></pre>
+<p>We can easily see that we have a pool of 4 disks, they are aranged in a raid 10 (raid 1 mirrors
+that are assembled to a raid 0). We can see each disks health and status. We can see the state
+of the pool, or if errors occured (in the READ, WRITE, CKSUM columns). We can see the results of
+the last filesystem check (scrub).</p>
+<p>Nothing else comes close to this level of administration quality.</p>
+<p>Even though it's a copy-on-write filesystem, ZFS has no issues with storage accounting:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># zfs list -r tank
+</span><span>NAME                                                       USED  AVAIL  REFER  MOUNTPOINT
+</span><span>tank                                                      20.4T  12.2T  2.08M  none
+</span><span>...
+</span><span>tank/pub                                                  5.65T  1.35T  5.65T  /mnt/pub
+</span><span>tank/home                                                 2.69T  12.2T   288K  /mnt/home
+</span><span>tank/home/william                                         1.62T   836G  1.62T  /mnt/home/william
+</span></code></pre>
+<p>We can see exactly where data is used (by the USED column), how much it <em>logically</em> uses on disk
+after compression (REFER) and how much is available <em>once quotas are considered</em>.</p>
+<p>Even tools like measuring iostats are easy to access:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># zpool iostat -v tank
+</span><span>                                           capacity     operations     bandwidth
+</span><span>pool                                     alloc   free   read  write   read  write
+</span><span>---------------------------------------  -----  -----  -----  -----  -----  -----
+</span><span>tank                                     19.5T  13.2T      0     30   168K  4.31M
+</span><span>  mirror-0                               9.74T  6.62T      0     15  84.5K  2.15M
+</span><span>    scsi-SATA_ST18000NM000J-2T_ZR5EWW2S      -      -      0      7  41.9K  1.08M
+</span><span>    scsi-SATA_ST18000NM000J-2T_ZR5ER3PJ      -      -      0      7  42.5K  1.08M
+</span><span>  mirror-2                               9.76T  6.59T      0     15  83.8K  2.15M
+</span><span>    scsi-SATA_ST18000NM000J-2T_ZR5EY4RR      -      -      0      7  41.6K  1.08M
+</span><span>    scsi-SATA_ST18000NM000J-2T_ZR5ERJNC      -      -      0      7  42.2K  1.08M
+</span><span>---------------------------------------  -----  -----  -----  -----  -----  -----
+</span></code></pre>
+<p>Or how the filesystem cache is performing (which for the record, ZFS ignores
+the kernels default filesystem cache in favour of it's vastly improved adaptive
+replacement cache (ARC).</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># arc_summary
+</span><span>
+</span><span>------------------------------------------------------------------------
+</span><span>ZFS Subsystem Report                            Tue Aug 13 10:53:40 2024
+</span><span>Linux 5.14.21-150500.55.68-default                               2.2.5-1
+</span><span>Machine: morgan (x86_64)                                         2.2.5-1
+</span><span>
+</span><span>ARC status:                                                      HEALTHY
+</span><span>        Memory throttle count:                                         0
+</span><span>
+</span><span>ARC size (current):                                    19.6 %   15.7 GiB
+</span><span>        Target size (adaptive):                        20.0 %   16.0 GiB
+</span><span>        Min size (hard limit):                         20.0 %   16.0 GiB
+</span><span>        Max size (high water):                            5:1   80.0 GiB
+</span><span>...
+</span><span>        MFU data target:                               48.4 %    7.4 GiB
+</span><span>        MFU data size:                                 56.1 %    8.5 GiB
+</span><span>        MFU ghost data size:                                     3.5 GiB
+</span><span>        MFU metadata target:                           11.1 %    1.7 GiB
+</span><span>        MFU metadata size:                              4.8 %  748.8 MiB
+</span><span>        MFU ghost metadata size:                                 0 Bytes
+</span><span>        MRU data target:                               29.4 %    4.5 GiB
+</span><span>        MRU data size:                                 21.2 %    3.2 GiB
+</span><span>        MRU ghost data size:                                     5.2 GiB
+</span><span>        MRU metadata target:                           11.1 %    1.7 GiB
+</span><span>        MRU metadata size:                              8.6 %    1.3 GiB
+</span><span>        MRU ghost metadata size:                                 0 Bytes
+</span><span>
+</span><span>...
+</span><span>
+</span><span>ARC total accesses:                                                20.7G
+</span><span>        Total hits:                                   100.0 %      20.7G
+</span><span>        Total I/O hits:                               &lt; 0.1 %     511.7k
+</span><span>        Total misses:                                 &lt; 0.1 %       2.8M
+</span></code></pre>
+<p>I challenge you to find statistics on the linux filesystem cache hit percentages that are as accesible
+and easy to use as this.</p>
+<p>ZFS really sets a high bar for quality, performance and administration. I could go on further but you're
+probably already bored.</p>
+<h3 id="ext3-ext4">Ext3 / Ext4</h3>
+<p>Ext3 and Ext4 are journaled filesystems. The primary difference between ext3 and ext4 is the addition
+of extent allocation in ext4 (allowing larger ranges to be allocated contiguously for files).</p>
+<p>Outside of that ext is very simple. It's <a href="https://www.man7.org/linux/man-pages/man5/ext4.5.html">journaling supports mounting with journal_checksum</a> but it appears not to be
+enabled by default. Here is output from a filesystem I just created.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># sudo dumpe2fs /dev/disk/by-id/something | less
+</span><span>Filesystem features:      has_journal ext_attr resize_inode dir_index filetype needs_recovery \
+</span><span>    extent 64bit flex_bg sparse_super large_file huge_file dir_nlink extra_isize metadata_csum
+</span><span>Filesystem flags:         signed_directory_hash
+</span><span>Default mount options:    user_xattr acl
+</span></code></pre>
+<p>This means that corruption in the journal will potentially damage your FS if a powerloss occurs. To
+add further insult to this by default <em>most distros don't even use the journal for data - only
+metadata</em>. Don't believe me? Check <a href="https://www.man7.org/linux/man-pages/man5/ext4.5.html">the ext4 man page</a>
+and read the section on <code>data=</code> defaults. This means by default you have no crash protection on your
+data, only the metadata.</p>
+<p>If we examine corruption as a source of a hardware error, we also see that
+<a href="https://danluu.com/filesystem-errors/">hardware errors are silently ignored</a>.</p>
+<p>This means outside of "performance", the files in ext3/4 are generally at risk of silent damage or
+loss in the event of a crash of the kernel or sudden powerloss.</p>
+<h3 id="xfs-1">XFS</h3>
+<p>XFS is another journaled filesystem which originally came from Silicon Graphics.</p>
+<p>XFS supports full metadata and journal checksumming by default, as well as internally implementing
+transactional operations within the journal.</p>
+<p>However, similar to ext3/4, <a href="https://danluu.com/filesystem-errors/">hardware errors are silently ignored</a>.</p>
+<p>Unlike ext3/4, XFS journals your data as well.</p>
+<p>This leaves XFS as a very fast simple filesystem that is more reliable than ext3/4, but still
+prone to damage.</p>
+<p>As a consolation prize, XFS has a filesystem test suite called <code>xfs_tests</code>. This is now the defacto
+linux filesystem test suite. This speaks volumes to xfs caring about quality vs everyone else.</p>
+<h3 id="btrfs-1">Btrfs</h3>
+<p>Btrfs is cited by one source to be <a href="https://arstechnica.com/gadgets/2021/09/examining-btrfs-linuxs-perpetually-half-finished-filesystem/">perpetually half finished</a>
+and I can not fault that description.</p>
+<p>As a filesystem Btrfs makes a large number of promises and half-delivers on all of them.</p>
+<p>Unlike Ext3/4 and Xfs, Btrfs is the first introduction of a copy-on-write filesystem in Linux. This means
+that rather than writing to a journal before a write-in-place of data, btrfs <em>copies</em> extents/blocks
+of data and writes to them separate to the existing data. This in theory, provides perfect corruption
+and power loss resilience because all writes go into new blocks, and only once they are all complete
+is the filesystem tree atomicly flipped from the old-version to the new version.</p>
+<p>Additionally, this means that the checksums of all the blocks can be created and chained upward
+in the filesystem tree, providing a perfect trail for validation that each bit stored on the filesystem
+is exactly as it should be.</p>
+<p>However, it doesn't work out quite so nicely in Btrfs - Btrfs has a long history of filesystem
+corruption, even though it should be impossible in the design presented. This necesitated btrfs
+to develop a filesystem checker since it can tie itself in knots so easily. Contrast to ZFS that
+has no such issues.</p>
+<p>To add insult to injury, btrfs is the <a href="https://www.phoronix.com/review/linux-611-filesystems">slowest filesystem on linux</a>
+by a wide margin.</p>
+<p>This is to say nothing of the confusing administration experience, and difficulty for btrfs
+to show basic data like "free space" or "which disk has died in a raid 1". This is why
+I chose to nominate btrfs as having minimal hardware fault protection, since being able to
+identify which disk died in a raid is table stakes, and btrfs somehow still fails at this
+basic operation.</p>
+<p>And this is to say nothing of the process to fix a damaged raid 1 - it's painful and risky at best.</p>
+<h3 id="apfs-1">Apfs</h3>
+<p>Apfs is Apple's Filesystem on MacOS, iPhoneOS and iPadOS. It's not available on linux but we include
+it here because it acts as a great comparison point.</p>
+<p>Apfs is a copy-on-write and voluming filesystem. It supports cryptographically signed read-only
+volumes which Apple uses for it's Boot partitions to allow crytpographic verification of the
+whole OS from the moment the device turns on (linux has nothing like this!) This also means
+that if an update goes bad, it can trivially be rolled back to.</p>
+<p>The tool to manager Apfs (if you go digging) are really straight forward and easy to use and
+understand. There are tools to automatically thin-snapshots if too many exist and you need
+local space reclaimed, or if you want to add new volumes etc.</p>
+<p>The biggest weakness of Apfs is that the developers opted to skip <em>data</em> checksumming stating
+that "nvme drives automatically provide ECC meaning that bad blocks won't be returned from
+the drive". This is as we call it in the industry <a href="https://ahl.dtrace.org/2016/06/19/apfs-part5/">a crock of shit</a>.
+Nvme drives <em>barely</em> function day to day without ECC meaning that anything beyond it's already
+minimal margins will result in dataloss.</p>
+<p>Where Apfs excels though is integration with timemachine, apples in built backup system. By default
+apfs will snapshot your system (even when you are out and about). When timemachine syncs to the
+backup destination, it simply transmits the needed apfs snapshots.</p>
+<p>This gives you the ability to locally browse snapshots to review versions of files, recover things
+you deleted (without needing a recycle bin), and only if you need deep historical access you can
+browse older versions on the backup destination. To add to this, timemachine being "set and forget"
+makes it the absolute gold standard in backups today.</p>
+<p>This is the major reason apfs scores points into hardware failure protection - the fact that
+backups are built-in and part of the filesystem from day 1 shines through at each point, giving
+even conusmers data integrity and protection guarantees that no other OS comes near.</p>
+</details>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>Firstyear&#x27;s blog-a-log</title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>Webauthn Attestation and OpenSource Keys</h1>
+        <div class="border"></div>
+        <time datetime="2023-12-02" class="date" itemprop="datePublished">
+            02 Dec 2023
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <h1 id="webauthn-attestation-and-opensource-keys">Webauthn Attestation and OpenSource Keys</h1>
+<p>Webauthn (Passkeys) are only going to become more important in the future and as this grows,
+deployments with higher security risks and criticality are going to need to start to understand
+and embrace attestation of their keys.</p>
+<p>In their current form, almost all software products and IDM's today allow you to enroll any
+cryptographic authenticator. It doesn't matter what make or model it is, it will be allowed.</p>
+<p>However, not all authenticators are made equal. They each have different properties, security
+features, and some even have security issues affecting their hardware or software. Because
+webauthn is a <em>self contained</em> multiple factor authenticator, this means we need to be
+even more careful to ensure these devices are secure.</p>
+<p>To manage this deployments can <em>attest</em> keys during enrollment. Attestation is a cryptographic
+proof of origin that proves the device is of a certain make and model. This allows us to select
+which devices we allow - and which we don't.</p>
+<h2 id="threat-modelling">Threat Modelling</h2>
+<p>To make an informed determination about what keys we should allow in our IDM we have to assess
+our individual risks. Generally we want to consider the damage from a compromised authenticator.</p>
+<p>When I'm inside my home network going to control my house lightbulbs, that's quite low risk. Private
+network, with little consequences of damage.</p>
+<p>For my personal email, compromise would represent a huge amount of personal damage as email is so
+critical to individual account security.</p>
+<p>If the release engineers in a linux distribution were compromised for example, that could lead to
+malware being distributed in the distribution aftecting thousands of people. Similar for developers
+of opensource where compromise of their credentials can lead to bugdoors being injected into code.</p>
+<h2 id="authenticator-risks">Authenticator Risks</h2>
+<p>Because of this, we need to consider the possible threat vectors against authenticators, and how
+an authenticator <em>may</em> become compromised.</p>
+<p>A problem here is that in Webauthn attestation, firmware versions are not (currently)
+included. This means that if any model or version of an authenticator's software or hardware is compromised,
+that <em>all</em> versions of that device must be considered compromised. This raises the bar for vendors
+to be sure they "get it right" when they ship a device the first time.</p>
+<h3 id="physical-attacks">Physical Attacks</h3>
+<p>This is the most obvious one. It can occur either in transit as the device is sent to you, or it
+can occur when the device is in your possesion.</p>
+<p>Mitigations are tamper evident packaging (transit only), tamper evident features on the device, or device construction
+that requires destruction actions to open.</p>
+<h3 id="local-software-attacks">Local Software Attacks</h3>
+<p>Rather than attacking the device physically, the device may be attacked locally via it's interfaces
+such as USB, NFC or Bluetooth. This leaves no physical evidence, but can still allow compromise of
+a device if physical access is obtained.</p>
+<p>Mitigations are tamper evident packaging (to prevent transit software attacks), and software
+hardening and use of memory safe languages.</p>
+<h3 id="remote-software-attacks">Remote Software Attacks</h3>
+<p>This is the most nefarious class, where a device can be compromised by it being connected to your
+machine as it visits a webpage. This is due to weaknesses in it's software via it's CTAP interface.</p>
+<p>Mitigations are software hardening, auditing for hidden vendor commands, and devices ensuring that
+any out of band management is never performed via the CTAP interface (it must be a seperate channel).</p>
+<h3 id="cryptographic-failures">Cryptographic Failures</h3>
+<p>This is a failure of the devices programming or hardware during cryptographic operations allowing
+private keys to be removed from the secure enclave that exists inside the device.</p>
+<p>Mitigations are in the hands of vendors requiring detailed audits and work to ensure their software
+is not vulnerable.</p>
+<h2 id="external-certification-bodies">External Certification Bodies</h2>
+<p>FIDO who certifies authenticators publishes a metadata service that shows details about various
+authenticators and their assessments. These can be found on the <a href="https://fidoalliance.org/metadata/">mds service site</a>.</p>
+<p>The MDS defines multiple certification levels for devices. These are defined <a href="https://fidoalliance.org/certification/authenticator-certification-levels/">on fido's site</a>.</p>
+<p>Currently the best reference for an overview is the <a href="https://fidoalliance.org/specs/fido-security-requirements/fido-authenticator-security-requirements-v1.5-fd-20211102.html#authenticator-hardware-examples">table of authenticator hardware examples</a>.</p>
+<p>We have a tool for querying this data <a href="https://github.com/kanidm/webauthn-rs/tree/master/fido-mds-tool">as part of webauthn-rs</a></p>
+<h2 id="what-authenticator-do-you-recommend">What Authenticator Do You Recommend?</h2>
+<p><a href="https://www.yubico.com/products/yubikey-5-overview/">Yubikey 5 Series</a></p>
+<p>These are the gold standard, and have all the best features here.</p>
+<ul>
+<li>Tamper evident packaging</li>
+<li>Hardware that can not be opened without destruction</li>
+<li>Hardened software to prevent local compromise</li>
+<li>No hidden vendor commands in CTAP preventing remote compromise</li>
+<li>Audits of their cryptographic processors to ensure they are high quality</li>
+<li>FIPS variant meets L2 FIDO criteria - the highest level currently granted by FIDO
+<ul>
+<li>Non FIPS variants are the same HW, so should be able to achieve L2 as well in future</li>
+</ul>
+</li>
+</ul>
+<p><a href="https://www.token2.com/shop/product/token2-t2f2-fido2-and-u2f-security-key">Token2 T2F2</a></p>
+<p>Runner up - this is the only other authenticator we have found with high quality tamper
+resitent features.</p>
+<ul>
+<li>No tamper evident packaging</li>
+<li>Hardware that can not be opened without destruction</li>
+<li>Hardened software to prevent local compromise</li>
+<li>No hidden vendor commands in CTAP preventing remote compromise</li>
+</ul>
+<h2 id="so-what-about-opensource-authenticators">So What About OpenSource Authenticators?</h2>
+<p>There are two major brands that I am aware of. Nitrokey and Solokey.</p>
+<p>Sadly both have issues, meaning I advise against their use.</p>
+<h3 id="solokey">Solokey</h3>
+<p>Solokey is the only opensource authenticator with a FIDO certification. They are built
+with an epoxy over their main circuits to highlight if these are altered. This is a great level
+of tamper resistence.</p>
+<p>The solokey is based on an LPC55S69 which unfortunately means it has been affected by a
+<a href="https://oxide.computer/blog/another-vulnerability-in-the-lpc55s69-rom?ref=brianlovin.com">trust chain bypass</a>.
+As a result NXP have had to issue new board revisions to resolve this, but it's not clear
+when you own a solokey if you have an affected revision or not. Since webauthn can't distinguish
+firmware versions either, it's also impossible to tell if a device has been fully software updated.</p>
+<p>In summary</p>
+<ul>
+<li>No tamper evident packaging</li>
+<li>Hardware that can not be opened without destruction</li>
+<li>Unable to tell if fully updated (vendor must change aaguids on fw version update)</li>
+<li>Local software trust chain bypass may be possible</li>
+</ul>
+<h3 id="nitrokey-3-nfc">Nitrokey 3 NFC</h3>
+<p>The Nitrokey 3 is built on the same hardware and software as the solokey. This means it is
+also vulnerable to the same issues. Unlike the solokey, the Nitrokey lacks tamper proof
+hardware - I can open mine quite easily with a spudger leaving no evidence of access. The
+NK3 I own is also a revision of the LPC55S69 which I can confirm is vulnerable
+to the trust chain bypass.</p>
+<blockquote>
+<p>UPDATE: 2024-08-05: Nitrokey have confirmed they are vulnerable to the LPC55S69 trust chain
+bypass and will NOT be changing CPU revision to resolve it.</p>
+</blockquote>
+<blockquote>
+<p>UPDATE: 2024-08-06: Per Nitrokeys <a href="https://docs.nitrokey.com/nitrokey3/features">own website</a>,
+no Nitrokey 3 model uses the secure enclave for FIDO operations.</p>
+</blockquote>
+<ul>
+<li>No tamper evident packaging</li>
+<li>Hardware has no tamper resistance</li>
+<li>Unable to tell if fully updated (vendor must change aaguids on fw version update)</li>
+<li>Local software trust chain bypass is possible</li>
+<li>Does not use devices own secure element</li>
+</ul>
+<h3 id="nitrokey-3-mini">Nitrokey 3 Mini</h3>
+<p>The Nitrokey 3 Mini uses the same software an the NK3N, but uses a different chip (nrf32). We are unable
+to assess the hardware security as we don't own one, but nitrokeys trackrecord would indicate it likely
+has poor tamper resistance.</p>
+<p>The <a href="https://shop.nitrokey.com/shop/nk3am-nitrokey-3a-mini-149?#attr=">NK3M shop page</a> as of 2023 declares:</p>
+<p><em>IMPORTANT NOTE: The included Secure Element is not used at this time. We are currently working on its integration and will enable its use later via firmware update.</em></p>
+<p>This means that keys are <em>very likely</em> not stored with secure mechanisms. Unless a firmware update that enables
+this feature changes the aaguid, it will always have to be assumed that this model of key is a version not
+using the secure enclave, making it inelligble for any serious use.</p>
+<ul>
+<li>No tamper evident packaging</li>
+<li>Hardware <em>likely</em> has no tamper resistance</li>
+<li>Unable to tell if fully updated (vendor must change aaguids on fw version update)</li>
+<li>Does not use devices own secure element</li>
+</ul>
+<blockquote>
+<p>UPDATE: 2024-05-15</p>
+</blockquote>
+<p>Nitrokey now use their secure enclave! They released the following announcement</p>
+<p><em>We are pleased to announce that we have reached a new milestone in the development of the Nitrokey 3.
+With the latest firmware version 1.7, the integrated secure element is now used for the secure
+storage of cryptographic keys. The secure element has been certified up to operating system level
+according to Common Criteria EAL 6+ and therefore meets high security requirements. Together with
+the open source firmware developed in Rust, the Nitrokey 3 is one of the most secure and modern
+security keys of all time.</em></p>
+<p>This is a very bold claim given that there is still no way to tell a key that doesn't use the SE
+from one that does, and given the lack of any kind of hardware tamper resistance on the device
+at all. Given their track record, I would continue to doubt the security of these keys unless
+Nitrokey make significant and public efforts to actually improve their approaches to development.</p>
+<blockquote>
+<p>UPDATE: 2024-08-06: Per Nitrokeys <a href="https://docs.nitrokey.com/nitrokey3/features">own website</a>,
+no Nitrokey 3 model uses the secure enclave for FIDO operations. So this undoes the previous
+announcement they have made in full.</p>
+</blockquote>
+<h3 id="nitrokey-2">Nitrokey 2</h3>
+<p>Also called the Nitrokey FIDO2. While this device is named "FIDO2", it has never been certified by
+FIDO. Like the NK 3, it has no tamper resistant packaging or hardware.</p>
+<p>The NK2 has a weird feature though - you can update it <em>from a website</em> ( <a href="https://update.nitrokey.com/">update site</a> ).</p>
+<p>The way this is performed is with a hidden set of vendor commands that are hidden inside the credential ID
+of the CTAP2 get assertion process, defined by the value <code>WALLET_TAG</code>. You can see the checks for this
+in <a href="https://github.com/Nitrokey/nitrokey-fido2-firmware/blob/12f2c14c6d7752293385c4c2f5317f16b0b63e61/fido2/extensions/extensions.c#L112">the nitrokey firmware source</a></p>
+<p>The problem here is that this means any website can sent a credential id with this <code>WALLET_TAG</code> and
+the nitrokey will respect and start to process those commands. More shocking, is these commands do
+not require interaction (touch) of the device or the pin to proceed, so visiting any webpage can
+trigger these commands. These commands include retrieving the device firmware versions, triggering
+the device to go into bootloader mode, and updating the firmware.</p>
+<p>At this time I am not aware of or sure about vulnerabilities in the NK2 L432KC6 chip. However, the
+ability to perform remote unauthenticated firmware updates is not something I want in a secure authenticator.</p>
+<p>Just like the other keys, since webauthn can't distinguish firmware versions either, it's also
+impossible to tell if a device has been fully software updated.</p>
+<ul>
+<li>No tamper evident packaging</li>
+<li>Hardware has no tamper resistance</li>
+<li>Unable to tell if fully updated (vendor must change aaguids on fw version update)</li>
+<li>Remote software trust chain bypass may be possible due to vendor commands</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>Today there are no opensource keys that meet basic security requirements for use in higher security
+environments. This means that attestation of webauthn keys in these environments is critical to ensure
+that these and other compromised keys documented in the FIDO MDS are not used in these situations.</p>
+<p>If there are other models and makes of opensource security keys I haven't reviewed, let me know
+so that I can purchase them for auditing!</p>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>
