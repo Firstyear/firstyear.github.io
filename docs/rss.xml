@@ -36,6 +36,8 @@ their images that the out of box (OOB) experience is awful.&lt;&#x2F;p&gt;
 &lt;p&gt;This leads people to &lt;code&gt;services.msc&lt;&#x2F;code&gt; and you disable random stuff you don&#x27;t recognise because &quot;I dunno
 what it does, must be bloat&quot;. As our GN video shows, sometimes those random services can take up 30%
 of a systems resources &lt;em&gt;just&lt;&#x2F;em&gt; idling which really has a negative impact on user experience.&lt;&#x2F;p&gt;
+&lt;p&gt;To define bloat in one, clear line.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;em&gt;Bloat is pre-installed software that has no benefit to the user&#x2F;system and actively consumes RAM, CPU and&#x2F;or GPU resources.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;so-what-about-linux&quot;&gt;So what about Linux?&lt;&#x2F;h2&gt;
 &lt;p&gt;This proliferation of bloat in Windows has led to this idea that when you install a system, it
 always comes with some &quot;hidden part&quot; that must be taking up resources.&lt;&#x2F;p&gt;
