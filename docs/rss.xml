@@ -26,7 +26,6 @@ their images that the out of box (OOB) experience is awful.&lt;&#x2F;p&gt;
 &lt;ul&gt;
 &lt;li&gt;McAfee anti-virus&lt;&#x2F;li&gt;
 &lt;li&gt;That anoying ASUS thing that tries to install from your motherboard&lt;&#x2F;li&gt;
-&lt;li&gt;Any software made by Razer&lt;&#x2F;li&gt;
 &lt;li&gt;Pre-installed OEM helper software on Windows&lt;&#x2F;li&gt;
 &lt;li&gt;This blog post&lt;&#x2F;li&gt;
 &lt;li&gt;Copilot&lt;&#x2F;li&gt;
@@ -37,7 +36,7 @@ their images that the out of box (OOB) experience is awful.&lt;&#x2F;p&gt;
 what it does, must be bloat&quot;. As our GN video shows, sometimes those random services can take up 30%
 of a systems resources &lt;em&gt;just&lt;&#x2F;em&gt; idling which really has a negative impact on user experience.&lt;&#x2F;p&gt;
 &lt;p&gt;To define bloat in one, clear line.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;em&gt;Bloat is pre-installed software that has no benefit to the user&#x2F;system and actively consumes RAM, CPU and&#x2F;or GPU resources.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;em&gt;Bloat is software installed for corporate gain, which has no benefit to the user&#x2F;system and actively consumes significant RAM, CPU and&#x2F;or GPU resources.&lt;&#x2F;em&gt;&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;so-what-about-linux&quot;&gt;So what about Linux?&lt;&#x2F;h2&gt;
 &lt;p&gt;This proliferation of bloat in Windows has led to this idea that when you install a system, it
 always comes with some &quot;hidden part&quot; that must be taking up resources.&lt;&#x2F;p&gt;
@@ -48,7 +47,7 @@ of what&#x27;s installed by default has a purpose on your system to make it more
 software like NTP clients) just to save &lt;em&gt;disk space&lt;&#x2F;em&gt; which isn&#x27;t really a resource that&#x27;s at a premium
 these days.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;what-should-you-do&quot;&gt;What should you do?&lt;&#x2F;h2&gt;
-&lt;p&gt;Don&#x27;t stress about &quot;bloat&quot; in Linux - it simply isn&#x27;t there in the same way as it is in Windows. There
+&lt;p&gt;Don&#x27;t stress about &quot;bloat&quot; in Linux - it simply isn&#x27;t there like it is in Windows. There
 certainly are parts of a Linux distro that &lt;em&gt;can&lt;&#x2F;em&gt; negatively impact performance, but that is &lt;em&gt;not&lt;&#x2F;em&gt;
 the same as &quot;bloat&quot; (looking at you PackageKit).&lt;&#x2F;p&gt;
 &lt;p&gt;And remember that software that &lt;em&gt;isn&#x27;t running&lt;&#x2F;em&gt; and is just on disk, isn&#x27;t consuming any resources!
