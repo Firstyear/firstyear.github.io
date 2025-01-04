@@ -14,13 +14,13 @@
           <author>Unknown</author>
           <link>https://fy.blackhats.net.au/blog/2025-01-04-bloat/</link>
           <guid>https://fy.blackhats.net.au/blog/2025-01-04-bloat/</guid>
-          <description xml:base="https://fy.blackhats.net.au/blog/2025-01-04-bloat/">&lt;p&gt;Common question we see in the OpenSUSE community are &quot;which distro is the least bloated&quot;,
+          <description xml:base="https://fy.blackhats.net.au/blog/2025-01-04-bloat/">&lt;p&gt;Common questions we see in the OpenSUSE community are &quot;which distro is the least bloated&quot;,
 &quot;how can I remove bloat&quot;, &quot;package X is bloat&quot; etc.&lt;&#x2F;p&gt;
 &lt;p&gt;For the longest time this has confused me - Linux while sometimes slow, isn&#x27;t &quot;bloated&quot;. So
-where are all these questions coming from.&lt;&#x2F;p&gt;
+where are all these questions coming from?&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;what-is-bloat&quot;&gt;What is Bloat?&lt;&#x2F;h2&gt;
 &lt;p&gt;It was only recently while watching an older &lt;a href=&quot;https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v=5N7aYtkzKJc&quot;&gt;Gamers Nexus video on a prebuilt Dell PC&lt;&#x2F;a&gt;
-that I realised where this may be coming from. So many OEM&#x27;s install 3rd party software into
+that I realised where this is from - So many OEM&#x27;s install 3rd party software into
 their images that the out of box (OOB) experience is awful.&lt;&#x2F;p&gt;
 &lt;p&gt;Some genuine examples of bloat are:&lt;&#x2F;p&gt;
 &lt;ul&gt;
