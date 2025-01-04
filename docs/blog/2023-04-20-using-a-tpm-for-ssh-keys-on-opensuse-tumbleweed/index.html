@@ -34,15 +34,15 @@
                         
                             
                             <li class="nav">
-                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
-                                    <span itemprop="name">Blog</span>
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
                                 </a>
                             </li>
                         
                             
                             <li class="nav">
-                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
-                                    <span itemprop="name">Pages</span>
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
                                 </a>
                             </li>
                         
@@ -118,6 +118,26 @@ with the line:</p>
 <h2 id="allow-user-access">Allow User Access</h2>
 <p>Add your user to the tss group</p>
 <pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>usermod -a -G tss username
+</span></code></pre>
+<h2 id="execute-fapi-provisioning">Execute FAPI Provisioning</h2>
+<p>The tpm2 library comes with a feature api (FAPI), which annoyingly needs
+provisioning before we can proceed. If you skip this provisioning step,
+you will be annoyed by a pointless warning message every time you use
+your ssh key.</p>
+<p>If you attempt the provisioning later, you will BREAK YOUR KEYS.</p>
+<p>Edit <code>/etc/tpm2-tss/fapi-config.json</code> and ensure this line is present:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>     &quot;ek_cert_less&quot;: &quot;yes&quot;,
+</span></code></pre>
+<p>now run:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tss2_provision
+</span></code></pre>
+<blockquote>
+<p>HINT: If you have errors you can get more output with:</p>
+</blockquote>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>TSS2_LOG=fapi+debug tss2_provision
+</span></code></pre>
+<p>If you get an error about "An SRK already exists", you can clear it with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tpm2_evictcontrol -C o -c 0x81000001
 </span></code></pre>
 <h2 id="configure-the-ssh-key">Configure the SSH key</h2>
 <p><em>NOTE</em> Be sure to perform these steps as your user - not as root!</p>

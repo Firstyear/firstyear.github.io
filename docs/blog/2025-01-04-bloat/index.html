@@ -68,45 +68,51 @@
             
 <article itemscope itemtype="http://schema.org/BlogPosting">
     <div itemprop="headline">
-        <h1>I no longer recommend FreeIPA</h1>
+        <h1>Bloat</h1>
         <div class="border"></div>
-        <time datetime="2019-07-10" class="date" itemprop="datePublished">
-            10 Jul 2019
+        <time datetime="2025-01-04" class="date" itemprop="datePublished">
+            04 Jan 2025
         </time>
     </div>
     <div itemprop="articleBody">
-        <h1 id="i-no-longer-recommend-freeipa">I no longer recommend FreeIPA</h1>
-<p>It's probably taken me a few years to write this, but I can no longer
-recommend FreeIPA for IDM installations.</p>
-<h2 id="why-not">Why not?</h2>
-<p>The FreeIPA project focused on Kerberos and SSSD, with enough other
-parts glued on to look like a complete IDM project. Now that's fine,
-but it means that concerns in other parts of the project are largely
-ignored. It creates design decisions that are not scalable or robust.</p>
-<p>Due to these decisions IPA has stability issues and scaling issues that
-other products do not.</p>
-<p>To be clear: security systems like IDM or LDAP can <em>never</em> go down.
-That's not acceptable.</p>
-<h2 id="what-do-you-recommend-instead">What do you recommend instead?</h2>
+        <p>Common question we see in the OpenSUSE community are "which distro is the least bloated",
+"how can I remove bloat", "package X is bloat" etc.</p>
+<p>For the longest time this has confused me - Linux while sometimes slow, isn't "bloated". So
+where are all these questions coming from.</p>
+<h2 id="what-is-bloat">What is Bloat?</h2>
+<p>It was only recently while watching an older <a href="https://www.youtube.com/watch?v=5N7aYtkzKJc">Gamers Nexus video on a prebuilt Dell PC</a>
+that I realised where this may be coming from. So many OEM's install 3rd party software into
+their images that the out of box (OOB) experience is awful.</p>
+<p>Some genuine examples of bloat are:</p>
 <ul>
-<li><a href="https://kanidm.github.io/kanidm/stable/">Kanidm</a></li>
-<li>Samba with AD</li>
-<li>AzureAD</li>
-<li>389 Directory Server</li>
+<li>McAfee anti-virus</li>
+<li>That anoying ASUS thing that tries to install from your motherboard</li>
+<li>Any software made by Razer</li>
+<li>Pre-installed OEM helper software on Windows</li>
+<li>Copilot</li>
+<li>Any software a sales person tries to upsell you on</li>
+<li>The list continues forever ...</li>
 </ul>
-<p>All of these projects are very reliable, secure, scalable.</p>
-<p>Kanidm specifically is my own project built from the ground up, which
-has tried to learn from the mistakes and successes of AD, FreeIPA and
-389-ds. It's what I recommend the most.</p>
-<p>Additionally, we have done a lot of work into 389 to improve our out of
-box IDM capabilities too, but there is more to be done too. The Samba AD
-team have done great things too, and deserve a lot of respect for what
-they have done.</p>
-<h2 id="is-there-more-detail-than-this">Is there more detail than this?</h2>
-<p>Yes - buy me a drink and I'll talk :)</p>
-<h2 id="didn-t-you-help">Didn't you help?</h2>
-<p>I tried and it was not taken on board. Issues I reported years ago still
-exist today 🙃.</p>
+<p>This leads people to <code>services.msc</code> and you disable random stuff you don't recognise because "I dunno
+what it does, must be bloat". As our GN video shows, sometimes those random services can take up 30%
+of a systems resources <em>just</em> idling which really has a negative impact on user experience.</p>
+<h2 id="so-what-about-linux">So what about Linux?</h2>
+<p>This proliferation of bloat in Windows has led to this idea that when you install a system, it
+always comes with some "hidden part" that must be taking up resources.</p>
+<p>When you take this to Linux it doesn't really apply though. Linux distros aren't subject to the same
+financial kickbacks/incentives so random 3rd party software isn't just installed by default. Most
+of what's installed by default has a purpose on your system to make it more usable in some manner.</p>
+<p>Taken further we see people try to even remove as much software as possible (even critical and important
+software like NTP clients) just to save <em>disk space</em> which isn't really a resource that's at a premium
+these days.</p>
+<h2 id="what-should-you-do">What should you do?</h2>
+<p>Don't stress about "bloat" in Linux - it simply isn't there in the same way as it is in Windows. There
+certainly are parts of a Linux distro that <em>can</em> negatively impact performance, but that is <em>not</em>
+the same as "bloat" (looking at you PackageKit).</p>
+<p>And remember that software that <em>isn't running</em> and is just on disk, isn't consuming any resources!
+Those few MB you may save trying to remove it, is fractions of a percentage of your overall disk
+capacity. In the grand scheme of things it's nothing. It's not worth the risk of breaking your system
+(since Linux famously has no adequate safeties or guardrails to stop you destroying your machine).</p>
 
     </div>
 </article>

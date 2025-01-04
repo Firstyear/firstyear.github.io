@@ -7,7 +7,53 @@
       <generator>Zola</generator>
       <language>en</language>
       <atom:link href="https://fy.blackhats.net.au/rss.xml" rel="self" type="application/rss+xml"/>
-      <lastBuildDate>Mon, 09 Sep 2024 00:00:00 +0000</lastBuildDate>
+      <lastBuildDate>Sat, 04 Jan 2025 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>Bloat</title>
+          <pubDate>Sat, 04 Jan 2025 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://fy.blackhats.net.au/blog/2025-01-04-bloat/</link>
+          <guid>https://fy.blackhats.net.au/blog/2025-01-04-bloat/</guid>
+          <description xml:base="https://fy.blackhats.net.au/blog/2025-01-04-bloat/">&lt;p&gt;Common question we see in the OpenSUSE community are &quot;which distro is the least bloated&quot;,
+&quot;how can I remove bloat&quot;, &quot;package X is bloat&quot; etc.&lt;&#x2F;p&gt;
+&lt;p&gt;For the longest time this has confused me - Linux while sometimes slow, isn&#x27;t &quot;bloated&quot;. So
+where are all these questions coming from.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;what-is-bloat&quot;&gt;What is Bloat?&lt;&#x2F;h2&gt;
+&lt;p&gt;It was only recently while watching an older &lt;a href=&quot;https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v=5N7aYtkzKJc&quot;&gt;Gamers Nexus video on a prebuilt Dell PC&lt;&#x2F;a&gt;
+that I realised where this may be coming from. So many OEM&#x27;s install 3rd party software into
+their images that the out of box (OOB) experience is awful.&lt;&#x2F;p&gt;
+&lt;p&gt;Some genuine examples of bloat are:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;McAfee anti-virus&lt;&#x2F;li&gt;
+&lt;li&gt;That anoying ASUS thing that tries to install from your motherboard&lt;&#x2F;li&gt;
+&lt;li&gt;Any software made by Razer&lt;&#x2F;li&gt;
+&lt;li&gt;Pre-installed OEM helper software on Windows&lt;&#x2F;li&gt;
+&lt;li&gt;Copilot&lt;&#x2F;li&gt;
+&lt;li&gt;Any software a sales person tries to upsell you on&lt;&#x2F;li&gt;
+&lt;li&gt;The list continues forever ...&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;This leads people to &lt;code&gt;services.msc&lt;&#x2F;code&gt; and you disable random stuff you don&#x27;t recognise because &quot;I dunno
+what it does, must be bloat&quot;. As our GN video shows, sometimes those random services can take up 30%
+of a systems resources &lt;em&gt;just&lt;&#x2F;em&gt; idling which really has a negative impact on user experience.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;so-what-about-linux&quot;&gt;So what about Linux?&lt;&#x2F;h2&gt;
+&lt;p&gt;This proliferation of bloat in Windows has led to this idea that when you install a system, it
+always comes with some &quot;hidden part&quot; that must be taking up resources.&lt;&#x2F;p&gt;
+&lt;p&gt;When you take this to Linux it doesn&#x27;t really apply though. Linux distros aren&#x27;t subject to the same
+financial kickbacks&#x2F;incentives so random 3rd party software isn&#x27;t just installed by default. Most
+of what&#x27;s installed by default has a purpose on your system to make it more usable in some manner.&lt;&#x2F;p&gt;
+&lt;p&gt;Taken further we see people try to even remove as much software as possible (even critical and important
+software like NTP clients) just to save &lt;em&gt;disk space&lt;&#x2F;em&gt; which isn&#x27;t really a resource that&#x27;s at a premium
+these days.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;what-should-you-do&quot;&gt;What should you do?&lt;&#x2F;h2&gt;
+&lt;p&gt;Don&#x27;t stress about &quot;bloat&quot; in Linux - it simply isn&#x27;t there in the same way as it is in Windows. There
+certainly are parts of a Linux distro that &lt;em&gt;can&lt;&#x2F;em&gt; negatively impact performance, but that is &lt;em&gt;not&lt;&#x2F;em&gt;
+the same as &quot;bloat&quot; (looking at you PackageKit).&lt;&#x2F;p&gt;
+&lt;p&gt;And remember that software that &lt;em&gt;isn&#x27;t running&lt;&#x2F;em&gt; and is just on disk, isn&#x27;t consuming any resources!
+Those few MB you may save trying to remove it, is fractions of a percentage of your overall disk
+capacity. In the grand scheme of things it&#x27;s nothing. It&#x27;s not worth the risk of breaking your system
+(since Linux famously has no adequate safeties or guardrails to stop you destroying your machine).&lt;&#x2F;p&gt;
+</description>
+      </item>
       <item>
           <title>Yubikey Key Vulnerability - How It Affects You</title>
           <pubDate>Mon, 09 Sep 2024 00:00:00 +0000</pubDate>
@@ -3017,6 +3063,26 @@ with the line:&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;allow-user-access&quot;&gt;Allow User Access&lt;&#x2F;h2&gt;
 &lt;p&gt;Add your user to the tss group&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;usermod -a -G tss username
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;execute-fapi-provisioning&quot;&gt;Execute FAPI Provisioning&lt;&#x2F;h2&gt;
+&lt;p&gt;The tpm2 library comes with a feature api (FAPI), which annoyingly needs
+provisioning before we can proceed. If you skip this provisioning step,
+you will be annoyed by a pointless warning message every time you use
+your ssh key.&lt;&#x2F;p&gt;
+&lt;p&gt;If you attempt the provisioning later, you will BREAK YOUR KEYS.&lt;&#x2F;p&gt;
+&lt;p&gt;Edit &lt;code&gt;&#x2F;etc&#x2F;tpm2-tss&#x2F;fapi-config.json&lt;&#x2F;code&gt; and ensure this line is present:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;     &amp;quot;ek_cert_less&amp;quot;: &amp;quot;yes&amp;quot;,
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;now run:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;tss2_provision
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;blockquote&gt;
+&lt;p&gt;HINT: If you have errors you can get more output with:&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;TSS2_LOG=fapi+debug tss2_provision
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;If you get an error about &quot;An SRK already exists&quot;, you can clear it with:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;tpm2_evictcontrol -C o -c 0x81000001
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;h2 id=&quot;configure-the-ssh-key&quot;&gt;Configure the SSH key&lt;&#x2F;h2&gt;
 &lt;p&gt;&lt;em&gt;NOTE&lt;&#x2F;em&gt; Be sure to perform these steps as your user - not as root!&lt;&#x2F;p&gt;
