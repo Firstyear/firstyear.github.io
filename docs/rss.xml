@@ -7,7 +7,29 @@
       <generator>Zola</generator>
       <language>en</language>
       <atom:link href="https://fy.blackhats.net.au/rss.xml" rel="self" type="application/rss+xml"/>
-      <lastBuildDate>Sat, 04 Jan 2025 00:00:00 +0000</lastBuildDate>
+      <lastBuildDate>Thu, 06 Feb 2025 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>Debugging Reference Counters</title>
+          <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://fy.blackhats.net.au/blog/2025-02-06-refcounts/</link>
+          <guid>https://fy.blackhats.net.au/blog/2025-02-06-refcounts/</guid>
+          <description xml:base="https://fy.blackhats.net.au/blog/2025-02-06-refcounts/">&lt;p&gt;While at Everything Open, I got to catch up with &lt;a href=&quot;https:&#x2F;&#x2F;social.lol&#x2F;@robn&quot;&gt;Rob N&lt;&#x2F;a&gt; and chat about
+what we had been working on the last few years. We got chatting about a really interesting issue
+he was having with a patch for ZFS he&#x27;d be working on where he couldn&#x27;t find what was decrementing
+a reference counter too far and causing issues.&lt;&#x2F;p&gt;
+&lt;p&gt;While chatting about this I had the idea &quot;Why not change the amount the counter increments and
+decrements?&quot;. That way if at one callsite you inc&#x2F;dec by 1 and another you do the same by 2, then
+if you end up at minus 2 you know which caller was the one being triggered too much, and can then
+follow up with other debugging options to work out why the dec was called too much.&lt;&#x2F;p&gt;
+&lt;p&gt;Another interesting suggestion was to increment and decrement by prime numbers, but this may end
+up failing if the call site that inc&#x2F;dec by 1 is called multiple times. So some creative shuffling
+of the values could end up being needed to bisect the offending caller in that case. Generally large
+prime numbers would avoid this potential issue though, and if your counter is 64bit the likelihood
+of an over&#x2F;under flow is pretty low.&lt;&#x2F;p&gt;
+&lt;p&gt;So I hope that helps someone with a future reference count issue.&lt;&#x2F;p&gt;
+</description>
+      </item>
       <item>
           <title>Bloat</title>
           <pubDate>Sat, 04 Jan 2025 00:00:00 +0000</pubDate>
@@ -6518,6 +6540,12 @@ mirroring between multilple stripes alternately. You can append the
 second stripe with (note the -a). You could do this with other shares
 (offsite for example) or with a HDD on your desk.&lt;&#x2F;p&gt;
 &lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;tmutil setdestination -a smb:&#x2F;&#x2F;timemachine:password@hostname&#x2F;timemachine_b
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Time machine with ZFS may have some odd issues with quota not applying properly, so
+you may want to set a quote client side&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;tmutil destinationinfo
+&lt;&#x2F;span&gt;&lt;span&gt;# tmutil setquota &amp;lt;UUID OF LOCATION&amp;gt; &amp;lt;QUOTA IN GB&amp;gt;
+&lt;&#x2F;span&gt;&lt;span&gt;tmutil setquota 58A5BADF-FB61-4BDD-A053-9344366423A5 800
 &lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
 &lt;h3 id=&quot;stuck-backups&quot;&gt;Stuck Backups&lt;&#x2F;h3&gt;
 &lt;p&gt;Sometimes tm can get &quot;stuck&quot; unable to complete the first backup.&lt;&#x2F;p&gt;

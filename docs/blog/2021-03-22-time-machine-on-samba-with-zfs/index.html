@@ -34,15 +34,15 @@
                         
                             
                             <li class="nav">
-                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
-                                    <span itemprop="name">Pages</span>
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
                                 </a>
                             </li>
                         
                             
                             <li class="nav">
-                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
-                                    <span itemprop="name">Blog</span>
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
                                 </a>
                             </li>
                         
@@ -226,6 +226,12 @@ mirroring between multilple stripes alternately. You can append the
 second stripe with (note the -a). You could do this with other shares
 (offsite for example) or with a HDD on your desk.</p>
 <pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tmutil setdestination -a smb://timemachine:password@hostname/timemachine_b
+</span></code></pre>
+<p>Time machine with ZFS may have some odd issues with quota not applying properly, so
+you may want to set a quote client side</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tmutil destinationinfo
+</span><span># tmutil setquota &lt;UUID OF LOCATION&gt; &lt;QUOTA IN GB&gt;
+</span><span>tmutil setquota 58A5BADF-FB61-4BDD-A053-9344366423A5 800
 </span></code></pre>
 <h3 id="stuck-backups">Stuck Backups</h3>
 <p>Sometimes tm can get "stuck" unable to complete the first backup.</p>
