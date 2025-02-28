@@ -68,45 +68,42 @@
             
 <article itemscope itemtype="http://schema.org/BlogPosting">
     <div itemprop="headline">
-        <h1>I no longer recommend FreeIPA</h1>
+        <h1>Backup Yubikey Strategy</h1>
         <div class="border"></div>
-        <time datetime="2019-07-10" class="date" itemprop="datePublished">
-            10 Jul 2019
+        <time datetime="2025-02-28" class="date" itemprop="datePublished">
+            28 Feb 2025
         </time>
     </div>
     <div itemprop="articleBody">
-        <h1 id="i-no-longer-recommend-freeipa">I no longer recommend FreeIPA</h1>
-<p>It's probably taken me a few years to write this, but I can no longer
-recommend FreeIPA for IDM installations.</p>
-<h2 id="why-not">Why not?</h2>
-<p>The FreeIPA project focused on Kerberos and SSSD, with enough other
-parts glued on to look like a complete IDM project. Now that's fine,
-but it means that concerns in other parts of the project are largely
-ignored. It creates design decisions that are not scalable or robust.</p>
-<p>Due to these decisions IPA has stability issues and scaling issues that
-other products do not.</p>
-<p>To be clear: security systems like IDM or LDAP can <em>never</em> go down.
-That's not acceptable.</p>
-<h2 id="what-do-you-recommend-instead">What do you recommend instead?</h2>
-<ul>
-<li><a href="https://kanidm.github.io/kanidm/stable/">Kanidm</a></li>
-<li>Samba with AD</li>
-<li>AzureAD</li>
-<li>389 Directory Server</li>
-</ul>
-<p>All of these projects are very reliable, secure, scalable.</p>
-<p>Kanidm specifically is my own project built from the ground up, which
-has tried to learn from the mistakes and successes of AD, FreeIPA and
-389-ds. It's what I recommend the most.</p>
-<p>Additionally, we have done a lot of work into 389 to improve our out of
-box IDM capabilities too, but there is more to be done too. The Samba AD
-team have done great things too, and deserve a lot of respect for what
-they have done.</p>
-<h2 id="is-there-more-detail-than-this">Is there more detail than this?</h2>
-<p>Yes - buy me a drink and I'll talk :)</p>
-<h2 id="didn-t-you-help">Didn't you help?</h2>
-<p>I tried and it was not taken on board. Issues I reported years ago still
-exist today 🙃.</p>
+        <p>After a local security meetup where I presented about Webauthn, I had a really interesting
+chat with a member about a possible Yubikey management strategy.</p>
+<p>Normally when you purchase a yubikey it's recommended that you buy two of them - one primary
+and one backup. But how do you keep them in sync? You have to ensure every key you enroll
+on the primary is also on the backup!</p>
+<p>This means you tend to have your secondary key nearby - not so great for backups/disaster
+management.</p>
+<p>When we start to look at a business, they'll want to consider something a bit more robust
+like a '3 2 1' esque strategy (3 copies, 2 different physical media, 1 copy off site).</p>
+<p>Given these are yubikeys, we can't really do the 2 different physical media (especially as
+no other key maker even comes close to yubikeys quality and security). But we can consider
+the 3 and 1 parts.</p>
+<p>We can easily have 3 yubikeys and 1 offsite. But now the maintenance of keeping all these
+updated is much harder. How do we take care of this?</p>
+<p>Rotate the keys - on a schedule, the keys should be swapped in place (similar to industrial
+pumps with lead, lag, and reserve). We have a lead key that's used daily, the lag key which
+is the backup onsite, and the reserve which is offsite. Then we periodically rotate them
+so that the lead becomes the lag, the lag becomes the reserve (and offsite), and the reserve
+is moved onsite as the lead key. This allows the lead key (former reserve key) to quickly be
+identified for missing any credentials, and the lag key can be used to authorise the lead
+key to enroll anything that it was missing.</p>
+<p>I don't think this process is perfect - there is obviously a delay between a new account enrollment
+and it being on all three keys. This delay is going to be based on the rotation period. There is
+still also a risk that infrequently used accounts may be missed on one of the three keys, which
+can require some discipline to ensure that all credentials are periodically tested and verified
+as operational.</p>
+<p>I think this is a really interesting suggestion and has some promise, but I'd be keen to hear of
+other thoughts on the matter - or better ways to manage this. I certainly don't think this approach
+is for everyone either, but I can see a lot of places it would be quite valuable.</p>
 
     </div>
 </article>

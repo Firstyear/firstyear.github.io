@@ -7,7 +7,44 @@
       <generator>Zola</generator>
       <language>en</language>
       <atom:link href="https://fy.blackhats.net.au/rss.xml" rel="self" type="application/rss+xml"/>
-      <lastBuildDate>Thu, 06 Feb 2025 00:00:00 +0000</lastBuildDate>
+      <lastBuildDate>Fri, 28 Feb 2025 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>Backup Yubikey Strategy</title>
+          <pubDate>Fri, 28 Feb 2025 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://fy.blackhats.net.au/blog/2025-02-28-backup-yubikey-strategy/</link>
+          <guid>https://fy.blackhats.net.au/blog/2025-02-28-backup-yubikey-strategy/</guid>
+          <description xml:base="https://fy.blackhats.net.au/blog/2025-02-28-backup-yubikey-strategy/">&lt;p&gt;After a local security meetup where I presented about Webauthn, I had a really interesting
+chat with a member about a possible Yubikey management strategy.&lt;&#x2F;p&gt;
+&lt;p&gt;Normally when you purchase a yubikey it&#x27;s recommended that you buy two of them - one primary
+and one backup. But how do you keep them in sync? You have to ensure every key you enroll
+on the primary is also on the backup!&lt;&#x2F;p&gt;
+&lt;p&gt;This means you tend to have your secondary key nearby - not so great for backups&#x2F;disaster
+management.&lt;&#x2F;p&gt;
+&lt;p&gt;When we start to look at a business, they&#x27;ll want to consider something a bit more robust
+like a &#x27;3 2 1&#x27; esque strategy (3 copies, 2 different physical media, 1 copy off site).&lt;&#x2F;p&gt;
+&lt;p&gt;Given these are yubikeys, we can&#x27;t really do the 2 different physical media (especially as
+no other key maker even comes close to yubikeys quality and security). But we can consider
+the 3 and 1 parts.&lt;&#x2F;p&gt;
+&lt;p&gt;We can easily have 3 yubikeys and 1 offsite. But now the maintenance of keeping all these
+updated is much harder. How do we take care of this?&lt;&#x2F;p&gt;
+&lt;p&gt;Rotate the keys - on a schedule, the keys should be swapped in place (similar to industrial
+pumps with lead, lag, and reserve). We have a lead key that&#x27;s used daily, the lag key which
+is the backup onsite, and the reserve which is offsite. Then we periodically rotate them
+so that the lead becomes the lag, the lag becomes the reserve (and offsite), and the reserve
+is moved onsite as the lead key. This allows the lead key (former reserve key) to quickly be
+identified for missing any credentials, and the lag key can be used to authorise the lead
+key to enroll anything that it was missing.&lt;&#x2F;p&gt;
+&lt;p&gt;I don&#x27;t think this process is perfect - there is obviously a delay between a new account enrollment
+and it being on all three keys. This delay is going to be based on the rotation period. There is
+still also a risk that infrequently used accounts may be missed on one of the three keys, which
+can require some discipline to ensure that all credentials are periodically tested and verified
+as operational.&lt;&#x2F;p&gt;
+&lt;p&gt;I think this is a really interesting suggestion and has some promise, but I&#x27;d be keen to hear of
+other thoughts on the matter - or better ways to manage this. I certainly don&#x27;t think this approach
+is for everyone either, but I can see a lot of places it would be quite valuable.&lt;&#x2F;p&gt;
+</description>
+      </item>
       <item>
           <title>Debugging Reference Counters</title>
           <pubDate>Thu, 06 Feb 2025 00:00:00 +0000</pubDate>
