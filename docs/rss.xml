@@ -1677,6 +1677,10 @@ the same time as the unleashed a passkeys dev website (I won&#x27;t link to it o
 but to summarise, this push to resident keys means that security keys are excluded because they often
 have extremely low limits on storage, the highest being 25 for yubikeys. That simply won&#x27;t cut it for
 most people where they have more than 25 accounts.&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;UPDATE 2025-05: Yubikeys with firmware version 5.7 can store 100 resident keys - a huge improvement
+but still not enough for most people.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
 &lt;p&gt;Now with resident keys as passkeys as users we certainly don&#x27;t have the expectation that our
 security keys will work when we want to use them!&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;the-enshittocene-period&quot;&gt;The Enshittocene Period&lt;&#x2F;h2&gt;
@@ -1705,6 +1709,9 @@ work how will people from other disciplines fare?&lt;&#x2F;p&gt;
 &lt;p&gt;Externally there are other issues. Apple Keychain has personally wiped out all my Passkeys on
 &lt;em&gt;three separate occasions&lt;&#x2F;em&gt;. There are external reports we have recieved of other users who&#x27;s
 Keychain Passkeys have been wiped just like mine.&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;UPDATE 2025-05: It&#x27;s four times now my passkey have been wiped out.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
 &lt;p&gt;Since this blog has been published many people have contacted me with their own stories of how
 Passkeys have failed them in various ways. Disappointment in the technology appears to be the norm
 rather than the exception.&lt;&#x2F;p&gt;
