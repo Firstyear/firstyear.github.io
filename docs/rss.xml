@@ -1261,12 +1261,12 @@ was then discovered which relied on injected code into a http library.&lt;&#x2F;
 compromise of the build host and the injection of code would mean that hosts are reproducing the
 same compromised binaries in each case.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;other-attacks&quot;&gt;Other Attacks&lt;&#x2F;h3&gt;
-&lt;p&gt;The CNCF maintains a &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;tree&#x2F;main&#x2F;supply-chain-security&#x2F;compromises&quot;&gt;list of supply chain attacks&lt;&#x2F;a&gt;.
+&lt;p&gt;The CNCF maintains a &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;tree&#x2F;main&#x2F;community&#x2F;catalog&#x2F;compromises&quot;&gt;list of supply chain attacks&lt;&#x2F;a&gt;.
 This is likely not comprehensive, but it gives us a good over view to analyse. There are 78 attacks here
 and they are helpfully &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;blob&#x2F;main&#x2F;supply-chain-security&#x2F;compromises&#x2F;compromise-definitions.md&quot;&gt;categorised by attack type&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
 &lt;p&gt;Within this set of attacks, only three may have been detected by reproducible builds.&lt;&#x2F;p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;blob&#x2F;main&#x2F;supply-chain-security&#x2F;compromises&#x2F;2017&#x2F;ccleaner.md&quot;&gt;CCleaner&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;tree&#x2F;main&#x2F;community&#x2F;catalog&#x2F;compromises&#x2F;2017&#x2F;ccleaner.md&quot;&gt;CCleaner&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;p&gt;Developer signing keys were stolen.&lt;&#x2F;p&gt;
 &lt;p&gt;This application is not opensource, so users would be unable to rebuild and validate the results.&lt;&#x2F;p&gt;
@@ -1276,7 +1276,7 @@ be certificate transparency style logs that are issued in parallel which list th
 a signing key has made such that an attacker would not be able to upload their signatures into
 the CT log, or if they were, that it would allow notification and detection of the compromise.&lt;&#x2F;p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;blob&#x2F;main&#x2F;supply-chain-security&#x2F;compromises&#x2F;2003&#x2F;kernel-repository.md&quot;&gt;Kernel Alternate Mirror&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;tree&#x2F;main&#x2F;community&#x2F;catalog&#x2F;compromises&#x2F;2003&#x2F;kernel-repository.md&quot;&gt;Kernel Alternate Mirror&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;p&gt;A mirror of the source code had alterations.&lt;&#x2F;p&gt;
 &lt;p&gt;This would rely on a user downloading and building the kernel from &lt;em&gt;different&lt;&#x2F;em&gt; mirrors. At this point
@@ -1285,7 +1285,7 @@ not match nor would other elements. Again, reproducible builds could find this, 
 easier ways to detect this in the first place such as signed archives or only using trust mirrors
 with https.&lt;&#x2F;p&gt;
 &lt;ul&gt;
-&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;blob&#x2F;main&#x2F;supply-chain-security&#x2F;compromises&#x2F;2016&#x2F;keydnap.md&quot;&gt;Transmission &#x2F; Keydnap&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;tree&#x2F;main&#x2F;community&#x2F;catalog&#x2F;compromises&#x2F;2016&#x2F;keydnap.md&quot;&gt;Transmission &#x2F; Keydnap&lt;&#x2F;a&gt;&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;p&gt;The developers signing keys were stolen allowing fake builds to be uploaded.&lt;&#x2F;p&gt;
 &lt;p&gt;The user would be able to detect the subterfuge by building transmission themself, however as
@@ -1328,8 +1328,12 @@ stages of a build in the first place.&lt;&#x2F;p&gt;
 to analyse the data, the possible attacks, and then derive solutions that protect from those attacks.&lt;&#x2F;p&gt;
 &lt;p&gt;We need to expend effort in places with meaningful outcomes based on risk assessment, rather than
 propose solutions and force them to stick.&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&quot;Complex problems have simple, easy to understand, wrong answers.&quot;&lt;&#x2F;p&gt;
+&lt;p&gt;Benno Rice, &lt;a href=&quot;https:&#x2F;&#x2F;www.youtube.com&#x2F;watch?v=9-IWMbJXoLM&quot;&gt;What Unix Cost Us&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
 &lt;h2 id=&quot;special-mention&quot;&gt;Special Mention&lt;&#x2F;h2&gt;
-&lt;p&gt;I noticed in the review of each compromise, the &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;blob&#x2F;main&#x2F;supply-chain-security&#x2F;compromises&#x2F;2016&#x2F;mint.md&quot;&gt;Linux Mint ISO compromise&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;I noticed in the review of each compromise, the &lt;a href=&quot;https:&#x2F;&#x2F;github.com&#x2F;cncf&#x2F;tag-security&#x2F;tree&#x2F;main&#x2F;community&#x2F;catalog&#x2F;compromises&#x2F;2016&#x2F;mint.md&quot;&gt;Linux Mint ISO compromise&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
 &lt;p&gt;This attack would actually still be viable today because of how many distributions rely on third party
 mirrors that operate over http. Most of these distributions still attempt to ask users to perform
 complex and obtuse GPG verification steps of ISOs. Security must be accessible and usable to all

@@ -34,15 +34,15 @@
                         
                             
                             <li class="nav">
-                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
-                                    <span itemprop="name">Blog</span>
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
                                 </a>
                             </li>
                         
                             
                             <li class="nav">
-                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
-                                    <span itemprop="name">Pages</span>
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
                                 </a>
                             </li>
                         
@@ -331,12 +331,12 @@ was then discovered which relied on injected code into a http library.</p>
 compromise of the build host and the injection of code would mean that hosts are reproducing the
 same compromised binaries in each case.</p>
 <h3 id="other-attacks">Other Attacks</h3>
-<p>The CNCF maintains a <a href="https://github.com/cncf/tag-security/tree/main/supply-chain-security/compromises">list of supply chain attacks</a>.
+<p>The CNCF maintains a <a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises">list of supply chain attacks</a>.
 This is likely not comprehensive, but it gives us a good over view to analyse. There are 78 attacks here
 and they are helpfully <a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/compromise-definitions.md">categorised by attack type</a>.</p>
 <p>Within this set of attacks, only three may have been detected by reproducible builds.</p>
 <ul>
-<li><a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/2017/ccleaner.md">CCleaner</a></li>
+<li><a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2017/ccleaner.md">CCleaner</a></li>
 </ul>
 <p>Developer signing keys were stolen.</p>
 <p>This application is not opensource, so users would be unable to rebuild and validate the results.</p>
@@ -346,7 +346,7 @@ be certificate transparency style logs that are issued in parallel which list th
 a signing key has made such that an attacker would not be able to upload their signatures into
 the CT log, or if they were, that it would allow notification and detection of the compromise.</p>
 <ul>
-<li><a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/2003/kernel-repository.md">Kernel Alternate Mirror</a></li>
+<li><a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2003/kernel-repository.md">Kernel Alternate Mirror</a></li>
 </ul>
 <p>A mirror of the source code had alterations.</p>
 <p>This would rely on a user downloading and building the kernel from <em>different</em> mirrors. At this point
@@ -355,7 +355,7 @@ not match nor would other elements. Again, reproducible builds could find this, 
 easier ways to detect this in the first place such as signed archives or only using trust mirrors
 with https.</p>
 <ul>
-<li><a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/2016/keydnap.md">Transmission / Keydnap</a></li>
+<li><a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2016/keydnap.md">Transmission / Keydnap</a></li>
 </ul>
 <p>The developers signing keys were stolen allowing fake builds to be uploaded.</p>
 <p>The user would be able to detect the subterfuge by building transmission themself, however as
@@ -398,8 +398,12 @@ stages of a build in the first place.</p>
 to analyse the data, the possible attacks, and then derive solutions that protect from those attacks.</p>
 <p>We need to expend effort in places with meaningful outcomes based on risk assessment, rather than
 propose solutions and force them to stick.</p>
+<blockquote>
+<p>"Complex problems have simple, easy to understand, wrong answers."</p>
+<p>Benno Rice, <a href="https://www.youtube.com/watch?v=9-IWMbJXoLM">What Unix Cost Us</a></p>
+</blockquote>
 <h2 id="special-mention">Special Mention</h2>
-<p>I noticed in the review of each compromise, the <a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/2016/mint.md">Linux Mint ISO compromise</a>.</p>
+<p>I noticed in the review of each compromise, the <a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2016/mint.md">Linux Mint ISO compromise</a>.</p>
 <p>This attack would actually still be viable today because of how many distributions rely on third party
 mirrors that operate over http. Most of these distributions still attempt to ask users to perform
 complex and obtuse GPG verification steps of ISOs. Security must be accessible and usable to all
