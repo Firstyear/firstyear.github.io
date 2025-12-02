@@ -7,7 +7,262 @@
       <generator>Zola</generator>
       <language>en</language>
       <atom:link href="https://fy.blackhats.net.au/rss.xml" rel="self" type="application/rss+xml"/>
-      <lastBuildDate>Fri, 28 Feb 2025 00:00:00 +0000</lastBuildDate>
+      <lastBuildDate>Tue, 02 Dec 2025 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>FreeBSD Jails in Isolated FIB (Routing Table)</title>
+          <pubDate>Tue, 02 Dec 2025 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://fy.blackhats.net.au/blog/2025-12-02-freebsd-jail-fibs/</link>
+          <guid>https://fy.blackhats.net.au/blog/2025-12-02-freebsd-jail-fibs/</guid>
+          <description xml:base="https://fy.blackhats.net.au/blog/2025-12-02-freebsd-jail-fibs/">&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;docs.freebsd.org&#x2F;en&#x2F;books&#x2F;handbook&#x2F;jails&#x2F;&quot;&gt;FreeBSD Jails&lt;&#x2F;a&gt; are a really useful way to isolate
+and run processes in a &lt;code&gt;container&lt;&#x2F;code&gt; under FreeBSD. You can either create thick jails similar which allow
+different versions of a whole isolated FreeBSD OS, or you can create thin or service jails that share
+resources and are very lightweight.&lt;&#x2F;p&gt;
+&lt;p&gt;Regardless, you need to attach a network to your jail so you can expose services. There are a number
+of ways to achieve this, but I chose to use &lt;a href=&quot;https:&#x2F;&#x2F;docs.freebsd.org&#x2F;en&#x2F;books&#x2F;handbook&#x2F;jails&#x2F;#creating-vnet-jail&quot;&gt;VNET Jails&lt;&#x2F;a&gt;
+to keep my jail isolated from my host machine.&lt;&#x2F;p&gt;
+&lt;p&gt;However as is the curse of being Firstyear, I encountered a bug. I noticed very poor throughput to
+the jail in the order of 100kb&#x2F;s when the host was able provide 10gbit to a client. After a lot
+of investigation, it turns out that LRO (Large Receive Offload) on my network card was interacting
+with the epair network device and causing the issue (even through a VM). I have reported this
+to the &lt;a href=&quot;https:&#x2F;&#x2F;bugs.freebsd.org&#x2F;bugzilla&#x2F;show_bug.cgi?id=291144&quot;&gt;FreeBSD bugzilla&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
+&lt;p&gt;But in the meantime I still needed a solution to my problem. I noticed that disabling LRO, while I
+improved network performance, it was still in the order of 1GBit instead of 10GBit.&lt;&#x2F;p&gt;
+&lt;p&gt;In this case I decided to setup the jail with host mode networking, but to isolate the jail into
+it&#x27;s own FIB (Forwarding Information Base).&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;what-is-a-fib&quot;&gt;What is a FIB?&lt;&#x2F;h2&gt;
+&lt;p&gt;You may know this better as a routing table - it is how your computer (or router) makes decisions
+about where traffic should be routed to. Routing tables always match more-specific route when they decide
+where to send traffic.&lt;&#x2F;p&gt;
+&lt;p&gt;As an example:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# netstat -rn
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;Destination        Gateway            Flags         Netif Expire
+&lt;&#x2F;span&gt;&lt;span&gt;default            172.24.10.1        UGS         bridge0
+&lt;&#x2F;span&gt;&lt;span&gt;127.0.0.1          link#4             UH              lo0
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.10.0&#x2F;24     link#5             U           bridge0
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.10.2        link#4             UHS             lo0
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;In this example, if you were to &lt;code&gt;ping 127.0.0.1&lt;&#x2F;code&gt; the route table shows that this should be sent via
+the device lo0, and that the network is directly attached to that interfaces (Gateway = link). If
+we were to &lt;code&gt;ping 172.24.10.1&lt;&#x2F;code&gt; this would be sent via bridge1 (as 172.24.10.1 is part of the subnet 172.24.10.0&#x2F;24)
+and that 172.24.10.1 should be on that network (Gateway = link). Finally if we were to &lt;code&gt;ping 103.2.119.199&lt;&#x2F;code&gt;
+then since no subnets match, we fall back to the &lt;code&gt;default&lt;&#x2F;code&gt; route, and the traffic is sent via the gateway
+router at &lt;code&gt;172.24.10.1&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;so-why-would-you-need-multiple-fibs&quot;&gt;So Why Would You Need Multiple FIBs?&lt;&#x2F;h2&gt;
+&lt;p&gt;Imagine our network is laid out like so. You&#x27;ll notice the FIB from above is from the Server in this
+example.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;┌─────────────┐             ┌─────────────┐  
+&lt;&#x2F;span&gt;&lt;span&gt;│   router    │             │   Server    │  
+&lt;&#x2F;span&gt;&lt;span&gt;│┌───────────┐│             │┌───────────┐│  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.10.1│◀─────────────┤│172.24.10.2││  
+&lt;&#x2F;span&gt;&lt;span&gt;│├───────────┤│             │└───────────┘│  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.11.1││             │             │  
+&lt;&#x2F;span&gt;&lt;span&gt;│├───────────┤│             │             │  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.12.1│◀──────┐      │             │  
+&lt;&#x2F;span&gt;&lt;span&gt;└┴───────────┴┘      │      └─────────────┘  
+&lt;&#x2F;span&gt;&lt;span&gt;                     │                       
+&lt;&#x2F;span&gt;&lt;span&gt;                     │      ┌───────────────┐
+&lt;&#x2F;span&gt;&lt;span&gt;                     │      │    Laptop     │
+&lt;&#x2F;span&gt;&lt;span&gt;                     │      │┌─────────────┐│
+&lt;&#x2F;span&gt;&lt;span&gt;                     └──────┤│172.24.12.100││
+&lt;&#x2F;span&gt;&lt;span&gt;                            │└─────────────┘│
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            └───────────────┘
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;When our laptop contacts the server, it has to go via the router. When the server &lt;em&gt;replies&lt;&#x2F;em&gt; to the
+laptop, since the laptop&#x27;s address is not in the server&#x27;s FIB, it uses the default route for the
+return traffic.&lt;&#x2F;p&gt;
+&lt;p&gt;Now let&#x27;s add another interface on the server, but attached to a separate VLAN (Virtual LAN).&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;┌─────────────┐             ┌─────────────┐  
+&lt;&#x2F;span&gt;&lt;span&gt;│   router    │             │   Server    │  
+&lt;&#x2F;span&gt;&lt;span&gt;│┌───────────┐│             │┌───────────┐│  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.10.1│◀─────────────┤│172.24.10.2││  
+&lt;&#x2F;span&gt;&lt;span&gt;│├───────────┤│             │├───────────┤│  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.11.1│◀─────────────┤│172.24.11.2││  
+&lt;&#x2F;span&gt;&lt;span&gt;│├───────────┤│             │└───────────┘│  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.12.1│◀──────┐      │             │  
+&lt;&#x2F;span&gt;&lt;span&gt;└┴───────────┴┘      │      └─────────────┘  
+&lt;&#x2F;span&gt;&lt;span&gt;                     │                       
+&lt;&#x2F;span&gt;&lt;span&gt;                     │      ┌───────────────┐
+&lt;&#x2F;span&gt;&lt;span&gt;                     │      │    Laptop     │
+&lt;&#x2F;span&gt;&lt;span&gt;                     │      │┌─────────────┐│
+&lt;&#x2F;span&gt;&lt;span&gt;                     └──────┤│172.24.12.100││
+&lt;&#x2F;span&gt;&lt;span&gt;                            │└─────────────┘│
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            └───────────────┘
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Our servers FIB would update to:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# netstat -rn
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;Destination        Gateway            Flags         Netif Expire
+&lt;&#x2F;span&gt;&lt;span&gt;default            172.24.10.1        UGS         bridge0
+&lt;&#x2F;span&gt;&lt;span&gt;127.0.0.1          link#4             UH              lo0
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.10.0&#x2F;24     link#5             U           bridge0
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.10.2        link#4             UHS             lo0
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.11.0&#x2F;24     link#6             U           bridge1
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.11.2        link#4             UHS             lo0
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;So when our laptop (172.24.12.100) contacts the server on 172.24.10.2, everything works as before.&lt;&#x2F;p&gt;
+&lt;p&gt;But if our laptop contacts the server on 172.24.11.2 it will fail. Why?&lt;&#x2F;p&gt;
+&lt;p&gt;Because we created a &lt;em&gt;triangular route&lt;&#x2F;em&gt;.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;┌─────────────┐             ┌─────────────┐  
+&lt;&#x2F;span&gt;&lt;span&gt;│   router    │             │   Server    │  
+&lt;&#x2F;span&gt;&lt;span&gt;│┌───────────┐│             │┌───────────┐│  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.10.1│◀─X───3.──────┤│172.24.10.2││  
+&lt;&#x2F;span&gt;&lt;span&gt;│├───────────┤│             │├───────────┤│  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.11.1│├─────2.──────▶│172.24.11.2││  
+&lt;&#x2F;span&gt;&lt;span&gt;│├───────────┤│             │└───────────┘│  
+&lt;&#x2F;span&gt;&lt;span&gt;││172.24.12.1│◀──────┐      │             │  
+&lt;&#x2F;span&gt;&lt;span&gt;└┴───────────┴┘      │      └─────────────┘  
+&lt;&#x2F;span&gt;&lt;span&gt;                     │                       
+&lt;&#x2F;span&gt;&lt;span&gt;                    1.      ┌───────────────┐
+&lt;&#x2F;span&gt;&lt;span&gt;                     │      │    Laptop     │
+&lt;&#x2F;span&gt;&lt;span&gt;                     │      │┌─────────────┐│
+&lt;&#x2F;span&gt;&lt;span&gt;                     └──────┤│172.24.12.100││
+&lt;&#x2F;span&gt;&lt;span&gt;                            │└─────────────┘│
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            │               │
+&lt;&#x2F;span&gt;&lt;span&gt;                            └───────────────┘
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;First the traffic from our laptop goes to the router (1.), which sends the packet to the server on 172.24.11.2 (2.).
+The server then processes the packet and needs to reply to the laptop. However, since our route table
+doesn&#x27;t have 172.24.12.0&#x2F;24, we fall back to the &lt;em&gt;default route&lt;&#x2F;em&gt;. So now the response from 172.24.11.2 is sent
+out via bridge0 - Not bridge1 (3.) !!! As a result the router will drop the response as it&#x27;s source network (172.24.11.2)
+doesn&#x27;t match the actual network subnet (172.24.10.0&#x2F;24)&lt;&#x2F;p&gt;
+&lt;p&gt;To resolve this we want to isolate each bridge with their own FIBs, so that they each have their own
+default routes.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;the-end-result&quot;&gt;The End Result&lt;&#x2F;h2&gt;
+&lt;p&gt;So when this is completed (on FreeBSD) you will have two (or more!) FIBs available, which you can
+inspect with netstat. Notice the &lt;code&gt;-F X&lt;&#x2F;code&gt; where X is the FIB number.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# netstat -F 0 -rn
+&lt;&#x2F;span&gt;&lt;span&gt;Routing tables
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;Internet:
+&lt;&#x2F;span&gt;&lt;span&gt;Destination        Gateway            Flags         Netif Expire
+&lt;&#x2F;span&gt;&lt;span&gt;default            172.24.10.1        UGS         bridge1
+&lt;&#x2F;span&gt;&lt;span&gt;127.0.0.1          link#4             UH              lo0
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.10.0&#x2F;24     link#5             U           bridge1
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.10.22       link#4             UHS             lo0
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;# netstat -F 1 -rn
+&lt;&#x2F;span&gt;&lt;span&gt;Routing tables (fib: 1)
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;Internet:
+&lt;&#x2F;span&gt;&lt;span&gt;Destination        Gateway            Flags         Netif Expire
+&lt;&#x2F;span&gt;&lt;span&gt;default            172.24.11.1        UGS         bridge2
+&lt;&#x2F;span&gt;&lt;span&gt;127.0.0.1          link#4             UHS             lo0
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.11.0&#x2F;24     link#6             U           bridge2
+&lt;&#x2F;span&gt;&lt;span&gt;172.24.11.131      link#4             UHS             lo0
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Here you can see there is a separate FIB for bridge1 and bride11, and they have different default gateways.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;setting-up-fibs&quot;&gt;Setting Up FIBs&lt;&#x2F;h2&gt;
+&lt;p&gt;Setup the number of FIBs you want in &lt;code&gt;&#x2F;boot&#x2F;loader.conf&lt;&#x2F;code&gt;&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# &#x2F;boot&#x2F;loader.conf
+&lt;&#x2F;span&gt;&lt;span&gt;net.fibs=2
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;When you create your interfaces in rc.conf, attach the FIB to your interface.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# Setup your tagged VLANs
+&lt;&#x2F;span&gt;&lt;span&gt;vlans_ix0=&amp;quot;1 2&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;# Create the bridges
+&lt;&#x2F;span&gt;&lt;span&gt;cloned_interfaces=&amp;quot;bridge1 bridge2&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;# Up the physical interface
+&lt;&#x2F;span&gt;&lt;span&gt;ifconfig_ix0=&amp;quot;up&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;# Up the VLAN tagged 1
+&lt;&#x2F;span&gt;&lt;span&gt;ifconfig_ix0_1=&amp;quot;up&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;# Add the VLAN 1 to bridge 1 and set an IP. This defaults to FIB 0
+&lt;&#x2F;span&gt;&lt;span&gt;ifconfig_bridge1=&amp;quot;inet 172.24.10.2&#x2F;24 addm ix0.1&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;# Add the defaultroute to FIB 0
+&lt;&#x2F;span&gt;&lt;span&gt;defaultrouter=&amp;quot;172.24.10.1&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;# Repeat for VLAN 2
+&lt;&#x2F;span&gt;&lt;span&gt;ifconfig_ix0_2=&amp;quot;up&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;# Add VLAN 2 to bridge 2
+&lt;&#x2F;span&gt;&lt;span&gt;ifconfig_bridge2=&amp;quot;addm ix0.2&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;# Add the address to bridge 2 *and* assign it to FIB 1
+&lt;&#x2F;span&gt;&lt;span&gt;ifconfig_bridge2_alias0=&amp;quot;inet 172.24.11.131&#x2F;24 fib 1&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;# Add routes to FIB 1
+&lt;&#x2F;span&gt;&lt;span&gt;static_routes=&amp;quot;fibnetwork fibdefault&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;route_fibnetwork=&amp;quot;-net 172.24.11.0&#x2F;24 -interface bridge11 -fib 1&amp;quot;
+&lt;&#x2F;span&gt;&lt;span&gt;route_fibdefault=&amp;quot;default 172.24.11.1 -fib 1&amp;quot;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Reboot your machine.&lt;&#x2F;p&gt;
+&lt;p&gt;Now you can test your new routes - the command &lt;code&gt;setfib&lt;&#x2F;code&gt; executes a command under the specified FIB.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;setfib -F 0 traceroute ....
+&lt;&#x2F;span&gt;&lt;span&gt;setfib -F 1 traceroute ....
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Now you have to configure the jail to run in the second FIB. Thankfully you just use &quot;host mode&quot; networking
+and it will automatically attach to the right FIB if you use an IP from that FIB.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;# &#x2F;etc&#x2F;jail.conf.d&#x2F;test.conf
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;span&gt;test {
+&lt;&#x2F;span&gt;&lt;span&gt;    ...
+&lt;&#x2F;span&gt;&lt;span&gt;    ip4.addr = 172.24.11.131;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;span&gt;
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Happy Gaoling!&lt;&#x2F;p&gt;
+</description>
+      </item>
+      <item>
+          <title>MacOS Mail App Stuck Indexing</title>
+          <pubDate>Tue, 25 Nov 2025 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://fy.blackhats.net.au/blog/2025-11-25-macos-mail-app-indexing/</link>
+          <guid>https://fy.blackhats.net.au/blog/2025-11-25-macos-mail-app-indexing/</guid>
+          <description xml:base="https://fy.blackhats.net.au/blog/2025-11-25-macos-mail-app-indexing/">&lt;p&gt;It is that beautiful time of year where once again MacOS has decided to forget how to search my
+Mail.app inboxes. There are plenty of reports online about this issue occuring over the last few
+years and it appears there is no obvious solution - or fix from Apple.&lt;&#x2F;p&gt;
+&lt;p&gt;What occurs is when you attempt a search in Mail.app&#x27;s interface, no results are returned and the
+status area shows as permanently stuck at indexing.&lt;&#x2F;p&gt;
+&lt;p&gt;Searching shows a number of &quot;remedies&quot; that don&#x27;t actually work. These include the:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Add Macintosh HD to spotlight privacy, wait 10 seconds, then remove it.&lt;&#x2F;li&gt;
+&lt;li&gt;Uncheck and recheck &quot;mail&quot; in spotlight options.&lt;&#x2F;li&gt;
+&lt;li&gt;Checking for login items that &quot;might interfere&quot;.&lt;&#x2F;li&gt;
+&lt;li&gt;Delete and recreate envelope index files&lt;&#x2F;li&gt;
+&lt;li&gt;Rebuilding mailboxes&lt;&#x2F;li&gt;
+&lt;li&gt;Healing crystals or something.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;⚠️ NONE OF THESE SUGGESTIONS WORK. NONE. DON&#x27;T WASTE YOUR TIME. ⚠️&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;Anyway, the fix is far simpler but requires some confidence to use a terminal. All of these commands
+must be run as root (aka, prefixed with &lt;code&gt;sudo&lt;&#x2F;code&gt;).&lt;&#x2F;p&gt;
+&lt;p&gt;Disable all spotlight indexes on all volumes.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;mdutil -ia off
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Erase all indexes&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;mdutil -Ea
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Reboot your machine. I&#x27;m serious, you can&#x27;t skip this step, you have to reboot here.&lt;&#x2F;p&gt;
+&lt;p&gt;When the machine comes back, wait a few minutes for things to &quot;settle&quot;.&lt;&#x2F;p&gt;
+&lt;p&gt;Now remove the spotlight index directories completely.&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;mdutil -Xa
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Finally, re-enable the indexing process&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;mdutil -ia on
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;You can check the status of the reindex with:&lt;&#x2F;p&gt;
+&lt;pre style=&quot;background-color:#2b303b;color:#c0c5ce;&quot;&gt;&lt;code&gt;&lt;span&gt;mdutil -sav
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;p&gt;Or by opening spotlight search and typeing one letter, which will then show a progress bar of the
+indexing process. In my case it took more than 2 hours to complete, so be patient.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;other-details&quot;&gt;Other Details&lt;&#x2F;h2&gt;
+&lt;p&gt;During the process I investigated with console.app to identify a possible cause of the indexing failure,
+however I was unable to idenitfy any. But this is not the first time that this has happened to me,
+so maybe I&#x27;ll find something next time.&lt;&#x2F;p&gt;
+</description>
+      </item>
       <item>
           <title>Backup Yubikey Strategy</title>
           <pubDate>Fri, 28 Feb 2025 00:00:00 +0000</pubDate>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>
+        
+        
+          FreeBSD Jails in Isolated FIB (Routing Table)
+        
+        
+        </title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>FreeBSD Jails in Isolated FIB (Routing Table)</h1>
+        <div class="border"></div>
+        <time datetime="2025-12-02" class="date" itemprop="datePublished">
+            02 Dec 2025
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <p><a href="https://docs.freebsd.org/en/books/handbook/jails/">FreeBSD Jails</a> are a really useful way to isolate
+and run processes in a <code>container</code> under FreeBSD. You can either create thick jails similar which allow
+different versions of a whole isolated FreeBSD OS, or you can create thin or service jails that share
+resources and are very lightweight.</p>
+<p>Regardless, you need to attach a network to your jail so you can expose services. There are a number
+of ways to achieve this, but I chose to use <a href="https://docs.freebsd.org/en/books/handbook/jails/#creating-vnet-jail">VNET Jails</a>
+to keep my jail isolated from my host machine.</p>
+<p>However as is the curse of being Firstyear, I encountered a bug. I noticed very poor throughput to
+the jail in the order of 100kb/s when the host was able provide 10gbit to a client. After a lot
+of investigation, it turns out that LRO (Large Receive Offload) on my network card was interacting
+with the epair network device and causing the issue (even through a VM). I have reported this
+to the <a href="https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=291144">FreeBSD bugzilla</a>.</p>
+<p>But in the meantime I still needed a solution to my problem. I noticed that disabling LRO, while I
+improved network performance, it was still in the order of 1GBit instead of 10GBit.</p>
+<p>In this case I decided to setup the jail with host mode networking, but to isolate the jail into
+it's own FIB (Forwarding Information Base).</p>
+<h2 id="what-is-a-fib">What is a FIB?</h2>
+<p>You may know this better as a routing table - it is how your computer (or router) makes decisions
+about where traffic should be routed to. Routing tables always match more-specific route when they decide
+where to send traffic.</p>
+<p>As an example:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># netstat -rn
+</span><span>
+</span><span>Destination        Gateway            Flags         Netif Expire
+</span><span>default            172.24.10.1        UGS         bridge0
+</span><span>127.0.0.1          link#4             UH              lo0
+</span><span>172.24.10.0/24     link#5             U           bridge0
+</span><span>172.24.10.2        link#4             UHS             lo0
+</span></code></pre>
+<p>In this example, if you were to <code>ping 127.0.0.1</code> the route table shows that this should be sent via
+the device lo0, and that the network is directly attached to that interfaces (Gateway = link). If
+we were to <code>ping 172.24.10.1</code> this would be sent via bridge1 (as 172.24.10.1 is part of the subnet 172.24.10.0/24)
+and that 172.24.10.1 should be on that network (Gateway = link). Finally if we were to <code>ping 103.2.119.199</code>
+then since no subnets match, we fall back to the <code>default</code> route, and the traffic is sent via the gateway
+router at <code>172.24.10.1</code>.</p>
+<h2 id="so-why-would-you-need-multiple-fibs">So Why Would You Need Multiple FIBs?</h2>
+<p>Imagine our network is laid out like so. You'll notice the FIB from above is from the Server in this
+example.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌─────────────┐             ┌─────────────┐  
+</span><span>│   router    │             │   Server    │  
+</span><span>│┌───────────┐│             │┌───────────┐│  
+</span><span>││172.24.10.1│◀─────────────┤│172.24.10.2││  
+</span><span>│├───────────┤│             │└───────────┘│  
+</span><span>││172.24.11.1││             │             │  
+</span><span>│├───────────┤│             │             │  
+</span><span>││172.24.12.1│◀──────┐      │             │  
+</span><span>└┴───────────┴┘      │      └─────────────┘  
+</span><span>                     │                       
+</span><span>                     │      ┌───────────────┐
+</span><span>                     │      │    Laptop     │
+</span><span>                     │      │┌─────────────┐│
+</span><span>                     └──────┤│172.24.12.100││
+</span><span>                            │└─────────────┘│
+</span><span>                            │               │
+</span><span>                            │               │
+</span><span>                            │               │
+</span><span>                            └───────────────┘
+</span></code></pre>
+<p>When our laptop contacts the server, it has to go via the router. When the server <em>replies</em> to the
+laptop, since the laptop's address is not in the server's FIB, it uses the default route for the
+return traffic.</p>
+<p>Now let's add another interface on the server, but attached to a separate VLAN (Virtual LAN).</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌─────────────┐             ┌─────────────┐  
+</span><span>│   router    │             │   Server    │  
+</span><span>│┌───────────┐│             │┌───────────┐│  
+</span><span>││172.24.10.1│◀─────────────┤│172.24.10.2││  
+</span><span>│├───────────┤│             │├───────────┤│  
+</span><span>││172.24.11.1│◀─────────────┤│172.24.11.2││  
+</span><span>│├───────────┤│             │└───────────┘│  
+</span><span>││172.24.12.1│◀──────┐      │             │  
+</span><span>└┴───────────┴┘      │      └─────────────┘  
+</span><span>                     │                       
+</span><span>                     │      ┌───────────────┐
+</span><span>                     │      │    Laptop     │
+</span><span>                     │      │┌─────────────┐│
+</span><span>                     └──────┤│172.24.12.100││
+</span><span>                            │└─────────────┘│
+</span><span>                            │               │
+</span><span>                            │               │
+</span><span>                            │               │
+</span><span>                            └───────────────┘
+</span></code></pre>
+<p>Our servers FIB would update to:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># netstat -rn
+</span><span>
+</span><span>Destination        Gateway            Flags         Netif Expire
+</span><span>default            172.24.10.1        UGS         bridge0
+</span><span>127.0.0.1          link#4             UH              lo0
+</span><span>172.24.10.0/24     link#5             U           bridge0
+</span><span>172.24.10.2        link#4             UHS             lo0
+</span><span>172.24.11.0/24     link#6             U           bridge1
+</span><span>172.24.11.2        link#4             UHS             lo0
+</span></code></pre>
+<p>So when our laptop (172.24.12.100) contacts the server on 172.24.10.2, everything works as before.</p>
+<p>But if our laptop contacts the server on 172.24.11.2 it will fail. Why?</p>
+<p>Because we created a <em>triangular route</em>.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌─────────────┐             ┌─────────────┐  
+</span><span>│   router    │             │   Server    │  
+</span><span>│┌───────────┐│             │┌───────────┐│  
+</span><span>││172.24.10.1│◀─X───3.──────┤│172.24.10.2││  
+</span><span>│├───────────┤│             │├───────────┤│  
+</span><span>││172.24.11.1│├─────2.──────▶│172.24.11.2││  
+</span><span>│├───────────┤│             │└───────────┘│  
+</span><span>││172.24.12.1│◀──────┐      │             │  
+</span><span>└┴───────────┴┘      │      └─────────────┘  
+</span><span>                     │                       
+</span><span>                    1.      ┌───────────────┐
+</span><span>                     │      │    Laptop     │
+</span><span>                     │      │┌─────────────┐│
+</span><span>                     └──────┤│172.24.12.100││
+</span><span>                            │└─────────────┘│
+</span><span>                            │               │
+</span><span>                            │               │
+</span><span>                            │               │
+</span><span>                            └───────────────┘
+</span></code></pre>
+<p>First the traffic from our laptop goes to the router (1.), which sends the packet to the server on 172.24.11.2 (2.).
+The server then processes the packet and needs to reply to the laptop. However, since our route table
+doesn't have 172.24.12.0/24, we fall back to the <em>default route</em>. So now the response from 172.24.11.2 is sent
+out via bridge0 - Not bridge1 (3.) !!! As a result the router will drop the response as it's source network (172.24.11.2)
+doesn't match the actual network subnet (172.24.10.0/24)</p>
+<p>To resolve this we want to isolate each bridge with their own FIBs, so that they each have their own
+default routes.</p>
+<h2 id="the-end-result">The End Result</h2>
+<p>So when this is completed (on FreeBSD) you will have two (or more!) FIBs available, which you can
+inspect with netstat. Notice the <code>-F X</code> where X is the FIB number.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># netstat -F 0 -rn
+</span><span>Routing tables
+</span><span>
+</span><span>Internet:
+</span><span>Destination        Gateway            Flags         Netif Expire
+</span><span>default            172.24.10.1        UGS         bridge1
+</span><span>127.0.0.1          link#4             UH              lo0
+</span><span>172.24.10.0/24     link#5             U           bridge1
+</span><span>172.24.10.22       link#4             UHS             lo0
+</span><span>
+</span><span># netstat -F 1 -rn
+</span><span>Routing tables (fib: 1)
+</span><span>
+</span><span>Internet:
+</span><span>Destination        Gateway            Flags         Netif Expire
+</span><span>default            172.24.11.1        UGS         bridge2
+</span><span>127.0.0.1          link#4             UHS             lo0
+</span><span>172.24.11.0/24     link#6             U           bridge2
+</span><span>172.24.11.131      link#4             UHS             lo0
+</span></code></pre>
+<p>Here you can see there is a separate FIB for bridge1 and bride11, and they have different default gateways.</p>
+<h2 id="setting-up-fibs">Setting Up FIBs</h2>
+<p>Setup the number of FIBs you want in <code>/boot/loader.conf</code></p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /boot/loader.conf
+</span><span>net.fibs=2
+</span></code></pre>
+<p>When you create your interfaces in rc.conf, attach the FIB to your interface.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># Setup your tagged VLANs
+</span><span>vlans_ix0=&quot;1 2&quot;
+</span><span>
+</span><span># Create the bridges
+</span><span>cloned_interfaces=&quot;bridge1 bridge2&quot;
+</span><span>
+</span><span># Up the physical interface
+</span><span>ifconfig_ix0=&quot;up&quot;
+</span><span>
+</span><span># Up the VLAN tagged 1
+</span><span>ifconfig_ix0_1=&quot;up&quot;
+</span><span># Add the VLAN 1 to bridge 1 and set an IP. This defaults to FIB 0
+</span><span>ifconfig_bridge1=&quot;inet 172.24.10.2/24 addm ix0.1&quot;
+</span><span># Add the defaultroute to FIB 0
+</span><span>defaultrouter=&quot;172.24.10.1&quot;
+</span><span>
+</span><span># Repeat for VLAN 2
+</span><span>ifconfig_ix0_2=&quot;up&quot;
+</span><span># Add VLAN 2 to bridge 2
+</span><span>ifconfig_bridge2=&quot;addm ix0.2&quot;
+</span><span># Add the address to bridge 2 *and* assign it to FIB 1
+</span><span>ifconfig_bridge2_alias0=&quot;inet 172.24.11.131/24 fib 1&quot;
+</span><span>
+</span><span># Add routes to FIB 1
+</span><span>static_routes=&quot;fibnetwork fibdefault&quot;
+</span><span>route_fibnetwork=&quot;-net 172.24.11.0/24 -interface bridge11 -fib 1&quot;
+</span><span>route_fibdefault=&quot;default 172.24.11.1 -fib 1&quot;
+</span></code></pre>
+<p>Reboot your machine.</p>
+<p>Now you can test your new routes - the command <code>setfib</code> executes a command under the specified FIB.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>setfib -F 0 traceroute ....
+</span><span>setfib -F 1 traceroute ....
+</span></code></pre>
+<p>Now you have to configure the jail to run in the second FIB. Thankfully you just use "host mode" networking
+and it will automatically attach to the right FIB if you use an IP from that FIB.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /etc/jail.conf.d/test.conf
+</span><span>
+</span><span>test {
+</span><span>    ...
+</span><span>    ip4.addr = 172.24.11.131;
+</span><span>}
+</span><span>
+</span></code></pre>
+<p>Happy Gaoling!</p>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>

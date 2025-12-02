@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>
+        
+        
+          MacOS Mail App Stuck Indexing
+        
+        
+        </title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>MacOS Mail App Stuck Indexing</h1>
+        <div class="border"></div>
+        <time datetime="2025-11-25" class="date" itemprop="datePublished">
+            25 Nov 2025
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <p>It is that beautiful time of year where once again MacOS has decided to forget how to search my
+Mail.app inboxes. There are plenty of reports online about this issue occuring over the last few
+years and it appears there is no obvious solution - or fix from Apple.</p>
+<p>What occurs is when you attempt a search in Mail.app's interface, no results are returned and the
+status area shows as permanently stuck at indexing.</p>
+<p>Searching shows a number of "remedies" that don't actually work. These include the:</p>
+<ul>
+<li>Add Macintosh HD to spotlight privacy, wait 10 seconds, then remove it.</li>
+<li>Uncheck and recheck "mail" in spotlight options.</li>
+<li>Checking for login items that "might interfere".</li>
+<li>Delete and recreate envelope index files</li>
+<li>Rebuilding mailboxes</li>
+<li>Healing crystals or something.</li>
+</ul>
+<blockquote>
+<p>⚠️ NONE OF THESE SUGGESTIONS WORK. NONE. DON'T WASTE YOUR TIME. ⚠️</p>
+</blockquote>
+<p>Anyway, the fix is far simpler but requires some confidence to use a terminal. All of these commands
+must be run as root (aka, prefixed with <code>sudo</code>).</p>
+<p>Disable all spotlight indexes on all volumes.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -ia off
+</span></code></pre>
+<p>Erase all indexes</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -Ea
+</span></code></pre>
+<p>Reboot your machine. I'm serious, you can't skip this step, you have to reboot here.</p>
+<p>When the machine comes back, wait a few minutes for things to "settle".</p>
+<p>Now remove the spotlight index directories completely.</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -Xa
+</span></code></pre>
+<p>Finally, re-enable the indexing process</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -ia on
+</span></code></pre>
+<p>You can check the status of the reindex with:</p>
+<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -sav
+</span></code></pre>
+<p>Or by opening spotlight search and typeing one letter, which will then show a progress bar of the
+indexing process. In my case it took more than 2 hours to complete, so be patient.</p>
+<h2 id="other-details">Other Details</h2>
+<p>During the process I investigated with console.app to identify a possible cause of the indexing failure,
+however I was unable to idenitfy any. But this is not the first time that this has happened to me,
+so maybe I'll find something next time.</p>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>
