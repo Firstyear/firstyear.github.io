@@ -149,8 +149,7 @@ I would need to select &lt;code&gt;Security Key&lt;&#x2F;code&gt; and then click
 &lt;&#x2F;blockquote&gt;
 &lt;p&gt;Google Chrome has a similar set of Modals and nudges (though props to Chrome, they at least &lt;em&gt;implicitly&lt;&#x2F;em&gt;
 activate your security key from the first modal so a power user who knows the trick can use it). So they
-are just as bad here IMO. Honestly I think Microsoft has the best options of all the platforms here with
-regard to user choice.&lt;&#x2F;p&gt;
+are just as bad here IMO.&lt;&#x2F;p&gt;
 &lt;p&gt;This is what I mean by &quot;vendor lockin&quot;. It&#x27;s not just about where the private keys are stored. It&#x27;s
 the continual friction at each step of the interaction when you deviate from the vendors intended
 path. It&#x27;s about making it so annoying to use &lt;em&gt;anything else&lt;&#x2F;em&gt; that you settle into one vendors
