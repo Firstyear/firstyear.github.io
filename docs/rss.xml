@@ -63,9 +63,34 @@ where the Passkeys live&quot;.&lt;&#x2F;p&gt;
 where any Passkeys from Apple&#x27;s devices can&#x27;t sync to a non-Apple device. Other vendors often &lt;em&gt;can&lt;&#x2F;em&gt;
 allow you to sync out of their ecosystem - Microsoft Password Manager and Google Password Manager
 for example may allow you to sync to other devices (from information I was told on 2025-12-18, that I have partially confirmed, I could still be wrong - and often am.).&lt;&#x2F;p&gt;
-&lt;p&gt;This means that for Apple users, you &lt;em&gt;may&lt;&#x2F;em&gt; feel a bit more &quot;trapped&quot; if you use their platform Passkeys.&lt;&#x2F;p&gt;
+&lt;p&gt;This means that for Apple users, you &lt;em&gt;may&lt;&#x2F;em&gt; feel a bit more &quot;trapped&quot; if you use their platform Passkeys compared to other vendors.&lt;&#x2F;p&gt;
 &lt;&#x2F;blockquote&gt;
 &lt;h2 id=&quot;what-s-the-same&quot;&gt;What&#x27;s the same?&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;passkeys-are-still-hard-to-conceptualise&quot;&gt;Passkeys Are Still Hard to Conceptualise&lt;&#x2F;h3&gt;
+&lt;p&gt;Passwords for all their security flaws are easy for a person to grasp. &quot;Something only I know!&quot;.&lt;&#x2F;p&gt;
+&lt;p&gt;SMS 2FA is easy to use - wait for the message and type in the code. &quot;Something only I can receive&quot;.&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Yes I know SMS isn&#x27;t secure, don&#x27;t come at me.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;p&gt;Beyond that we start to face challenges.&lt;&#x2F;p&gt;
+&lt;p&gt;Storing a password into a Credential Manager is an act of trust. Knowing that you &lt;em&gt;dont know&lt;&#x2F;em&gt; the
+password any more. Knowing you only have to know the password to access the Credential Manager. Being
+able to conceptualise that storage process &lt;em&gt;and trust it&lt;&#x2F;em&gt;. I can at least see the random password in the Credential Manager
+so it brings a feeling of safety. I can print that out and it would be annoying but I guess I could
+type it back in. But it&#x27;s something I can still conceptualise.&lt;&#x2F;p&gt;
+&lt;p&gt;From there TOTP in a Credential Manager is not a difficult jump to make. You can see that random see, the number
+changing, and I already trust the Credential Manager to save my passwords.&lt;&#x2F;p&gt;
+&lt;p&gt;So what about a Passkey?&lt;&#x2F;p&gt;
+&lt;p&gt;Passkeys don&#x27;t have anything tangible I can observe - how are they working? Compared to the Password
+I can&#x27;t &quot;see&quot; what makes it secure. I only have the words on the screen to go by. I can&#x27;t even print
+it out and keep a copy in case of a disaster.&lt;&#x2F;p&gt;
+&lt;p&gt;But moreover, what if I&#x27;d never gotten past SMS 2FA - what if I had never used a Credential Manager
+and learnt to understand and trust how they work? Now suddenly
+I am on a bigger journey. I now have to shift from &quot;something I know&quot; to &quot;something I trust&quot;, without
+the intermediate steps in the process.&lt;&#x2F;p&gt;
+&lt;p&gt;And asking users to trust something that they can&#x27;t see inside of is a big request. Even today I still
+get questions from smart &lt;em&gt;security invested&lt;&#x2F;em&gt; technical persons about how Passkeys work. If this confuses
+security engineers, what about people in other areas with different areas of expertise?&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;thought-leadership&quot;&gt;Thought Leadership&lt;&#x2F;h3&gt;
 &lt;p&gt;Today I saw this excellent quote in the context of why Passkeys are better than Password and TOTP in a Password Manager:&lt;&#x2F;p&gt;
 &lt;blockquote&gt;

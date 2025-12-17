@@ -40,15 +40,15 @@
                         
                             
                             <li class="nav">
-                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
-                                    <span itemprop="name">Pages</span>
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
                                 </a>
                             </li>
                         
                             
                             <li class="nav">
-                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
-                                    <span itemprop="name">Blog</span>
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
                                 </a>
                             </li>
                         
@@ -130,9 +130,34 @@ where the Passkeys live".</p>
 where any Passkeys from Apple's devices can't sync to a non-Apple device. Other vendors often <em>can</em>
 allow you to sync out of their ecosystem - Microsoft Password Manager and Google Password Manager
 for example may allow you to sync to other devices (from information I was told on 2025-12-18, that I have partially confirmed, I could still be wrong - and often am.).</p>
-<p>This means that for Apple users, you <em>may</em> feel a bit more "trapped" if you use their platform Passkeys.</p>
+<p>This means that for Apple users, you <em>may</em> feel a bit more "trapped" if you use their platform Passkeys compared to other vendors.</p>
 </blockquote>
 <h2 id="what-s-the-same">What's the same?</h2>
+<h3 id="passkeys-are-still-hard-to-conceptualise">Passkeys Are Still Hard to Conceptualise</h3>
+<p>Passwords for all their security flaws are easy for a person to grasp. "Something only I know!".</p>
+<p>SMS 2FA is easy to use - wait for the message and type in the code. "Something only I can receive".</p>
+<blockquote>
+<p>Yes I know SMS isn't secure, don't come at me.</p>
+</blockquote>
+<p>Beyond that we start to face challenges.</p>
+<p>Storing a password into a Credential Manager is an act of trust. Knowing that you <em>dont know</em> the
+password any more. Knowing you only have to know the password to access the Credential Manager. Being
+able to conceptualise that storage process <em>and trust it</em>. I can at least see the random password in the Credential Manager
+so it brings a feeling of safety. I can print that out and it would be annoying but I guess I could
+type it back in. But it's something I can still conceptualise.</p>
+<p>From there TOTP in a Credential Manager is not a difficult jump to make. You can see that random see, the number
+changing, and I already trust the Credential Manager to save my passwords.</p>
+<p>So what about a Passkey?</p>
+<p>Passkeys don't have anything tangible I can observe - how are they working? Compared to the Password
+I can't "see" what makes it secure. I only have the words on the screen to go by. I can't even print
+it out and keep a copy in case of a disaster.</p>
+<p>But moreover, what if I'd never gotten past SMS 2FA - what if I had never used a Credential Manager
+and learnt to understand and trust how they work? Now suddenly
+I am on a bigger journey. I now have to shift from "something I know" to "something I trust", without
+the intermediate steps in the process.</p>
+<p>And asking users to trust something that they can't see inside of is a big request. Even today I still
+get questions from smart <em>security invested</em> technical persons about how Passkeys work. If this confuses
+security engineers, what about people in other areas with different areas of expertise?</p>
 <h3 id="thought-leadership">Thought Leadership</h3>
 <p>Today I saw this excellent quote in the context of why Passkeys are better than Password and TOTP in a Password Manager:</p>
 <blockquote>
