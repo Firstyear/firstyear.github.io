@@ -25,7 +25,7 @@ before, and a few new ones I&#x27;ve learnt! Let&#x27;s round up the year togeth
 &lt;li&gt;Passkeys have flaws - learn about them and use them &lt;em&gt;on your terms&lt;&#x2F;em&gt;. Don&#x27;t write them off wholesale based on this blog. I, the author of this blog, use Passkeys!!!&lt;&#x2F;li&gt;
 &lt;li&gt;DO engage with and learn about Credential Managers (aka Password Managers). This is where the Passkey is stored.&lt;&#x2F;li&gt;
 &lt;li&gt;DO use a Credential Manager you control and can backup. I recommend Bitwarden or Vaultwarden which allow backups to be taken easily.&lt;&#x2F;li&gt;
-&lt;li&gt;&lt;em&gt;AVOID&lt;&#x2F;em&gt; using a platform (Apple, Google) Credential Manager as your only Passkey repository - these can&#x27;t easily backed up and you CAN be locked out permanently.
+&lt;li&gt;&lt;em&gt;AVOID&lt;&#x2F;em&gt; using a platform (Apple, Google, Microsoft) Credential Manager as your only Passkey repository - these can&#x27;t easily backed up and you CAN be locked out permanently.
 &lt;ul&gt;
 &lt;li&gt;IF you use a platform Passkey manager, frequently sync it with &lt;a href=&quot;https:&#x2F;&#x2F;fidoalliance.org&#x2F;specifications-credential-exchange-specifications&#x2F;&quot;&gt;FIDO Credential Exchange&lt;&#x2F;a&gt; to an external Credential Manager you can backup&#x2F;control.&lt;&#x2F;li&gt;
 &lt;li&gt;OR use both the platform Passkey manager &lt;em&gt;AND&lt;&#x2F;em&gt; a Credential Manager you control in parallel.&lt;&#x2F;li&gt;
@@ -47,37 +47,47 @@ lockin&quot; are now pointing at this specification as proof that this claim is 
 &lt;blockquote&gt;
 &lt;p&gt;&quot;See! Look! You can export your credentials to another Passkey provider if you want! We aren&#x27;t locking you in!!!&quot;&lt;&#x2F;p&gt;
 &lt;&#x2F;blockquote&gt;
-&lt;p&gt;I have to agree - this is great if you want to &lt;em&gt;change&lt;&#x2F;em&gt; which walled-garden you live inside. However
-it doesn&#x27;t assist with the day to day usage of Passkeys when you have devices from &lt;em&gt;different&lt;&#x2F;em&gt; vendor ecosystems. Nor
-does it make it easier for me to use a Passkey provider outside of my vendors platform provider.&lt;&#x2F;p&gt;
-&lt;p&gt;Example: Let&#x27;s say that I have an Windows Desktop and a Macbook Pro - I can sign up a Passkey on the Macbook Pro
-but I can&#x27;t then use it on the Windows Desktop.
-&lt;a href=&quot;https:&#x2F;&#x2F;fidoalliance.org&#x2F;specifications-credential-exchange-specifications&#x2F;&quot;&gt;FIDO Credential Exchange&lt;&#x2F;a&gt;
-lets me copy from
-Apple&#x27;s Keychain to whatever provider I use on the Windows machine. But now I have to do that
-exchange &lt;em&gt;every time I enrol a new Passkey&lt;&#x2F;em&gt;. Similar I would need to do the reverse from Windows
-to Mac every time that I sign up on the Windows machine.&lt;&#x2F;p&gt;
-&lt;p&gt;So day to day, this changes very little - but if I want to go from &quot;all in on Apple&quot; to &quot;all in on
-Google&quot; then I can do a big-bang migration and jump from once garden to the next. But if you have
-mixed device ecosystems (like uhhh ... you know. Most of the world does) then very little will
-change for you with this.&lt;&#x2F;p&gt;
-&lt;p&gt;But if I use my own Credential Manager (e.g. Vaultwarden) then I can happily work between multiple
-ecosystems.&lt;&#x2F;p&gt;
+&lt;p&gt;I have to agree - this is great if you want to &lt;em&gt;change&lt;&#x2F;em&gt; which garden you live inside. However
+it doesn&#x27;t help with the &lt;em&gt;continual friction&lt;&#x2F;em&gt; that exists using Passkeys, or
+the challenges of day to day usage of Passkeys when you have devices from &lt;em&gt;different&lt;&#x2F;em&gt; ecosystems.&lt;&#x2F;p&gt;
+&lt;p&gt;So it&#x27;s very realistic that a user may end up with &lt;em&gt;fragmented&lt;&#x2F;em&gt; Passkeys between their devices, and they
+may end up not aware they can make this jump between providers, or that they could consolidate their
+credentials to a single Credential Manager. This ends up in the same position where even though the
+user &lt;em&gt;could&lt;&#x2F;em&gt; change provider, they may end up feeling locked into one provider because they aren&#x27;t
+given the information they need to make an informed decision about how they could use other Credential Managers.&lt;&#x2F;p&gt;
+&lt;p&gt;For example, I think it would be very realistic to assume that some users may feel that their Passkeys are bound
+to only their phone. Or that since their phone was the first device to have Passkeys, that&#x27;s &quot;just
+where the Passkeys live&quot;.&lt;&#x2F;p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Let&#x27;s address one of the biases here - I&#x27;ve been heavily affected by the Apple side of this problem
+where any Passkeys from Apple&#x27;s devices can&#x27;t sync to a non-Apple device. Other vendors often &lt;em&gt;can&lt;&#x2F;em&gt;
+allow you to sync out of their ecosystem - Microsoft Password Manager and Google Password Manager
+for example may allow you to sync to other devices (from information I was told on 2025-12-18, that I have partially confirmed, I could still be wrong - and often am.).&lt;&#x2F;p&gt;
+&lt;p&gt;This means that for Apple users, you &lt;em&gt;may&lt;&#x2F;em&gt; feel a bit more &quot;trapped&quot; if you use their platform Passkeys.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
 &lt;h2 id=&quot;what-s-the-same&quot;&gt;What&#x27;s the same?&lt;&#x2F;h2&gt;
 &lt;h3 id=&quot;thought-leadership&quot;&gt;Thought Leadership&lt;&#x2F;h3&gt;
-&lt;p&gt;Today I saw this excellent quote in the context of why Passkeys are better than Password+TOTP in a Password Manager:&lt;&#x2F;p&gt;
+&lt;p&gt;Today I saw this excellent quote in the context of why Passkeys are better than Password and TOTP in a Password Manager:&lt;&#x2F;p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Individuals having to learn to use password management software and be vigilant against phishing is an industry failure, not a personal success.&lt;&#x2F;p&gt;
 &lt;&#x2F;blockquote&gt;
 &lt;p&gt;Even giving as much benefit of the doubt to this statement, and that the &quot;and&quot; might be load bearing we have to ask - Where are passkeys stored?&lt;&#x2F;p&gt;
 &lt;p&gt;&lt;img src=&quot;&#x2F;_static&#x2F;passkey&#x2F;af5o5b.jpg&quot; alt=&quot;image&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
-&lt;p&gt;So we still have to teach individuals about password (credential) managers, and how Passkeys work so that people trust them. That fundamental truth hasn&#x27;t changed.&lt;&#x2F;p&gt;
-&lt;p&gt;But not only this - if a person is choosing a password+TOTP over a Passkey, we have to ask &quot;why is that&quot;? Do we think that it&#x27;s truly about arrogance? Do we think that
-this user believes they are more important? Or is there and underlying usability issue at play? Why might we be recommending this to others? Do we really think that
-Passkeys come without a need of education?&lt;&#x2F;p&gt;
-&lt;p&gt;Maybe I&#x27;m fundamentally missing the original point of this comment. Maybe I am completely misinterpretting it. But I still think we need to say if a person chooses
-password and TOTP over a Passkey even once they are informed of the choices, then Passkeys have &lt;em&gt;failed&lt;&#x2F;em&gt; that user. What could we have done better?&lt;&#x2F;p&gt;
-&lt;p&gt;Perhaps one could interpret this statement as you don&#x27;t need to teach users about Passkeys if they are using their &lt;em&gt;✨ m a g i c a l ✨&lt;&#x2F;em&gt; platform Passkey manager since it&#x27;s so much nicer than a password and TOTP. And that leads to ...&lt;&#x2F;p&gt;
+&lt;p&gt;So we still have to teach individuals about password (credential) managers, and how Passkeys work so
+that people trust them. That fundamental truth hasn&#x27;t changed. But this
+also adds a natural barrier to Passkey adoption - the same barriers which have affected Credential
+Manager adoption for the last decade or so.&lt;&#x2F;p&gt;
+&lt;p&gt;Not only this - if a person is choosing a password and TOTP over a Passkey (or even recommending them),
+we have to ask &quot;why is that&quot;? Do we think that it&#x27;s truly about arrogance? Do we think that
+this user believes they are more important? Or is there an underlying usability issue at play?&lt;&#x2F;p&gt;
+&lt;p&gt;Do we really think that Passkeys come without needing user education?&lt;&#x2F;p&gt;
+&lt;p&gt;Maybe I&#x27;m fundamentally missing the original point of this comment. Maybe I am completely
+misinterpretting it. But I still think we need to say if a person chooses password and TOTP over a
+Passkey even once they are informed of the choices, then Passkeys have &lt;em&gt;failed&lt;&#x2F;em&gt; that user. What
+could we have done better?&lt;&#x2F;p&gt;
+&lt;p&gt;Perhaps one could interpret this statement as you don&#x27;t need to teach users about Passkeys if they
+are using their &lt;em&gt;✨ m a g i c a l ✨&lt;&#x2F;em&gt; platform Passkey manager since it&#x27;s so much nicer than a
+password and TOTP and it &lt;em&gt;just works&lt;&#x2F;em&gt;. And that leads to ...&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;it-s-still-vendor-lockin&quot;&gt;It&#x27;s Still Vendor Lockin&lt;&#x2F;h3&gt;
 &lt;blockquote&gt;
 &lt;p&gt;In economics, vendor lock-in, [...] makes a customer dependent on a vendor for products, unable to
@@ -86,9 +96,7 @@ use another vendor without substantial switching costs.&lt;&#x2F;p&gt;
 &lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Vendor_lock-in&quot;&gt;citation - wikipedia&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
 &lt;p&gt;See, the big issue that the thought leaders seem to get wrong is that they believe that if you can
 use FIDO Credential Exchange, then you aren&#x27;t locked in because you can move between Passkey providers.&lt;&#x2F;p&gt;
-&lt;p&gt;But if we aren&#x27;t teaching our users about credential management, didn&#x27;t we just silently lock them into
-to our platform Passkey manager?&lt;&#x2F;p&gt;
-&lt;p&gt;Not only that, when you try to go against the platform manager, it&#x27;s the continual friction at each stage of the users
+&lt;p&gt;The issue is when you try to go against the platform manager, it&#x27;s the continual friction at each stage of the users
 experience. It makes
 the cost to switch &lt;em&gt;high&lt;&#x2F;em&gt; because at each point you encounter friction if you deviate from the vendors
 intended paths.&lt;&#x2F;p&gt;
@@ -116,7 +124,8 @@ I would need to select &lt;code&gt;Security Key&lt;&#x2F;code&gt; and then click
 &lt;&#x2F;blockquote&gt;
 &lt;p&gt;Google Chrome has a similar set of Modals and nudges (though props to Chrome, they at least &lt;em&gt;implicitly&lt;&#x2F;em&gt;
 activate your security key from the first modal so a power user who knows the trick can use it). So they
-are just as bad here IMO.&lt;&#x2F;p&gt;
+are just as bad here IMO. Honestly I think Microsoft has the best options of all the platforms here with
+regard to user choice.&lt;&#x2F;p&gt;
 &lt;p&gt;This is what I mean by &quot;vendor lockin&quot;. It&#x27;s not just about where the private keys are stored. It&#x27;s
 the continual friction at each step of the interaction when you deviate from the vendors intended
 path. It&#x27;s about making it so annoying to use &lt;em&gt;anything else&lt;&#x2F;em&gt; that you settle into one vendors
@@ -135,7 +144,7 @@ we meant to do to help them?&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;vendors-can-lock-you-out&quot;&gt;Vendors Can Lock You Out&lt;&#x2F;h3&gt;
 &lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;hey.paris&#x2F;posts&#x2F;appleid&#x2F;&quot;&gt;Dr Paris Buttfield-Addison was locked out of their Apple account&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
 &lt;p&gt;I recommend you read the post, but the side effect - every Passkey they had in an Apple keychain is now unrecoverable.&lt;&#x2F;p&gt;
-&lt;p&gt;There is just as much evidence about the same practices with Google &#x2F; Android.&lt;&#x2F;p&gt;
+&lt;p&gt;There is just as much evidence about the same account practices with Google and Microsoft.&lt;&#x2F;p&gt;
 &lt;p&gt;I honestly don&#x27;t think I have to say much else, this is terrifying that every account you own could be destroyed by a single action where you have no recourse.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;authentication-providers-still-miscommunicate&quot;&gt;Authentication Providers Still Miscommunicate&lt;&#x2F;h3&gt;
 &lt;p&gt;We still have issues where services that are embracing Passkeys are communicating badly about them.
@@ -167,7 +176,7 @@ assumed you would use a synchronised cloud keychain of some kind. In 2025 I stil
 of these services, but mostly the large problem sites have now finally allowed you to enrol multiple Passkeys.&lt;&#x2F;p&gt;
 &lt;p&gt;But that doesn&#x27;t stop sites pulling tricks on you.&lt;&#x2F;p&gt;
 &lt;p&gt;I&#x27;ve encountered multiple sites that now use &lt;code&gt;authenticatorAttachment&lt;&#x2F;code&gt; options to force you to use
-a platform bound Passkey. In other words, they force you into Google or Apple. No password manager,
+a platform bound Passkey. In other words, they force you into Microsoft, Google or Apple. No password manager,
 no security key, no choices.&lt;&#x2F;p&gt;
 &lt;p&gt;I won&#x27;t claim this one as an attempt at &quot;vendor lockin&quot; by the big players, but it is a reflection
 of what developers believe a Passkey to be - they believe it means a private key stored in one of
@@ -185,7 +194,8 @@ same vendor doesn&#x27;t use your passkey when you go to sign in again anyway.&l
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
 &lt;p&gt;Yep, Passkeys Still Have Problems.&lt;&#x2F;p&gt;
 &lt;p&gt;But it&#x27;s not &lt;em&gt;all&lt;&#x2F;em&gt; doom and gloom.&lt;&#x2F;p&gt;
-&lt;p&gt;Most of the issues are around &lt;em&gt;platform&lt;&#x2F;em&gt; Passkey providers like Apple or Google.&lt;&#x2F;p&gt;
+&lt;p&gt;Most of the issues are around &lt;em&gt;platform&lt;&#x2F;em&gt; Passkey providers like Apple, Microsoft or Google, where the
+power balance is shifted against you as a user.&lt;&#x2F;p&gt;
 &lt;p&gt;The best thing you can do as a user, and for anyone in your life you want to help, is to be educated
 about Credential Managers. Regardless of Passwords, TOTP, Passkeys or anything else, empowering people
 to manage and think about their online security via a Credential Manager they feel they control and
@@ -218,6 +228,7 @@ you want people to enroll a passkey on sign in, communicate that before you atte
 kids, consent is paramount.&lt;&#x2F;p&gt;
 &lt;p&gt;But of course - maybe I just &quot;don&#x27;t understand Passkeys correctly&quot;. I am but an underachiving white man on the internet after all.&lt;&#x2F;p&gt;
 &lt;p&gt;EDIT: 2025-12-17 - expanded on the password&#x2F;totp + password manager argument.&lt;&#x2F;p&gt;
+&lt;p&gt;EDIT: 2025-12-18 - updated the FIDO credential exchange and lock in sections based on some new information.&lt;&#x2F;p&gt;
 </description>
       </item>
       <item>
