@@ -22,6 +22,7 @@ I don&#x27;t understand Passkeys in that case.&lt;&#x2F;p&gt;
 before, and a few new ones I&#x27;ve learnt! Let&#x27;s round up the year together then.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;too-lazy-didn-t-read&quot;&gt;Too Lazy - Didn&#x27;t Read&lt;&#x2F;h2&gt;
 &lt;ul&gt;
+&lt;li&gt;Passkeys have flaws - learn about them and use them &lt;em&gt;on your terms&lt;&#x2F;em&gt;. Don&#x27;t write them off wholesale based on this blog. I, the author of this blog, use Passkeys!!!&lt;&#x2F;li&gt;
 &lt;li&gt;DO engage with and learn about Credential Managers (aka Password Managers). This is where the Passkey is stored.&lt;&#x2F;li&gt;
 &lt;li&gt;DO use a Credential Manager you control and can backup. I recommend Bitwarden or Vaultwarden which allow backups to be taken easily.&lt;&#x2F;li&gt;
 &lt;li&gt;&lt;em&gt;AVOID&lt;&#x2F;em&gt; using a platform (Apple, Google) Credential Manager as your only Passkey repository - these can&#x27;t easily backed up and you CAN be locked out permanently.
