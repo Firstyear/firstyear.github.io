@@ -71,7 +71,12 @@ ecosystems.&lt;&#x2F;p&gt;
 &lt;p&gt;Even giving as much benefit of the doubt to this statement, and that the &quot;and&quot; might be load bearing we have to ask - Where are passkeys stored?&lt;&#x2F;p&gt;
 &lt;p&gt;&lt;img src=&quot;&#x2F;_static&#x2F;passkey&#x2F;af5o5b.jpg&quot; alt=&quot;image&quot; &#x2F;&gt;&lt;&#x2F;p&gt;
 &lt;p&gt;So we still have to teach individuals about password (credential) managers, and how Passkeys work so that people trust them. That fundamental truth hasn&#x27;t changed.&lt;&#x2F;p&gt;
-&lt;p&gt;Perhaps one could interpret this as you don&#x27;t need to teach users about Passkeys if they are using their &lt;em&gt;✨ m a g i c a l ✨&lt;&#x2F;em&gt; platform Passkey manager. And that leads to ...&lt;&#x2F;p&gt;
+&lt;p&gt;But not only this - if a person is choosing a password+TOTP over a Passkey, we have to ask &quot;why is that&quot;? Do we think that it&#x27;s truly about arrogance? Do we think that
+this user believes they are more important? Or is there and underlying usability issue at play? Why might we be recommending this to others? Do we really think that
+Passkeys come without a need of education?&lt;&#x2F;p&gt;
+&lt;p&gt;Maybe I&#x27;m fundamentally missing the original point of this comment. Maybe I am completely misinterpretting it. But I still think we need to say if a person chooses
+password and TOTP over a Passkey even once they are informed of the choices, then Passkeys have &lt;em&gt;failed&lt;&#x2F;em&gt; that user. What could we have done better?&lt;&#x2F;p&gt;
+&lt;p&gt;Perhaps one could interpret this statement as you don&#x27;t need to teach users about Passkeys if they are using their &lt;em&gt;✨ m a g i c a l ✨&lt;&#x2F;em&gt; platform Passkey manager since it&#x27;s so much nicer than a password and TOTP. And that leads to ...&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;it-s-still-vendor-lockin&quot;&gt;It&#x27;s Still Vendor Lockin&lt;&#x2F;h3&gt;
 &lt;blockquote&gt;
 &lt;p&gt;In economics, vendor lock-in, [...] makes a customer dependent on a vendor for products, unable to
@@ -211,6 +216,7 @@ options or javascript API&#x27;s. Just leave it to the users platform modals to 
 you want people to enroll a passkey on sign in, communicate that before you attempt the enrolment. Remember
 kids, consent is paramount.&lt;&#x2F;p&gt;
 &lt;p&gt;But of course - maybe I just &quot;don&#x27;t understand Passkeys correctly&quot;. I am but an underachiving white man on the internet after all.&lt;&#x2F;p&gt;
+&lt;p&gt;EDIT: 2025-12-17 - expanded on the password&#x2F;totp + password manager argument.&lt;&#x2F;p&gt;
 </description>
       </item>
       <item>
