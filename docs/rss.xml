@@ -78,8 +78,9 @@ password any more. Knowing you only have to know the password to access the Cred
 able to conceptualise that storage process &lt;em&gt;and trust it&lt;&#x2F;em&gt;. I can at least see the random password in the Credential Manager
 so it brings a feeling of safety. I can print that out and it would be annoying but I guess I could
 type it back in. But it&#x27;s something I can still conceptualise.&lt;&#x2F;p&gt;
-&lt;p&gt;From there TOTP in a Credential Manager is not a difficult jump to make. You can see that random see, the number
-changing, and I already trust the Credential Manager to save my passwords.&lt;&#x2F;p&gt;
+&lt;p&gt;From there TOTP in a Credential Manager is not a difficult jump to make. You can see that random seed, the number
+changing every 30 seconds, and I already trust the Credential Manager to save my passwords. It&#x27;s not hard to start
+to trust TOTP too at this point.&lt;&#x2F;p&gt;
 &lt;p&gt;So what about a Passkey?&lt;&#x2F;p&gt;
 &lt;p&gt;Passkeys don&#x27;t have anything tangible I can observe - how are they working? Compared to the Password
 I can&#x27;t &quot;see&quot; what makes it secure. I only have the words on the screen to go by. I can&#x27;t even print
@@ -105,7 +106,8 @@ Manager adoption for the last decade or so.&lt;&#x2F;p&gt;
 &lt;p&gt;Not only this - if a person is choosing a password and TOTP over a Passkey (or even recommending them),
 we have to ask &quot;why is that&quot;? Do we think that it&#x27;s truly about arrogance? Do we think that
 this user believes they are more important? Or is there an underlying usability issue at play?&lt;&#x2F;p&gt;
-&lt;p&gt;Do we really think that Passkeys come without needing user education?&lt;&#x2F;p&gt;
+&lt;p&gt;Do we really think that Passkeys come without needing user education? To me it feels like this
+comment is overlooking the barriers that Passkeys naturally come with.&lt;&#x2F;p&gt;
 &lt;p&gt;Maybe I&#x27;m fundamentally missing the original point of this comment. Maybe I am completely
 misinterpretting it. But I still think we need to say if a person chooses password and TOTP over a
 Passkey even once they are informed of the choices, then Passkeys have &lt;em&gt;failed&lt;&#x2F;em&gt; that user. What
@@ -164,7 +166,7 @@ CTAP would still function, and all the historical fixes we&#x27;ve seen (such as
 not work. So now what? I&#x27;m not sure of the outcome of this story, but my assumption is there was not
 a happy ending.&lt;&#x2F;p&gt;
 &lt;p&gt;If someone ends up locked out of their accounts because their Passkeys got nuked silently, what are
-we meant to do to help them?&lt;&#x2F;p&gt;
+we meant to do to help them? How will they ever trust Passkeys again?&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;vendors-can-lock-you-out&quot;&gt;Vendors Can Lock You Out&lt;&#x2F;h3&gt;
 &lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;hey.paris&#x2F;posts&#x2F;appleid&#x2F;&quot;&gt;Dr Paris Buttfield-Addison was locked out of their Apple account&lt;&#x2F;a&gt;.&lt;&#x2F;p&gt;
 &lt;p&gt;I recommend you read the post, but the side effect - every Passkey they had in an Apple keychain is now unrecoverable.&lt;&#x2F;p&gt;
@@ -187,7 +189,7 @@ also why they believe it is phishing resistant because you can&#x27;t clone my f
 &lt;&#x2F;blockquote&gt;
 &lt;p&gt;This is a smart, educated person, with the title of &lt;em&gt;doctor&lt;&#x2F;em&gt;, and even she is concluding that Passkeys
 are sending biometrics over the internet. What are people in other disciplines going to think? What
-about people with a cognitive impairment or who not have access to education about Passkeys?&lt;&#x2F;p&gt;
+about people with a cognitive impairment or who do not have access to education about Passkeys?&lt;&#x2F;p&gt;
 &lt;p&gt;This kind of messaging that leads people to believe we are sending personal physical features over
 the internet is &lt;em&gt;harmful&lt;&#x2F;em&gt; because most people &lt;em&gt;will not want to send these data to a remote service&lt;&#x2F;em&gt;.
 This completely undermines the trust in Passkeys because we are establishing to people that they are

@@ -145,8 +145,9 @@ password any more. Knowing you only have to know the password to access the Cred
 able to conceptualise that storage process <em>and trust it</em>. I can at least see the random password in the Credential Manager
 so it brings a feeling of safety. I can print that out and it would be annoying but I guess I could
 type it back in. But it's something I can still conceptualise.</p>
-<p>From there TOTP in a Credential Manager is not a difficult jump to make. You can see that random see, the number
-changing, and I already trust the Credential Manager to save my passwords.</p>
+<p>From there TOTP in a Credential Manager is not a difficult jump to make. You can see that random seed, the number
+changing every 30 seconds, and I already trust the Credential Manager to save my passwords. It's not hard to start
+to trust TOTP too at this point.</p>
 <p>So what about a Passkey?</p>
 <p>Passkeys don't have anything tangible I can observe - how are they working? Compared to the Password
 I can't "see" what makes it secure. I only have the words on the screen to go by. I can't even print
@@ -172,7 +173,8 @@ Manager adoption for the last decade or so.</p>
 <p>Not only this - if a person is choosing a password and TOTP over a Passkey (or even recommending them),
 we have to ask "why is that"? Do we think that it's truly about arrogance? Do we think that
 this user believes they are more important? Or is there an underlying usability issue at play?</p>
-<p>Do we really think that Passkeys come without needing user education?</p>
+<p>Do we really think that Passkeys come without needing user education? To me it feels like this
+comment is overlooking the barriers that Passkeys naturally come with.</p>
 <p>Maybe I'm fundamentally missing the original point of this comment. Maybe I am completely
 misinterpretting it. But I still think we need to say if a person chooses password and TOTP over a
 Passkey even once they are informed of the choices, then Passkeys have <em>failed</em> that user. What
@@ -231,7 +233,7 @@ CTAP would still function, and all the historical fixes we've seen (such as full
 not work. So now what? I'm not sure of the outcome of this story, but my assumption is there was not
 a happy ending.</p>
 <p>If someone ends up locked out of their accounts because their Passkeys got nuked silently, what are
-we meant to do to help them?</p>
+we meant to do to help them? How will they ever trust Passkeys again?</p>
 <h3 id="vendors-can-lock-you-out">Vendors Can Lock You Out</h3>
 <p><a href="https://hey.paris/posts/appleid/">Dr Paris Buttfield-Addison was locked out of their Apple account</a>.</p>
 <p>I recommend you read the post, but the side effect - every Passkey they had in an Apple keychain is now unrecoverable.</p>
@@ -254,7 +256,7 @@ also why they believe it is phishing resistant because you can't clone my face o
 </blockquote>
 <p>This is a smart, educated person, with the title of <em>doctor</em>, and even she is concluding that Passkeys
 are sending biometrics over the internet. What are people in other disciplines going to think? What
-about people with a cognitive impairment or who not have access to education about Passkeys?</p>
+about people with a cognitive impairment or who do not have access to education about Passkeys?</p>
 <p>This kind of messaging that leads people to believe we are sending personal physical features over
 the internet is <em>harmful</em> because most people <em>will not want to send these data to a remote service</em>.
 This completely undermines the trust in Passkeys because we are establishing to people that they are
