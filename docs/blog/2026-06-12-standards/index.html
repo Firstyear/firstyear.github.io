@@ -82,7 +82,7 @@
     </div>
     <div itemprop="articleBody">
         <p>Part of my role as a software engineer (and formerly a sysadmin) is that I need to read - and
-understand standards. As <a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.youtube.com/c/BenEater)">Ben Eater</a> said once in his channel "standards trade clarity for
+understand standards. As <a rel="external" href="https://www.youtube.com/c/BenEater">Ben Eater</a> said once in his channel "standards trade clarity for
 specificity". This has many consequences - some of which we know as people implementing
 the standard incorrectly due to the lack of clarity (I've made this mistake plenty!). But I
 think this strive for accuracy ends up creating some unintended social outcomes.</p>
@@ -90,7 +90,7 @@ think this strive for accuracy ends up creating some unintended social outcomes.
 used. Maybe a law already exists for this, but I always say there is a divide between "the standard
 as intended" and "the standard as used".</p>
 <p>LDAP is a great example of this, especially as something I've worked on for so long.</p>
-<p><a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.rfc-editor.org/info/rfc4511/)">RFC 4511</a> defines the capabilities of LDAP, itself being a derivative of <a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://en.wikipedia.org/wiki/X.500)">X500 DAP</a>. LDAP defines
+<p><a rel="external" href="https://www.rfc-editor.org/info/rfc4511/">RFC 4511</a> defines the capabilities of LDAP, itself being a derivative of <a rel="external" href="https://en.wikipedia.org/wiki/X.500">X500 DAP</a>. LDAP defines
 many operations - searches, updates, binding (authentication), extended operations, even the ability
 to return referrals so that a query can be redirected. Extended operations allow the protocol to be
 customised. Controls allow extra information to be returned in parallel to other operations. Searches
@@ -104,7 +104,7 @@ computer with a hardware security token that your government issued that identif
 token then lets you login to your email hosted by "I can't believe it's not google". One identity
 and method to authenticate you, all shared and trusted.</p>
 <p>All of the parts presented become a part of this. But that intent isn't clear from the standard.</p>
-<p>So despite all of the capability that <a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.rfc-editor.org/info/rfc4511/)">RFC 4511</a> provides, what is actually used?</p>
+<p>So despite all of the capability that <a rel="external" href="https://www.rfc-editor.org/info/rfc4511/">RFC 4511</a> provides, what is actually used?</p>
 <p><code>search</code> and <code>bind</code>. In some edge cases you may see <code>modify</code>/<code>create</code> but not often. Certainly you
 don't see LDAP being a global catalog of identities. Every organisation ends up running their own
 small LDAP silo in isolation to everyone else, and most authentication today doesn't even go via
@@ -114,13 +114,13 @@ used is always <em>different</em>. Maybe it's a subset. Maybe it's completely or
 things are added that betray the intent of the standard. But it is this disconnect that often
 leads to confusion and friction between standards authors, implementors, and users.</p>
 <p>When viewed through this lens, so many challenges of modern technology start to fall into place.</p>
-<p><a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.w3.org/TR/webauthn/)">Webauthn</a> originally was designed to support security tokens (yubikeys) but was "used" to allow
+<p><a rel="external" href="https://www.w3.org/TR/webauthn/">Webauthn</a> originally was designed to support security tokens (yubikeys) but was "used" to allow
 software password managers that violated the assumptions that existed. The standard provides
 tools to allow helping users find what credentials they could enrol, but when used by implementors
 ends up locking people out or denying them consent and choice of how they authenticate. Even within
 all the capabilities of Webauthn, there are only a few narrow paths within the standard that create
 good user experiences today.</p>
-<p><a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.rfc-editor.org/info/rfc6749/)">OAuth2</a> exists to allow a service (client) to authorise a token that can be used on behalf of a user to
+<p><a rel="external" href="https://www.rfc-editor.org/info/rfc6749/">OAuth2</a> exists to allow a service (client) to authorise a token that can be used on behalf of a user to
 access something (resource server). But more often than not, what the user is authorising to is the
 service itself, and the token never goes anywhere. OAuth2 is often (mis)used for "authentication"
 to linux machines despite the user experience being so horrible.</p>

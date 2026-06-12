@@ -15,7 +15,7 @@
           <link>https://fy.blackhats.net.au/blog/2026-06-12-standards/</link>
           <guid>https://fy.blackhats.net.au/blog/2026-06-12-standards/</guid>
           <description xml:base="https://fy.blackhats.net.au/blog/2026-06-12-standards/">&lt;p&gt;Part of my role as a software engineer (and formerly a sysadmin) is that I need to read - and
-understand standards. As &lt;a href=&quot;https:&#x2F;&#x2F;fy.blackhats.net.au&#x2F;blog&#x2F;2026-06-12-standards&#x2F;(https:&#x2F;&#x2F;www.youtube.com&#x2F;c&#x2F;BenEater)&quot;&gt;Ben Eater&lt;&#x2F;a&gt; said once in his channel &quot;standards trade clarity for
+understand standards. As &lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;www.youtube.com&#x2F;c&#x2F;BenEater&quot;&gt;Ben Eater&lt;&#x2F;a&gt; said once in his channel &quot;standards trade clarity for
 specificity&quot;. This has many consequences - some of which we know as people implementing
 the standard incorrectly due to the lack of clarity (I&#x27;ve made this mistake plenty!). But I
 think this strive for accuracy ends up creating some unintended social outcomes.&lt;&#x2F;p&gt;
@@ -23,7 +23,7 @@ think this strive for accuracy ends up creating some unintended social outcomes.
 used. Maybe a law already exists for this, but I always say there is a divide between &quot;the standard
 as intended&quot; and &quot;the standard as used&quot;.&lt;&#x2F;p&gt;
 &lt;p&gt;LDAP is a great example of this, especially as something I&#x27;ve worked on for so long.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;fy.blackhats.net.au&#x2F;blog&#x2F;2026-06-12-standards&#x2F;(https:&#x2F;&#x2F;www.rfc-editor.org&#x2F;info&#x2F;rfc4511&#x2F;)&quot;&gt;RFC 4511&lt;&#x2F;a&gt; defines the capabilities of LDAP, itself being a derivative of &lt;a href=&quot;https:&#x2F;&#x2F;fy.blackhats.net.au&#x2F;blog&#x2F;2026-06-12-standards&#x2F;(https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;X.500)&quot;&gt;X500 DAP&lt;&#x2F;a&gt;. LDAP defines
+&lt;p&gt;&lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;www.rfc-editor.org&#x2F;info&#x2F;rfc4511&#x2F;&quot;&gt;RFC 4511&lt;&#x2F;a&gt; defines the capabilities of LDAP, itself being a derivative of &lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;X.500&quot;&gt;X500 DAP&lt;&#x2F;a&gt;. LDAP defines
 many operations - searches, updates, binding (authentication), extended operations, even the ability
 to return referrals so that a query can be redirected. Extended operations allow the protocol to be
 customised. Controls allow extra information to be returned in parallel to other operations. Searches
@@ -37,7 +37,7 @@ computer with a hardware security token that your government issued that identif
 token then lets you login to your email hosted by &quot;I can&#x27;t believe it&#x27;s not google&quot;. One identity
 and method to authenticate you, all shared and trusted.&lt;&#x2F;p&gt;
 &lt;p&gt;All of the parts presented become a part of this. But that intent isn&#x27;t clear from the standard.&lt;&#x2F;p&gt;
-&lt;p&gt;So despite all of the capability that &lt;a href=&quot;https:&#x2F;&#x2F;fy.blackhats.net.au&#x2F;blog&#x2F;2026-06-12-standards&#x2F;(https:&#x2F;&#x2F;www.rfc-editor.org&#x2F;info&#x2F;rfc4511&#x2F;)&quot;&gt;RFC 4511&lt;&#x2F;a&gt; provides, what is actually used?&lt;&#x2F;p&gt;
+&lt;p&gt;So despite all of the capability that &lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;www.rfc-editor.org&#x2F;info&#x2F;rfc4511&#x2F;&quot;&gt;RFC 4511&lt;&#x2F;a&gt; provides, what is actually used?&lt;&#x2F;p&gt;
 &lt;p&gt;&lt;code&gt;search&lt;&#x2F;code&gt; and &lt;code&gt;bind&lt;&#x2F;code&gt;. In some edge cases you may see &lt;code&gt;modify&lt;&#x2F;code&gt;&#x2F;&lt;code&gt;create&lt;&#x2F;code&gt; but not often. Certainly you
 don&#x27;t see LDAP being a global catalog of identities. Every organisation ends up running their own
 small LDAP silo in isolation to everyone else, and most authentication today doesn&#x27;t even go via
@@ -47,13 +47,13 @@ used is always &lt;em&gt;different&lt;&#x2F;em&gt;. Maybe it&#x27;s a subset. Ma
 things are added that betray the intent of the standard. But it is this disconnect that often
 leads to confusion and friction between standards authors, implementors, and users.&lt;&#x2F;p&gt;
 &lt;p&gt;When viewed through this lens, so many challenges of modern technology start to fall into place.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;fy.blackhats.net.au&#x2F;blog&#x2F;2026-06-12-standards&#x2F;(https:&#x2F;&#x2F;www.w3.org&#x2F;TR&#x2F;webauthn&#x2F;)&quot;&gt;Webauthn&lt;&#x2F;a&gt; originally was designed to support security tokens (yubikeys) but was &quot;used&quot; to allow
+&lt;p&gt;&lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;www.w3.org&#x2F;TR&#x2F;webauthn&#x2F;&quot;&gt;Webauthn&lt;&#x2F;a&gt; originally was designed to support security tokens (yubikeys) but was &quot;used&quot; to allow
 software password managers that violated the assumptions that existed. The standard provides
 tools to allow helping users find what credentials they could enrol, but when used by implementors
 ends up locking people out or denying them consent and choice of how they authenticate. Even within
 all the capabilities of Webauthn, there are only a few narrow paths within the standard that create
 good user experiences today.&lt;&#x2F;p&gt;
-&lt;p&gt;&lt;a href=&quot;https:&#x2F;&#x2F;fy.blackhats.net.au&#x2F;blog&#x2F;2026-06-12-standards&#x2F;(https:&#x2F;&#x2F;www.rfc-editor.org&#x2F;info&#x2F;rfc6749&#x2F;)&quot;&gt;OAuth2&lt;&#x2F;a&gt; exists to allow a service (client) to authorise a token that can be used on behalf of a user to
+&lt;p&gt;&lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;www.rfc-editor.org&#x2F;info&#x2F;rfc6749&#x2F;&quot;&gt;OAuth2&lt;&#x2F;a&gt; exists to allow a service (client) to authorise a token that can be used on behalf of a user to
 access something (resource server). But more often than not, what the user is authorising to is the
 service itself, and the token never goes anywhere. OAuth2 is often (mis)used for &quot;authentication&quot;
 to linux machines despite the user experience being so horrible.&lt;&#x2F;p&gt;
