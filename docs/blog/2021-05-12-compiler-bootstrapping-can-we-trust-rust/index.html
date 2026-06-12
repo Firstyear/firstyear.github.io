@@ -85,7 +85,7 @@
 <p>Recently I have been doing a lot of work for SUSE with how we package
 the Rust compiler. This process has been really interesting and
 challenging, but like anything it's certainly provided a lot of time
-for thought while <a href="https://xkcd.com/303/">waiting</a> for my packages to
+for thought while <a rel="external" href="https://xkcd.com/303/">waiting</a> for my packages to
 build.</p>
 <p>The Rust package in OpenSUSE has two methods of building the compiler
 internally in it's spec file.</p>
@@ -105,63 +105,61 @@ rust project</li>
 <h2 id="bootstrapping">Bootstrapping</h2>
 <p>There are many advocates of bootstrapping and then self sustaining a
 chain of compilers within a distribution. The roots of this come from
-Ken Thompsons Turing Award speech known as <a href="https://www.ece.cmu.edu/~ganger/712.fall02/papers/p761-thompson.pdf">Reflections on trusting
+Ken Thompsons Turing Award speech known as <a rel="external" href="https://www.ece.cmu.edu/~ganger/712.fall02/papers/p761-thompson.pdf">Reflections on trusting
 trust</a>
 . This details the process in which a compiler can be backdoored, to
 produce future backdoored compilers. This has been replicated by Manish
-G. detailed in their <a href="https://manishearth.github.io/blog/2016/12/02/reflections-on-rusting-trust/">blog, Reflections on Rusting
+G. detailed in their <a rel="external" href="https://manishearth.github.io/blog/2016/12/02/reflections-on-rusting-trust/">blog, Reflections on Rusting
 Trust</a>
 where they successfully create a self-hosting backdoored rust compiler.</p>
 <p>The process can be visualised as:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌──────────────┐              ┌──────────────┐                             
-</span><span>│  Backdoored  │              │   Trusted    │                             
-</span><span>│   Sources    │──────┐       │   Sources    │──────┐                      
-</span><span>│              │      │       │              │      │                      
-</span><span>└──────────────┘      │       └──────────────┘      │                      
-</span><span>                      │                             │                      
-</span><span>┌──────────────┐      │       ┌──────────────┐      │      ┌──────────────┐
-</span><span>│   Trusted    │      ▼       │  Backdoored  │      ▼      │  Backdoored  │
-</span><span>│ Interpreter  │──Produces───▶│    Binary    ├──Produces──▶│    Binary    │
-</span><span>│              │              │              │             │              │
-</span><span>└──────────────┘              └──────────────┘             └──────────────┘
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────┐              ┌──────────────┐                             </span></span>
+<span class="giallo-l"><span>│  Backdoored  │              │   Trusted    │                             </span></span>
+<span class="giallo-l"><span>│   Sources    │──────┐       │   Sources    │──────┐                      </span></span>
+<span class="giallo-l"><span>│              │      │       │              │      │                      </span></span>
+<span class="giallo-l"><span>└──────────────┘      │       └──────────────┘      │                      </span></span>
+<span class="giallo-l"><span>                      │                             │                      </span></span>
+<span class="giallo-l"><span>┌──────────────┐      │       ┌──────────────┐      │      ┌──────────────┐</span></span>
+<span class="giallo-l"><span>│   Trusted    │      ▼       │  Backdoored  │      ▼      │  Backdoored  │</span></span>
+<span class="giallo-l"><span>│ Interpreter  │──Produces───▶│    Binary    ├──Produces──▶│    Binary    │</span></span>
+<span class="giallo-l"><span>│              │              │              │             │              │</span></span>
+<span class="giallo-l"><span>└──────────────┘              └──────────────┘             └──────────────┘</span></span></code></pre>
 <p>We can see that in this attack, even with a set of trusted compiler
 sources, we can continue to produce a chain of backdoored binaries.</p>
 <p>This has led to many people, and even groups such as
-<a href="https://www.bootstrappable.org/">Bootstrappable</a> promoting work to be
+<a rel="external" href="https://www.bootstrappable.org/">Bootstrappable</a> promoting work to be
 able to produce trusted chains from trusted sources, so that we can
 assert a level of trust in our produced compiler binaries.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌──────────────┐              ┌──────────────┐                             
-</span><span>│   Trusted    │              │   Trusted    │                             
-</span><span>│   Sources    │──────┐       │   Sources    │──────┐                      
-</span><span>│              │      │       │              │      │                      
-</span><span>└──────────────┘      │       └──────────────┘      │                      
-</span><span>                      │                             │                      
-</span><span>┌──────────────┐      │       ┌──────────────┐      │      ┌──────────────┐
-</span><span>│   Trusted    │      ▼       │              │      ▼      │              │
-</span><span>│ Interpreter  │──Produces───▶│Trusted Binary├──Produces──▶│Trusted Binary│
-</span><span>│              │              │              │             │              │
-</span><span>└──────────────┘              └──────────────┘             └──────────────┘
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────┐              ┌──────────────┐                             </span></span>
+<span class="giallo-l"><span>│   Trusted    │              │   Trusted    │                             </span></span>
+<span class="giallo-l"><span>│   Sources    │──────┐       │   Sources    │──────┐                      </span></span>
+<span class="giallo-l"><span>│              │      │       │              │      │                      </span></span>
+<span class="giallo-l"><span>└──────────────┘      │       └──────────────┘      │                      </span></span>
+<span class="giallo-l"><span>                      │                             │                      </span></span>
+<span class="giallo-l"><span>┌──────────────┐      │       ┌──────────────┐      │      ┌──────────────┐</span></span>
+<span class="giallo-l"><span>│   Trusted    │      ▼       │              │      ▼      │              │</span></span>
+<span class="giallo-l"><span>│ Interpreter  │──Produces───▶│Trusted Binary├──Produces──▶│Trusted Binary│</span></span>
+<span class="giallo-l"><span>│              │              │              │             │              │</span></span>
+<span class="giallo-l"><span>└──────────────┘              └──────────────┘             └──────────────┘</span></span></code></pre>
 <p>This process would continue forever to the right, where each trusted
 binary is the result of trusted sources. This then ties into topics like
-<a href="https://reproducible-builds.org/">reproducible builds</a> which assert
+<a rel="external" href="https://reproducible-builds.org/">reproducible builds</a> which assert
 that you can separately rebuild the sources and attain the same binary,
 showing the process can not have been tampered with.</p>
 <h2 id="but-does-it-really-work-like-that">But does it really work like that?</h2>
 <p>Outside of thought exercises, there is little evidence of these attacks
 being carried out in reality.</p>
-<p>Last year in 2020 we saw supply chain attacks such as the <a href="https://en.wikipedia.org/wiki/SolarWinds#2019%E2%80%932020_supply_chain_attacks">Solarwinds
+<p>Last year in 2020 we saw supply chain attacks such as the <a rel="external" href="https://en.wikipedia.org/wiki/SolarWinds#2019%E2%80%932020_supply_chain_attacks">Solarwinds
 supply chain
 attacks</a>
 which was reported by
-<a href="https://www.fireeye.com/blog/products-and-services/2020/12/global-intrusion-campaign-leverages-software-supply-chain-compromise.html">Fireeye</a>
+<a rel="external" href="https://www.fireeye.com/blog/products-and-services/2020/12/global-intrusion-campaign-leverages-software-supply-chain-compromise.html">Fireeye</a>
 as <em>"Inserting malicious code into legitimate software updates for the
 Orion software that allow an attacker remote access into the victim's
 environment"</em>. What's really interesting here was that no compiler was
 compromised in the process like our theoretical attack, but code was
 simply inserted and then subsequently was released.</p>
-<p>Tavis Ormandy in his blog <a href="https://blog.cmpxchg8b.com/2020/07/you-dont-need-reproducible-builds.html">You don't need reproducible
+<p>Tavis Ormandy in his blog <a rel="external" href="https://blog.cmpxchg8b.com/2020/07/you-dont-need-reproducible-builds.html">You don't need reproducible
 builds</a>
 covers supply chain security, and examines why reproducible builds are
 not effective in the promises and claims they present. Importantly,
@@ -169,7 +167,7 @@ Tavis discusses how trivial it is to insert "bugdoors", or pieces of
 code that are malicious and will not be found, and can potentially be
 waved off as human error.</p>
 <p>Today, we don't even need bugdoors, with Microsoft Security Response
-Centre reporting that <a href="https://msrc-blog.microsoft.com/2019/07/16/a-proactive-approach-to-more-secure-code/">70% of vulnerabilities are memory safety
+Centre reporting that <a rel="external" href="https://msrc-blog.microsoft.com/2019/07/16/a-proactive-approach-to-more-secure-code/">70% of vulnerabilities are memory safety
 issues</a>.</p>
 <p>No amount of reproducible builds or compiler bootstrapping chain can
 shield us from the reality that attackers today will target the softest
@@ -231,18 +229,17 @@ adhere to the bootstrappable guidelines and principles to created a more
 version, we can use the rust language's provided signed binaries to
 reset the chain, allowing us to miss versions of rust, or to re-package
 older versions in some cases.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>                        ┌──────────────┐             ┌──────────────┐              
-</span><span>                 │      │   Trusted    │             │   Trusted    │              
-</span><span>             Missed     │   Sources    │──────┐      │   Sources    │──────┐       
-</span><span>             Version!   │              │      │      │              │      │       
-</span><span>                 │      └──────────────┘      │      └──────────────┘      │       
-</span><span>                 │                            │                            │        
-</span><span>┌──────────────┐ │      ┌──────────────┐      │      ┌──────────────┐      │       
-</span><span>│              │ │      │Trusted Binary│      ▼      │              │      ▼       
-</span><span>│Trusted Binary│ │      │ (from rust)  ├──Produces──▶│Trusted Binary│──Produces───▶ ...
-</span><span>│              │ │      │              │             │              │              
-</span><span>└──────────────┘ │      └──────────────┘             └──────────────┘              
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>                        ┌──────────────┐             ┌──────────────┐              </span></span>
+<span class="giallo-l"><span>                 │      │   Trusted    │             │   Trusted    │              </span></span>
+<span class="giallo-l"><span>             Missed     │   Sources    │──────┐      │   Sources    │──────┐       </span></span>
+<span class="giallo-l"><span>             Version!   │              │      │      │              │      │       </span></span>
+<span class="giallo-l"><span>                 │      └──────────────┘      │      └──────────────┘      │       </span></span>
+<span class="giallo-l"><span>                 │                            │                            │        </span></span>
+<span class="giallo-l"><span>┌──────────────┐ │      ┌──────────────┐      │      ┌──────────────┐      │       </span></span>
+<span class="giallo-l"><span>│              │ │      │Trusted Binary│      ▼      │              │      ▼       </span></span>
+<span class="giallo-l"><span>│Trusted Binary│ │      │ (from rust)  ├──Produces──▶│Trusted Binary│──Produces───▶ ...</span></span>
+<span class="giallo-l"><span>│              │ │      │              │             │              │              </span></span>
+<span class="giallo-l"><span>└──────────────┘ │      └──────────────┘             └──────────────┘              </span></span></code></pre>
 <p>This process here is interesting because:</p>
 <ul>
 <li>Using the signed binary from rust-lang is actually <em>faster</em> since we
@@ -273,18 +270,17 @@ take to packaging rust in SUSE. I think we should bootstrap from
 upstream rust every release because the rust project are in a far better
 position to perform audits and respond to trust threats than part time
 package maintainers that are commonly part of Linux distributions.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>│ ┌──────────────┐                              │ ┌──────────────┐                             
-</span><span>│ │   Trusted    │                              │ │   Trusted    │                             
-</span><span>│ │   Sources    │──────┐                       │ │   Sources    │──────┐                      
-</span><span>│ │              │      │                       │ │              │      │                      
-</span><span>│ └──────────────┘      │                       │ └──────────────┘      │                      
-</span><span>│                       │                       │                       │                      
-</span><span>│ ┌──────────────┐      │      ┌──────────────┐ │ ┌──────────────┐      │      ┌──────────────┐
-</span><span>│ │Trusted Binary│      ▼      │              │ │ │Trusted Binary│      ▼      │              │
-</span><span>│ │ (from rust)  ├──Produces──▶│Trusted Binary│ │ │ (from rust)  ├──Produces──▶│Trusted Binary│
-</span><span>│ │              │             │              │ │ │              │             │              │
-</span><span>│ └──────────────┘             └──────────────┘ │ └──────────────┘             └──────────────┘
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>│ ┌──────────────┐                              │ ┌──────────────┐                             </span></span>
+<span class="giallo-l"><span>│ │   Trusted    │                              │ │   Trusted    │                             </span></span>
+<span class="giallo-l"><span>│ │   Sources    │──────┐                       │ │   Sources    │──────┐                      </span></span>
+<span class="giallo-l"><span>│ │              │      │                       │ │              │      │                      </span></span>
+<span class="giallo-l"><span>│ └──────────────┘      │                       │ └──────────────┘      │                      </span></span>
+<span class="giallo-l"><span>│                       │                       │                       │                      </span></span>
+<span class="giallo-l"><span>│ ┌──────────────┐      │      ┌──────────────┐ │ ┌──────────────┐      │      ┌──────────────┐</span></span>
+<span class="giallo-l"><span>│ │Trusted Binary│      ▼      │              │ │ │Trusted Binary│      ▼      │              │</span></span>
+<span class="giallo-l"><span>│ │ (from rust)  ├──Produces──▶│Trusted Binary│ │ │ (from rust)  ├──Produces──▶│Trusted Binary│</span></span>
+<span class="giallo-l"><span>│ │              │             │              │ │ │              │             │              │</span></span>
+<span class="giallo-l"><span>│ └──────────────┘             └──────────────┘ │ └──────────────┘             └──────────────┘</span></span></code></pre>
 <p>We already fully trust the sources they release, and we already fully
 trust their binary compiler releases. We can simplify our build process
 (and speed it up!) by acknowledging this trust relationship exists,

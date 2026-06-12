@@ -124,7 +124,7 @@ was able to look at the source and identify the programming issue.
 During registration UV is <em>always</em> required, but during "discouraged"
 in authentication it's <em>never</em> required matching the reported bug.</p>
 <p>The author of the library then directed me to the fact that in
-<a href="https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#authenticatorMakeCredential">CTAP2.0</a>
+<a rel="external" href="https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html#authenticatorMakeCredential">CTAP2.0</a>
 this behaviour is <em>enshrined in the specification</em>.</p>
 <h2 id="why-is-this-behaviour-bad">Why is this behaviour bad?</h2>
 <p>I performed a quick poll on twitter, and asked about 5 non-technical
@@ -203,16 +203,15 @@ specification. When you register a credential you <em>must</em> store the state
 of the UV boolean at registration, and you <em>must</em> store the policy that
 was requested at registration. During authentication the following is
 checked in place of the webauthn defined UV check:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>if credential.registration_policy == required OR authentication.policy == required {
-</span><span>    assert(authentication.uv == true)
-</span><span>} else if credential.registration_policy == preferred AND credential.registration_uv == true {
-</span><span>    // We either sent authentication.policy preferred or discouraged, but the user registered
-</span><span>    // with UV so we enforce that behaviour.
-</span><span>    assert(authentication.uv == true)
-</span><span>} else {
-</span><span>    // Do not check uv.
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>if credential.registration_policy == required OR authentication.policy == required {</span></span>
+<span class="giallo-l"><span>    assert(authentication.uv == true)</span></span>
+<span class="giallo-l"><span>} else if credential.registration_policy == preferred AND credential.registration_uv == true {</span></span>
+<span class="giallo-l"><span>    // We either sent authentication.policy preferred or discouraged, but the user registered</span></span>
+<span class="giallo-l"><span>    // with UV so we enforce that behaviour.</span></span>
+<span class="giallo-l"><span>    assert(authentication.uv == true)</span></span>
+<span class="giallo-l"><span>} else {</span></span>
+<span class="giallo-l"><span>    // Do not check uv.</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>There is a single edge case in this work flow - since we now send
 "preferred" it's possible that a credential that registered without
 UV (IE via Firefox which doesn't support CTAP2.0_pre or greater) will

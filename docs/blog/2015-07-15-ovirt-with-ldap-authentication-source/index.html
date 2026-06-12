@@ -86,17 +86,14 @@
 domain system expects you to have kerberos. There is however a new AAA
 module that you can use.</p>
 <p>First, install it</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yum install ovirt-engine-extension-aaa-ldap
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>yum install ovirt-engine-extension-aaa-ldap</span></span></code></pre>
 <p>So we have a look at the package listing to see what could be a good
 example:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>rpm -ql ovirt-engine-extension-aaa-ldap
-</span><span>....
-</span><span>/usr/share/ovirt-engine-extension-aaa-ldap/examples/simple/
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>rpm -ql ovirt-engine-extension-aaa-ldap</span></span>
+<span class="giallo-l"><span>....</span></span>
+<span class="giallo-l"><span>/usr/share/ovirt-engine-extension-aaa-ldap/examples/simple/</span></span></code></pre>
 <p>So we copy our example in place:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cp -r /usr/share/ovirt-engine-extension-aaa-ldap/examples/simple/* /etc/ovirt-engine/
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cp -r /usr/share/ovirt-engine-extension-aaa-ldap/examples/simple/* /etc/ovirt-engine/</span></span></code></pre>
 <p>Now we edit the values in /etc/ovirt-engine/aaa/profile1.properties to
 match our site, then restart the engine service.</p>
 <p>Finally, we need to login is as our admin user, then go to configure and
@@ -104,7 +101,7 @@ assign our user a role. This should allow them to login.</p>
 <p>I'm seeing some issues with group permissions at the moment, but I
 suspect that is a schema mismatch issue.</p>
 <p>This was a really valuable resource.</p>
-<p><a href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.5/html/Administration_Guide/sect-Directory_Users.html">access.redhat.com</a>.</p>
+<p><a rel="external" href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Virtualization/3.5/html/Administration_Guide/sect-Directory_Users.html">access.redhat.com</a>.</p>
 
     </div>
 </article>

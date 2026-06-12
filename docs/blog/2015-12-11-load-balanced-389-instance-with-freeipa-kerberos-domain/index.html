@@ -86,46 +86,40 @@
 here!</a></p>
 <p>First, create a fake host that we can assign services too. This is for
 the load balancer (f5, netscaler, ace, haproxy)</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ipa host-add haproxydemo.ipa.example.com --random --force
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ipa host-add haproxydemo.ipa.example.com --random --force</span></span></code></pre>
 <p>Now you can add the keytab for the loadbalanced service.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ipa service-add --force ldap/haproxydemo.ipa.example.com
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ipa service-add --force ldap/haproxydemo.ipa.example.com</span></span></code></pre>
 <p>Then you need to delegate the keytab to the ldap servers that will sit
 behind the lb.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ipa service-add-host ldap/haproxydemo.ipa.example.com --hosts=liza.ipa.example.com
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ipa service-add-host ldap/haproxydemo.ipa.example.com --hosts=liza.ipa.example.com</span></span></code></pre>
 <p>You should be able to extract this keytab on the host now.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ipa-getkeytab -s alina.ipa.example.com -p ldap/haproxydemo.ipa.example.com -k /etc/dirsrv/slapd-localhost/ldap.keytab 
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ipa-getkeytab -s alina.ipa.example.com -p ldap/haproxydemo.ipa.example.com -k /etc/dirsrv/slapd-localhost/ldap.keytab </span></span></code></pre>
 <p>into /etc/sysconfig/dirsrv-localhost</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>KRB5_KTNAME=/etc/dirsrv/slapd-localhost/ldap.keytab 
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>KRB5_KTNAME=/etc/dirsrv/slapd-localhost/ldap.keytab </span></span></code></pre>
 <p>Now, restart the instance and make sure you can't connect directly.</p>
 <p>Setup haproxy. I had a huge amount of grief with ipv6, so I went v4 only
 for this demo. :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>global
-</span><span>    log         127.0.0.1 local2
-</span><span>
-</span><span>    chroot      /var/lib/haproxy
-</span><span>    pidfile     /var/run/haproxy.pid
-</span><span>    maxconn     4000
-</span><span>    user        haproxy
-</span><span>    group       haproxy
-</span><span>    daemon
-</span><span>
-</span><span>    stats socket /var/lib/haproxy/stats
-</span><span>
-</span><span>listen ldap :3389
-</span><span>        mode tcp
-</span><span>        balance roundrobin
-</span><span>
-</span><span>        server ldap 10.0.0.2:389 check
-</span><span>        timeout connect        10s
-</span><span>        timeout server          1m
-</span><span>
-</span><span>ldapsearch -H ldap://haproxydemo.ipa.example.com:3389 -Y GSSAPI
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>global</span></span>
+<span class="giallo-l"><span>    log         127.0.0.1 local2</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    chroot      /var/lib/haproxy</span></span>
+<span class="giallo-l"><span>    pidfile     /var/run/haproxy.pid</span></span>
+<span class="giallo-l"><span>    maxconn     4000</span></span>
+<span class="giallo-l"><span>    user        haproxy</span></span>
+<span class="giallo-l"><span>    group       haproxy</span></span>
+<span class="giallo-l"><span>    daemon</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    stats socket /var/lib/haproxy/stats</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>listen ldap :3389</span></span>
+<span class="giallo-l"><span>        mode tcp</span></span>
+<span class="giallo-l"><span>        balance roundrobin</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        server ldap 10.0.0.2:389 check</span></span>
+<span class="giallo-l"><span>        timeout connect        10s</span></span>
+<span class="giallo-l"><span>        timeout server          1m</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>ldapsearch -H ldap://haproxydemo.ipa.example.com:3389 -Y GSSAPI</span></span></code></pre>
 <p>Reveals a working connection!</p>
 
     </div>

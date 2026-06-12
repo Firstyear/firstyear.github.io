@@ -95,7 +95,7 @@ backed onto LDAP. The public cert in LDAP is validated, as is the chain
 to the CA.</p>
 <h2 id="you-will-need">You Will Need</h2>
 <ul>
-<li>LDAP (<a href="http://www.port389.org/">here is one I prepared earlier</a>)</li>
+<li>LDAP (<a rel="external" href="http://www.port389.org/">here is one I prepared earlier</a>)</li>
 <li>One Linux - Fedora 27 or RHEL 7 work best</li>
 <li>A smartcard (yubikey 4/nano works)</li>
 </ul>
@@ -107,43 +107,35 @@ for these externally.</p>
 <p>I've documented this before in another post, but for accesibility here
 it is again.</p>
 <p>Create an NSS DB, and generate a certificate signing request:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>certutil -d . -N -f pwdfile.txt
-</span><span>certutil -d . -R -a -o user.csr -f pwdfile.txt -g 4096 -Z SHA256 -v 24 \
-</span><span>--keyUsage digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment --nsCertType sslClient --extKeyUsage clientAuth \
-</span><span>-s &quot;CN=username,O=Testing,L=example,ST=Queensland,C=AU&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>certutil -d . -N -f pwdfile.txt</span></span>
+<span class="giallo-l"><span>certutil -d . -R -a -o user.csr -f pwdfile.txt -g 4096 -Z SHA256 -v 24 \</span></span>
+<span class="giallo-l"><span>--keyUsage digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment --nsCertType sslClient --extKeyUsage clientAuth \</span></span>
+<span class="giallo-l"><span>-s &quot;CN=username,O=Testing,L=example,ST=Queensland,C=AU&quot;</span></span></code></pre>
 <p>Once the request is signed, and your certificate is in "user.crt",
 import this to the database.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>certutil -A -d . -f pwdfile.txt -i user.crt -a -n TLS -t &quot;,,&quot;
-</span><span>certutil -A -d . -f pwdfile.txt -i ca.crt -a -n TLS -t &quot;CT,,&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>certutil -A -d . -f pwdfile.txt -i user.crt -a -n TLS -t &quot;,,&quot;</span></span>
+<span class="giallo-l"><span>certutil -A -d . -f pwdfile.txt -i ca.crt -a -n TLS -t &quot;CT,,&quot;</span></span></code></pre>
 <p>Now export that as a p12 bundle for the yubikey to import.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pk12util -o user.p12 -d . -k pwdfile.txt -n TLS
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>pk12util -o user.p12 -d . -k pwdfile.txt -n TLS</span></span></code></pre>
 <p>Now import this to the yubikey - remember to use slot 9a this time! As
 well make sure you set the touch policy NOW, because you can't change
 it later!</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yubico-piv-tool -s9a -i user.p12 -K PKCS12 -aimport-key -aimport-certificate -k --touch-policy=always
-</span></code></pre>
-<h2 id="setting-up-your-ldap-user">Setting up your LDAP user</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>yubico-piv-tool -s9a -i user.p12 -K PKCS12 -aimport-key -aimport-certificate -k --touch-policy=always</span></span></code></pre><h2 id="setting-up-your-ldap-user">Setting up your LDAP user</h2>
 <p>First setup your system to work with LDAP via SSSD. You've done that?
 Good! Now it's time to get our user ready.</p>
 <p>Take our user.crt and convert it to DER:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>openssl x509 -inform PEM -outform DER -in user.crt -out user.der
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>openssl x509 -inform PEM -outform DER -in user.crt -out user.der</span></span></code></pre>
 <p>Now you need to transform that into something that LDAP can understand.
 In the future I'll be adding a tool to 389-ds to make this
 "automatic", but for now you can use python:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>python3
-</span><span>&gt;&gt;&gt; import base64
-</span><span>&gt;&gt;&gt; with open(&#39;user.der&#39;, &#39;r&#39;) as f:
-</span><span>&gt;&gt;&gt;    print(base64.b64encode(f.read))
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>python3</span></span>
+<span class="giallo-l"><span>&gt;&gt;&gt; import base64</span></span>
+<span class="giallo-l"><span>&gt;&gt;&gt; with open(&#39;user.der&#39;, &#39;r&#39;) as f:</span></span>
+<span class="giallo-l"><span>&gt;&gt;&gt;    print(base64.b64encode(f.read))</span></span></code></pre>
 <p>That should output a long base64 string on one line. Add this to your
 ldap user with ldapvi:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>uid=william,ou=People,dc=...
-</span><span>userCertificate;binary:: &lt;BASE64&gt;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>uid=william,ou=People,dc=...</span></span>
+<span class="giallo-l"><span>userCertificate;binary:: &lt;BASE64&gt;</span></span></code></pre>
 <p>Note that ';binary' tag has an important meaning here for certificate
 data, and the '::' tells ldap that this is b64 encoded, so it will
 decode on addition.</p>
@@ -152,65 +144,59 @@ decode on addition.</p>
 attribute.</p>
 <p>In your various SSSD sections you'll need to make the following
 changes:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[domain/LDAP]
-</span><span>auth_provider = ldap
-</span><span>ldap_user_certificate = userCertificate;binary
-</span><span>
-</span><span>[sssd]
-</span><span># This controls OCSP checks, you probably want this enabled!
-</span><span># certificate_verification = no_verification
-</span><span>
-</span><span>[pam]
-</span><span>pam_cert_auth = True
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[domain/LDAP]</span></span>
+<span class="giallo-l"><span>auth_provider = ldap</span></span>
+<span class="giallo-l"><span>ldap_user_certificate = userCertificate;binary</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[sssd]</span></span>
+<span class="giallo-l"><span># This controls OCSP checks, you probably want this enabled!</span></span>
+<span class="giallo-l"><span># certificate_verification = no_verification</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[pam]</span></span>
+<span class="giallo-l"><span>pam_cert_auth = True</span></span></code></pre>
 <p>Now the TRICK is letting SSSD know to use certificates. You need to run:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sudo touch /var/lib/sss/pubconf/pam_preauth_available
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>sudo touch /var/lib/sss/pubconf/pam_preauth_available</span></span></code></pre>
 <p>With out this, SSSD won't even try to process CCID authentication!</p>
 <p>Add your ca.crt to the system trusted CA store for SSSD to verify:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>certutil -A -d /etc/pki/nssdb -i ca.crt -n USER_CA -t &quot;CT,,&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>certutil -A -d /etc/pki/nssdb -i ca.crt -n USER_CA -t &quot;CT,,&quot;</span></span></code></pre>
 <p>Add coolkey to the database so it can find smartcards:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>modutil -dbdir /etc/pki/nssdb -add &quot;coolkey&quot; -libfile /usr/lib64/libcoolkeypk11.so
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>modutil -dbdir /etc/pki/nssdb -add &quot;coolkey&quot; -libfile /usr/lib64/libcoolkeypk11.so</span></span></code></pre>
 <p>Check that SSSD can find the certs now:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># sudo /usr/libexec/sssd/p11_child --pre --nssdb=/etc/pki/nssdb
-</span><span>PIN for william
-</span><span>william
-</span><span>/usr/lib64/libcoolkeypk11.so
-</span><span>0001
-</span><span>CAC ID Certificate
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># sudo /usr/libexec/sssd/p11_child --pre --nssdb=/etc/pki/nssdb</span></span>
+<span class="giallo-l"><span>PIN for william</span></span>
+<span class="giallo-l"><span>william</span></span>
+<span class="giallo-l"><span>/usr/lib64/libcoolkeypk11.so</span></span>
+<span class="giallo-l"><span>0001</span></span>
+<span class="giallo-l"><span>CAC ID Certificate</span></span></code></pre>
 <p>If you get no output here you are missing something! If this doesn't
 work, nothing will!</p>
 <p>Finally, you need to tweak PAM to make sure that pam_unix isn't getting
 in the way. I use the following configuration.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>auth        required      pam_env.so
-</span><span># This skips pam_unix if the given uid is not local (IE it&#39;s from SSSD)
-</span><span>auth        [default=1 ignore=ignore success=ok] pam_localuser.so
-</span><span>auth        sufficient    pam_unix.so nullok try_first_pass
-</span><span>auth        requisite     pam_succeed_if.so uid &gt;= 1000 quiet_success
-</span><span>auth        sufficient    pam_sss.so prompt_always ignore_unknown_user
-</span><span>auth        required      pam_deny.so
-</span><span>
-</span><span>account     required      pam_unix.so
-</span><span>account     sufficient    pam_localuser.so
-</span><span>account     sufficient    pam_succeed_if.so uid &lt; 1000 quiet
-</span><span>account     [default=bad success=ok user_unknown=ignore] pam_sss.so
-</span><span>account     required      pam_permit.so
-</span><span>
-</span><span>password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type=
-</span><span>password    sufficient    pam_unix.so sha512 shadow try_first_pass use_authtok
-</span><span>password    sufficient    pam_sss.so use_authtok
-</span><span>password    required      pam_deny.so
-</span><span>
-</span><span>session     optional      pam_keyinit.so revoke
-</span><span>session     required      pam_limits.so
-</span><span>-session    optional      pam_systemd.so
-</span><span>session     [success=1 default=ignore] pam_succeed_if.so service in crond quiet use_uid
-</span><span>session     required      pam_unix.so
-</span><span>session     optional      pam_sss.so
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>auth        required      pam_env.so</span></span>
+<span class="giallo-l"><span># This skips pam_unix if the given uid is not local (IE it&#39;s from SSSD)</span></span>
+<span class="giallo-l"><span>auth        [default=1 ignore=ignore success=ok] pam_localuser.so</span></span>
+<span class="giallo-l"><span>auth        sufficient    pam_unix.so nullok try_first_pass</span></span>
+<span class="giallo-l"><span>auth        requisite     pam_succeed_if.so uid &gt;= 1000 quiet_success</span></span>
+<span class="giallo-l"><span>auth        sufficient    pam_sss.so prompt_always ignore_unknown_user</span></span>
+<span class="giallo-l"><span>auth        required      pam_deny.so</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>account     required      pam_unix.so</span></span>
+<span class="giallo-l"><span>account     sufficient    pam_localuser.so</span></span>
+<span class="giallo-l"><span>account     sufficient    pam_succeed_if.so uid &lt; 1000 quiet</span></span>
+<span class="giallo-l"><span>account     [default=bad success=ok user_unknown=ignore] pam_sss.so</span></span>
+<span class="giallo-l"><span>account     required      pam_permit.so</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type=</span></span>
+<span class="giallo-l"><span>password    sufficient    pam_unix.so sha512 shadow try_first_pass use_authtok</span></span>
+<span class="giallo-l"><span>password    sufficient    pam_sss.so use_authtok</span></span>
+<span class="giallo-l"><span>password    required      pam_deny.so</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>session     optional      pam_keyinit.so revoke</span></span>
+<span class="giallo-l"><span>session     required      pam_limits.so</span></span>
+<span class="giallo-l"><span>-session    optional      pam_systemd.so</span></span>
+<span class="giallo-l"><span>session     [success=1 default=ignore] pam_succeed_if.so service in crond quiet use_uid</span></span>
+<span class="giallo-l"><span>session     required      pam_unix.so</span></span>
+<span class="giallo-l"><span>session     optional      pam_sss.so</span></span></code></pre>
 <p>That's it! Restart SSSD, and you should be good to go.</p>
 <p>Finally, you may find SELinux isn't allowing authentication. This is
 really sad that smartcards don't work with SELinux out of the box and I

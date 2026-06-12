@@ -134,12 +134,12 @@ private keys to be removed from the secure enclave that exists inside the device
 is not vulnerable.</p>
 <h2 id="external-certification-bodies">External Certification Bodies</h2>
 <p>FIDO who certifies authenticators publishes a metadata service that shows details about various
-authenticators and their assessments. These can be found on the <a href="https://fidoalliance.org/metadata/">mds service site</a>.</p>
-<p>The MDS defines multiple certification levels for devices. These are defined <a href="https://fidoalliance.org/certification/authenticator-certification-levels/">on fido's site</a>.</p>
-<p>Currently the best reference for an overview is the <a href="https://fidoalliance.org/specs/fido-security-requirements/fido-authenticator-security-requirements-v1.5-fd-20211102.html#authenticator-hardware-examples">table of authenticator hardware examples</a>.</p>
-<p>We have a tool for querying this data <a href="https://github.com/kanidm/webauthn-rs/tree/master/fido-mds-tool">as part of webauthn-rs</a></p>
+authenticators and their assessments. These can be found on the <a rel="external" href="https://fidoalliance.org/metadata/">mds service site</a>.</p>
+<p>The MDS defines multiple certification levels for devices. These are defined <a rel="external" href="https://fidoalliance.org/certification/authenticator-certification-levels/">on fido's site</a>.</p>
+<p>Currently the best reference for an overview is the <a rel="external" href="https://fidoalliance.org/specs/fido-security-requirements/fido-authenticator-security-requirements-v1.5-fd-20211102.html#authenticator-hardware-examples">table of authenticator hardware examples</a>.</p>
+<p>We have a tool for querying this data <a rel="external" href="https://github.com/kanidm/webauthn-rs/tree/master/fido-mds-tool">as part of webauthn-rs</a></p>
 <h2 id="what-authenticator-do-you-recommend">What Authenticator Do You Recommend?</h2>
-<p><a href="https://www.yubico.com/products/yubikey-5-overview/">Yubikey 5 Series</a></p>
+<p><a rel="external" href="https://www.yubico.com/products/yubikey-5-overview/">Yubikey 5 Series</a></p>
 <p>These are the gold standard, and have all the best features here.</p>
 <ul>
 <li>Tamper evident packaging</li>
@@ -153,7 +153,7 @@ authenticators and their assessments. These can be found on the <a href="https:/
 </ul>
 </li>
 </ul>
-<p><a href="https://www.token2.com/shop/product/token2-t2f2-fido2-and-u2f-security-key">Token2 T2F2</a></p>
+<p><a rel="external" href="https://www.token2.com/shop/product/token2-t2f2-fido2-and-u2f-security-key">Token2 T2F2</a></p>
 <p>Runner up - this is the only other authenticator we have found with high quality tamper
 resitent features.</p>
 <ul>
@@ -170,7 +170,7 @@ resitent features.</p>
 with an epoxy over their main circuits to highlight if these are altered. This is a great level
 of tamper resistence.</p>
 <p>The solokey is based on an LPC55S69 which unfortunately means it has been affected by a
-<a href="https://oxide.computer/blog/another-vulnerability-in-the-lpc55s69-rom?ref=brianlovin.com">trust chain bypass</a>.
+<a rel="external" href="https://oxide.computer/blog/another-vulnerability-in-the-lpc55s69-rom?ref=brianlovin.com">trust chain bypass</a>.
 As a result NXP have had to issue new board revisions to resolve this, but it's not clear
 when you own a solokey if you have an affected revision or not. Since webauthn can't distinguish
 firmware versions either, it's also impossible to tell if a device has been fully software updated.</p>
@@ -192,7 +192,7 @@ to the trust chain bypass.</p>
 bypass and will NOT be changing CPU revision to resolve it.</p>
 </blockquote>
 <blockquote>
-<p>UPDATE: 2024-08-06: Per Nitrokeys <a href="https://docs.nitrokey.com/nitrokey3/features">own website</a>,
+<p>UPDATE: 2024-08-06: Per Nitrokeys <a rel="external" href="https://docs.nitrokey.com/nitrokey3/features">own website</a>,
 no Nitrokey 3 model uses the secure enclave for FIDO operations.</p>
 </blockquote>
 <ul>
@@ -206,7 +206,7 @@ no Nitrokey 3 model uses the secure enclave for FIDO operations.</p>
 <p>The Nitrokey 3 Mini uses the same software an the NK3N, but uses a different chip (nrf32). We are unable
 to assess the hardware security as we don't own one, but nitrokeys trackrecord would indicate it likely
 has poor tamper resistance.</p>
-<p>The <a href="https://shop.nitrokey.com/shop/nk3am-nitrokey-3a-mini-149?#attr=">NK3M shop page</a> as of 2023 declares:</p>
+<p>The <a rel="external" href="https://shop.nitrokey.com/shop/nk3am-nitrokey-3a-mini-149?#attr=">NK3M shop page</a> as of 2023 declares:</p>
 <p><em>IMPORTANT NOTE: The included Secure Element is not used at this time. We are currently working on its integration and will enable its use later via firmware update.</em></p>
 <p>This means that keys are <em>very likely</em> not stored with secure mechanisms. Unless a firmware update that enables
 this feature changes the aaguid, it will always have to be assumed that this model of key is a version not
@@ -232,17 +232,17 @@ from one that does, and given the lack of any kind of hardware tamper resistance
 at all. Given their track record, I would continue to doubt the security of these keys unless
 Nitrokey make significant and public efforts to actually improve their approaches to development.</p>
 <blockquote>
-<p>UPDATE: 2024-08-06: Per Nitrokeys <a href="https://docs.nitrokey.com/nitrokey3/features">own website</a>,
+<p>UPDATE: 2024-08-06: Per Nitrokeys <a rel="external" href="https://docs.nitrokey.com/nitrokey3/features">own website</a>,
 no Nitrokey 3 model uses the secure enclave for FIDO operations. So this undoes the previous
 announcement they have made in full.</p>
 </blockquote>
 <h3 id="nitrokey-2">Nitrokey 2</h3>
 <p>Also called the Nitrokey FIDO2. While this device is named "FIDO2", it has never been certified by
 FIDO. Like the NK 3, it has no tamper resistant packaging or hardware.</p>
-<p>The NK2 has a weird feature though - you can update it <em>from a website</em> ( <a href="https://update.nitrokey.com/">update site</a> ).</p>
+<p>The NK2 has a weird feature though - you can update it <em>from a website</em> ( <a rel="external" href="https://update.nitrokey.com/">update site</a> ).</p>
 <p>The way this is performed is with a hidden set of vendor commands that are hidden inside the credential ID
 of the CTAP2 get assertion process, defined by the value <code>WALLET_TAG</code>. You can see the checks for this
-in <a href="https://github.com/Nitrokey/nitrokey-fido2-firmware/blob/12f2c14c6d7752293385c4c2f5317f16b0b63e61/fido2/extensions/extensions.c#L112">the nitrokey firmware source</a></p>
+in <a rel="external" href="https://github.com/Nitrokey/nitrokey-fido2-firmware/blob/12f2c14c6d7752293385c4c2f5317f16b0b63e61/fido2/extensions/extensions.c#L112">the nitrokey firmware source</a></p>
 <p>The problem here is that this means any website can sent a credential id with this <code>WALLET_TAG</code> and
 the nitrokey will respect and start to process those commands. More shocking, is these commands do
 not require interaction (touch) of the device or the pin to proceed, so visiting any webpage can

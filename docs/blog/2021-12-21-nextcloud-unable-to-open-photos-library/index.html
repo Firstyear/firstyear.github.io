@@ -84,8 +84,7 @@
         <h1 id="nextcloud-unable-to-open-photos-library">Nextcloud - Unable to Open Photos Library</h1>
 <p>I noticed since macos 11.6.2 that Nextcloud has been unable to sync my
 photos library. Looking into this error in Console.app I saw:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>error   kernel  System Policy: Nextcloud(798) deny(1) file-read-data /Users/william/Pictures/Photos Library.photoslibrary
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>error   kernel  System Policy: Nextcloud(798) deny(1) file-read-data /Users/william/Pictures/Photos Library.photoslibrary</span></span></code></pre>
 <p>It seems that Nextcloud is not <em>sandboxed</em> which means that macos
 enforces stricter permissions on what this can or can not access, which
 is what prevented the photos library from syncing.</p>

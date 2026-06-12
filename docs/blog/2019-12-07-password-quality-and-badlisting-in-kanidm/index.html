@@ -90,7 +90,7 @@ and more.</p>
 <p>This means the current state of the art is still multi-factor auth.
 Something you have and something you know.</p>
 <p>Despite the presence of the multiple factors, it's still important to
-quality check passwords. Microsoft's Azure security team <a href="https://techcommunity.microsoft.com/t5/Azure-Active-Directory-Identity/Your-Pa-word-doesn-t-matter/ba-p/731984">have written
+quality check passwords. Microsoft's Azure security team <a rel="external" href="https://techcommunity.microsoft.com/t5/Azure-Active-Directory-Identity/Your-Pa-word-doesn-t-matter/ba-p/731984">have written
 about
 passwords</a>,
 and it really drives home the current situation. I would certainly trust
@@ -124,7 +124,7 @@ leetspeak, or giving up altogether and making the excellent
 "Password1" (which passes AD minimum password requirements on server
 2003).</p>
 <p>What we really want is entropy, length, and memorability. Dropbox made a
-great library for this called zxcvbn, which has since <a href="https://docs.rs/zxcvbn/2.0.0/zxcvbn/index.html">been ported to
+great library for this called zxcvbn, which has since <a rel="external" href="https://docs.rs/zxcvbn/2.0.0/zxcvbn/index.html">been ported to
 rust</a> . I highly
 recommend it.</p>
 <p>This library is great because it focuses on entropy, and then if the
@@ -158,7 +158,7 @@ administrators can preprocess their own lists before adding them to the
 badlist configuration.</p>
 <h2 id="creating-a-badlist">Creating a Badlist</h2>
 <p>I decided to do some analysis on a well known set of passwords
-maintained on the <a href="https://github.com/danielmiessler/SecLists/tree/master/Passwords">seclists
+maintained on the <a rel="external" href="https://github.com/danielmiessler/SecLists/tree/master/Passwords">seclists
 repository</a>
 . Apparently this is what pentesters reach for when they want to
 bruteforce or credential stuff on a domain.</p>
@@ -185,12 +185,11 @@ the password. I did a score 3 test, a score 3 with min pw len 10 and a
 score 4 test. This showed the following results which has the % blocked
 by zxcvbn and the no. that passed which will required badlisting as
 zxcvbn can't detect them (today).</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>TEST     | % blocked | no. passed
-</span><span>---------------------------------
-</span><span> s3      |  98.3%    |  1004
-</span><span> s3 + 10 |  98.9%    |  637
-</span><span> s4      |  99.7%    |  133
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>TEST     | % blocked | no. passed</span></span>
+<span class="giallo-l"><span>---------------------------------</span></span>
+<span class="giallo-l"><span> s3      |  98.3%    |  1004</span></span>
+<span class="giallo-l"><span> s3 + 10 |  98.9%    |  637</span></span>
+<span class="giallo-l"><span> s4      |  99.7%    |  133</span></span></code></pre>
 <p>Personally, it's quite hilarious that "2fast2furious" passed the
 score 3 check, and "30secondstomars" and "dracomalfoy" passed the
 score 4 check, but who am I to judge - that's what bad lists are for.</p>
@@ -199,12 +198,11 @@ length - not only was the preprocessor step faster, but alone that
 eliminated ~400 passwords that would have "passed" on score 3.</p>
 <p>Finally, from the rockyou + 10m set, the results show the following in
 the same conditions.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>TEST     | % blocked | no. passed
-</span><span>---------------------------------
-</span><span> s3      |  89.9%    |  101349
-</span><span> s3 + 10 |  92.4%    |  76425
-</span><span> s4      |  96.5%    |  34696
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>TEST     | % blocked | no. passed</span></span>
+<span class="giallo-l"><span>---------------------------------</span></span>
+<span class="giallo-l"><span> s3      |  89.9%    |  101349</span></span>
+<span class="giallo-l"><span> s3 + 10 |  92.4%    |  76425</span></span>
+<span class="giallo-l"><span> s4      |  96.5%    |  34696</span></span></code></pre>
 <p>This shows that a very "easy" win is to enforce password length, in
 addition to entropy checkers like zxcvbn, which are effective to block
 92% of the most common passwords in use on a broad set and 98% of what a

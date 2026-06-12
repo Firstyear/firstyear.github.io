@@ -84,14 +84,12 @@
         <h1 id="work-around-docker-exec-bug">Work around docker exec bug</h1>
 <p>There is currently a docker exec bug in Centos/RHEL 7 that causes errors
 such as:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># docker exec -i -t instance /bin/sh
-</span><span>rpc error: code = 2 desc = oci runtime error: exec failed: container_linux.go:247: starting container process caused &quot;process_linux.go:110: decoding init error from pipe caused \&quot;read parent: connection reset by peer\&quot;&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># docker exec -i -t instance /bin/sh</span></span>
+<span class="giallo-l"><span>rpc error: code = 2 desc = oci runtime error: exec failed: container_linux.go:247: starting container process caused &quot;process_linux.go:110: decoding init error from pipe caused \&quot;read parent: connection reset by peer\&quot;&quot;</span></span></code></pre>
 <p>As a work around you can use nsenter instead:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>PID=docker inspect --format {{.State.Pid}} &lt;name of container&gt;
-</span><span>nsenter --target $PID --mount --uts --ipc --net --pid /bin/sh
-</span></code></pre>
-<p>For more information, you can see the <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1655214">bugreport
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>PID=docker inspect --format {{.State.Pid}} &lt;name of container&gt;</span></span>
+<span class="giallo-l"><span>nsenter --target $PID --mount --uts --ipc --net --pid /bin/sh</span></span></code></pre>
+<p>For more information, you can see the <a rel="external" href="https://bugzilla.redhat.com/show_bug.cgi?id=1655214">bugreport
 here.</a></p>
 
     </div>

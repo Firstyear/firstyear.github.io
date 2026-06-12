@@ -92,7 +92,7 @@ uploads. It's pretty messy but it works, so this is an option if you
 want to investigate but I didn't want to pursue it.</p>
 <p>Bulidx exists and I got it working on my linux machine with the steps
 from
-<a href="https://www.docker.com/blog/getting-started-with-docker-for-arm-on-linux/">here</a>
+<a rel="external" href="https://www.docker.com/blog/getting-started-with-docker-for-arm-on-linux/">here</a>
 but the build took more than 3 hours, so I don't recommend it if you
 plan to do anything intense or frequently.</p>
 <h2 id="buildx-cluster">Buildx cluster</h2>
@@ -100,7 +100,7 @@ plan to do anything intense or frequently.</p>
 currently tucked into the experimental features. It can be enabled on
 docker for mac in the settings (note: you only need experimental support
 on the coordinating machine aka your workstation).</p>
-<p>Rather than follow the <a href="https://docs.docker.com/buildx/working-with-buildx/">official
+<p>Rather than follow the <a rel="external" href="https://docs.docker.com/buildx/working-with-buildx/">official
 docs</a> this will
 branch out. The reason is that buildx in the official docs uses
 qemu-aarch64 translation which is very slow and energy hungry, taking a
@@ -112,10 +112,9 @@ performed on native architecture machines.</p>
 <p>First we need to configure our nodes. In
 [/etc/docker/daemon.json]{.title-ref} we need to expose our docker
 socket to our mac. I have done this with the following:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>{
-</span><span>  &quot;hosts&quot;: [&quot;unix:///var/run/docker.sock&quot;, &quot;tcp://0.0.0.0:2376&quot;]
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>  &quot;hosts&quot;: [&quot;unix:///var/run/docker.sock&quot;, &quot;tcp://0.0.0.0:2376&quot;]</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p><em>WARNING</em>: This configuration is HIGHLY INSECURE. This exposes your
 docker socket to the network with no authentication, which is equivalent
 to un-authenticated root access. I have done this because my builder
@@ -126,38 +125,32 @@ buildx. No idea why but it don't.</p>
 <p>Once this is done restart docker on the two builder nodes.</p>
 <p>Now we can configure our coordinator machine. We need to check buildx is
 present:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker buildx --help
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker buildx --help</span></span></code></pre>
 <p>We then want to create a new builder instance and join our nodes to it.
 We can use the DOCKER_HOST environment variable for this:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>DOCKER_HOST=tcp://x.x.x.x:2376 docker buildx create --name cluster
-</span><span>DOCKER_HOST=tcp://x.x.x.x:2376 docker buildx create --name cluster --append
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>DOCKER_HOST=tcp://x.x.x.x:2376 docker buildx create --name cluster</span></span>
+<span class="giallo-l"><span>DOCKER_HOST=tcp://x.x.x.x:2376 docker buildx create --name cluster --append</span></span></code></pre>
 <p>We can then startup and bootstrap the required components with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker buildx use cluster
-</span><span>docker buildx inspect --bootstrap
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker buildx use cluster</span></span>
+<span class="giallo-l"><span>docker buildx inspect --bootstrap</span></span></code></pre>
 <p>We should see output like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Name:   cluster
-</span><span>Driver: docker-container
-</span><span>
-</span><span>Nodes:
-</span><span>Name:      cluster0
-</span><span>Endpoint:  tcp://...
-</span><span>Status:    running
-</span><span>Platforms: linux/amd64, linux/386
-</span><span>
-</span><span>Name:      cluster1
-</span><span>Endpoint:  tcp://...
-</span><span>Status:    running
-</span><span>Platforms: linux/arm64, linux/arm/v7, linux/arm/v6
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>Name:   cluster</span></span>
+<span class="giallo-l"><span>Driver: docker-container</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Nodes:</span></span>
+<span class="giallo-l"><span>Name:      cluster0</span></span>
+<span class="giallo-l"><span>Endpoint:  tcp://...</span></span>
+<span class="giallo-l"><span>Status:    running</span></span>
+<span class="giallo-l"><span>Platforms: linux/amd64, linux/386</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Name:      cluster1</span></span>
+<span class="giallo-l"><span>Endpoint:  tcp://...</span></span>
+<span class="giallo-l"><span>Status:    running</span></span>
+<span class="giallo-l"><span>Platforms: linux/arm64, linux/arm/v7, linux/arm/v6</span></span></code></pre>
 <p>If we are happy with this we can make this the default builder.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker buildx use cluster --default
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker buildx use cluster --default</span></span></code></pre>
 <p>And you can now use it to build your images such as:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker buildx build --push --platform linux/amd64,linux/arm64 -f Dockerfile -t &lt;tag&gt; .
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker buildx build --push --platform linux/amd64,linux/arm64 -f Dockerfile -t &lt;tag&gt; .</span></span></code></pre>
 <p>Now I can build my multiarch images much quicker and efficently!</p>
 
     </div>

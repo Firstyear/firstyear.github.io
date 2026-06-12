@@ -111,9 +111,9 @@ of the situation. We need to put that to the side and focus on evidence, not our
 <blockquote>
 <p>"Science is a rigorous, systematic endeavor that builds and organizes knowledge in the form of testable explanations and predictions about the world."</p>
 </blockquote>
-<p>If we are going to have a <a href="https://en.wikipedia.org/wiki/Science">scientific</a> discussion about
+<p>If we are going to have a <a rel="external" href="https://en.wikipedia.org/wiki/Science">scientific</a> discussion about
 reproducible builds, we need to define our predictions (hypothesis) but importantly we must also
-define the <a href="https://en.wikipedia.org/wiki/Null_hypothesis">null hypothesis</a>.</p>
+define the <a rel="external" href="https://en.wikipedia.org/wiki/Null_hypothesis">null hypothesis</a>.</p>
 <p>Which would mean that our hypothesis is:</p>
 <ul>
 <li>Reproducible builds would have impacted or prevented historical and current threats against supply chains.</li>
@@ -127,103 +127,102 @@ define the <a href="https://en.wikipedia.org/wiki/Null_hypothesis">null hypothes
 that application running on a consumer machine. There are a huge number of steps, and they vary from
 project to project. For the sake of this discussion, I'll describe the supply chain of a hypothetical
 application that is being submitted to openSUSE.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span> ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-</span><span>   ┌───────────────────┐                                  
-</span><span> │ │     Developer     │       Developer Workstation     │
-</span><span>   └───────────────────┘                                  
-</span><span> │           │                                           │
-</span><span>        Writes Code                                       
-</span><span> │           │                                           │
-</span><span>             ▼                                            
-</span><span> │ ┌───────────────────┐                                 │
-</span><span>   │    Workstation    │                                  
-</span><span> │ └───────────────────┘                                 │
-</span><span>             │                                            
-</span><span> │       Submits                                         │
-</span><span>┌ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
-</span><span>             ▼                                           │
-</span><span>│  ┌───────────────────┐                                  
-</span><span>   │   Pull Request    │       Code Repository           │
-</span><span>│  └───────────────────┘                                  
-</span><span>             │                                           │
-</span><span>│         Merge                                           
-</span><span>             │                                           │
-</span><span>│            ▼                                            
-</span><span>   ┌───────────────────┐                                 │
-</span><span>│  │     Git Main      │───Build and Test────┐            
-</span><span>   └───────────────────┘                     ▼           │
-</span><span>│            │                     ┌───────────────────┐  
-</span><span>         Publish                   │       CI/CD       │ │
-</span><span>│            │                     └───────────────────┘  
-</span><span>             ▼                                           │
-</span><span>│  ┌───────────────────┐                                  
-</span><span>   │ Release Artefacts │                                 │
-</span><span>│  └───────────────────┘                                  
-</span><span>             │                                           │
-</span><span>├ ─ ─ ─ ─Submits─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
-</span><span>             │                                           │
-</span><span>│            ▼                                            
-</span><span>   ┌───────────────────┐        Build Service            │
-</span><span>│  │Open Build Service │                                  
-</span><span>   └───────────────────┘                                 │
-</span><span>│            │                                            
-</span><span> ┌ ─ ─Begins Building─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─             │
-</span><span>│            │                              │             
-</span><span> │           ▼               Offline                     │
-</span><span>│  ┌───────────────────┐     Build Host     │             
-</span><span> │ │ Signature Checked │                                 │
-</span><span>│  └───────────────────┘                    │             
-</span><span> │           │                                           │
-</span><span>│        Unpacks                            │             
-</span><span> │           │                                           │
-</span><span>│            ▼                              │             
-</span><span> │ ┌───────────────────┐                                 │
-</span><span>│  │ Build Application │                    │             
-</span><span> │ └───────────────────┘                                 │
-</span><span>│            │                              │             
-</span><span> │       Packages                                        │
-</span><span>│            │                              │             
-</span><span> │           ▼                                           │
-</span><span>│  ┌───────────────────┐                    │             
-</span><span> │ │        RPM        │                                 │
-</span><span>│  └───────────────────┘                    │             
-</span><span> │           │                                           │
-</span><span>│         Signs                             │             
-</span><span> │           │                                           │
-</span><span>│            ▼                              │             
-</span><span> │ ┌───────────────────┐                                 │
-</span><span>│  │  Signed Package   │                    │             
-</span><span> │ └───────────────────┘                                 │
-</span><span>│            │                              │             
-</span><span> ┼ ─ ─ ─Distributes─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤
-</span><span>             │                                            
-</span><span> │           ▼                    Package Mirrors        │
-</span><span>   ┌───────────────────┐                                  
-</span><span> │ │      Mirrors      │                                 │
-</span><span>   └───────────────────┘                                  
-</span><span> │           │                                           │
-</span><span>┌ ─ ─ ─ ─Provides ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
-</span><span>             │                                           │
-</span><span>│            ▼                    Consumer Workstation    
-</span><span>   ┌───────────────────┐                                 │
-</span><span>│  │Downloaded Package │                                  
-</span><span>   └───────────────────┘                                 │
-</span><span>│        Verifies                                         
-</span><span>        Signature                                        │
-</span><span>│            │                                            
-</span><span>             ▼                                           │
-</span><span>│  ┌───────────────────┐                                  
-</span><span>   │ Verified Package  │                                 │
-</span><span>│  └───────────────────┘                                  
-</span><span>             │                                           │
-</span><span>│        Installs                                         
-</span><span>             │                                           │
-</span><span>│            ▼                                            
-</span><span>   ┌───────────────────┐                                 │
-</span><span>│  │ Application Runs  │                                  
-</span><span>   └───────────────────┘                                 │
-</span><span>└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ 
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span> ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span></span>
+<span class="giallo-l"><span>   ┌───────────────────┐                                  </span></span>
+<span class="giallo-l"><span> │ │     Developer     │       Developer Workstation     │</span></span>
+<span class="giallo-l"><span>   └───────────────────┘                                  </span></span>
+<span class="giallo-l"><span> │           │                                           │</span></span>
+<span class="giallo-l"><span>        Writes Code                                       </span></span>
+<span class="giallo-l"><span> │           │                                           │</span></span>
+<span class="giallo-l"><span>             ▼                                            </span></span>
+<span class="giallo-l"><span> │ ┌───────────────────┐                                 │</span></span>
+<span class="giallo-l"><span>   │    Workstation    │                                  </span></span>
+<span class="giallo-l"><span> │ └───────────────────┘                                 │</span></span>
+<span class="giallo-l"><span>             │                                            </span></span>
+<span class="giallo-l"><span> │       Submits                                         │</span></span>
+<span class="giallo-l"><span>┌ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ </span></span>
+<span class="giallo-l"><span>             ▼                                           │</span></span>
+<span class="giallo-l"><span>│  ┌───────────────────┐                                  </span></span>
+<span class="giallo-l"><span>   │   Pull Request    │       Code Repository           │</span></span>
+<span class="giallo-l"><span>│  └───────────────────┘                                  </span></span>
+<span class="giallo-l"><span>             │                                           │</span></span>
+<span class="giallo-l"><span>│         Merge                                           </span></span>
+<span class="giallo-l"><span>             │                                           │</span></span>
+<span class="giallo-l"><span>│            ▼                                            </span></span>
+<span class="giallo-l"><span>   ┌───────────────────┐                                 │</span></span>
+<span class="giallo-l"><span>│  │     Git Main      │───Build and Test────┐            </span></span>
+<span class="giallo-l"><span>   └───────────────────┘                     ▼           │</span></span>
+<span class="giallo-l"><span>│            │                     ┌───────────────────┐  </span></span>
+<span class="giallo-l"><span>         Publish                   │       CI/CD       │ │</span></span>
+<span class="giallo-l"><span>│            │                     └───────────────────┘  </span></span>
+<span class="giallo-l"><span>             ▼                                           │</span></span>
+<span class="giallo-l"><span>│  ┌───────────────────┐                                  </span></span>
+<span class="giallo-l"><span>   │ Release Artefacts │                                 │</span></span>
+<span class="giallo-l"><span>│  └───────────────────┘                                  </span></span>
+<span class="giallo-l"><span>             │                                           │</span></span>
+<span class="giallo-l"><span>├ ─ ─ ─ ─Submits─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ </span></span>
+<span class="giallo-l"><span>             │                                           │</span></span>
+<span class="giallo-l"><span>│            ▼                                            </span></span>
+<span class="giallo-l"><span>   ┌───────────────────┐        Build Service            │</span></span>
+<span class="giallo-l"><span>│  │Open Build Service │                                  </span></span>
+<span class="giallo-l"><span>   └───────────────────┘                                 │</span></span>
+<span class="giallo-l"><span>│            │                                            </span></span>
+<span class="giallo-l"><span> ┌ ─ ─Begins Building─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─             │</span></span>
+<span class="giallo-l"><span>│            │                              │             </span></span>
+<span class="giallo-l"><span> │           ▼               Offline                     │</span></span>
+<span class="giallo-l"><span>│  ┌───────────────────┐     Build Host     │             </span></span>
+<span class="giallo-l"><span> │ │ Signature Checked │                                 │</span></span>
+<span class="giallo-l"><span>│  └───────────────────┘                    │             </span></span>
+<span class="giallo-l"><span> │           │                                           │</span></span>
+<span class="giallo-l"><span>│        Unpacks                            │             </span></span>
+<span class="giallo-l"><span> │           │                                           │</span></span>
+<span class="giallo-l"><span>│            ▼                              │             </span></span>
+<span class="giallo-l"><span> │ ┌───────────────────┐                                 │</span></span>
+<span class="giallo-l"><span>│  │ Build Application │                    │             </span></span>
+<span class="giallo-l"><span> │ └───────────────────┘                                 │</span></span>
+<span class="giallo-l"><span>│            │                              │             </span></span>
+<span class="giallo-l"><span> │       Packages                                        │</span></span>
+<span class="giallo-l"><span>│            │                              │             </span></span>
+<span class="giallo-l"><span> │           ▼                                           │</span></span>
+<span class="giallo-l"><span>│  ┌───────────────────┐                    │             </span></span>
+<span class="giallo-l"><span> │ │        RPM        │                                 │</span></span>
+<span class="giallo-l"><span>│  └───────────────────┘                    │             </span></span>
+<span class="giallo-l"><span> │           │                                           │</span></span>
+<span class="giallo-l"><span>│         Signs                             │             </span></span>
+<span class="giallo-l"><span> │           │                                           │</span></span>
+<span class="giallo-l"><span>│            ▼                              │             </span></span>
+<span class="giallo-l"><span> │ ┌───────────────────┐                                 │</span></span>
+<span class="giallo-l"><span>│  │  Signed Package   │                    │             </span></span>
+<span class="giallo-l"><span> │ └───────────────────┘                                 │</span></span>
+<span class="giallo-l"><span>│            │                              │             </span></span>
+<span class="giallo-l"><span> ┼ ─ ─ ─Distributes─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤</span></span>
+<span class="giallo-l"><span>             │                                            </span></span>
+<span class="giallo-l"><span> │           ▼                    Package Mirrors        │</span></span>
+<span class="giallo-l"><span>   ┌───────────────────┐                                  </span></span>
+<span class="giallo-l"><span> │ │      Mirrors      │                                 │</span></span>
+<span class="giallo-l"><span>   └───────────────────┘                                  </span></span>
+<span class="giallo-l"><span> │           │                                           │</span></span>
+<span class="giallo-l"><span>┌ ─ ─ ─ ─Provides ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ </span></span>
+<span class="giallo-l"><span>             │                                           │</span></span>
+<span class="giallo-l"><span>│            ▼                    Consumer Workstation    </span></span>
+<span class="giallo-l"><span>   ┌───────────────────┐                                 │</span></span>
+<span class="giallo-l"><span>│  │Downloaded Package │                                  </span></span>
+<span class="giallo-l"><span>   └───────────────────┘                                 │</span></span>
+<span class="giallo-l"><span>│        Verifies                                         </span></span>
+<span class="giallo-l"><span>        Signature                                        │</span></span>
+<span class="giallo-l"><span>│            │                                            </span></span>
+<span class="giallo-l"><span>             ▼                                           │</span></span>
+<span class="giallo-l"><span>│  ┌───────────────────┐                                  </span></span>
+<span class="giallo-l"><span>   │ Verified Package  │                                 │</span></span>
+<span class="giallo-l"><span>│  └───────────────────┘                                  </span></span>
+<span class="giallo-l"><span>             │                                           │</span></span>
+<span class="giallo-l"><span>│        Installs                                         </span></span>
+<span class="giallo-l"><span>             │                                           │</span></span>
+<span class="giallo-l"><span>│            ▼                                            </span></span>
+<span class="giallo-l"><span>   ┌───────────────────┐                                 │</span></span>
+<span class="giallo-l"><span>│  │ Application Runs  │                                  </span></span>
+<span class="giallo-l"><span>   └───────────────────┘                                 │</span></span>
+<span class="giallo-l"><span>└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ </span></span></code></pre>
 <p>Phew, that's a lot of steps to get from some code to a users machine! This is not even a complete
 or exhaustive diagram either, I'm sure there are more steps I've missed or could add.</p>
 <h2 id="the-attacker-s-view">The Attacker's View</h2>
@@ -264,50 +263,49 @@ can alter a single bit of the build breaking the reproducibility.</p>
 signing that these changes can be detected.</p>
 <h2 id="what-do-these-protect">What Do These Protect?</h2>
 <p>So within our supply chain, what section is protected by these properties?</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>             │                                           │               
-</span><span>│            ▼                                                           
-</span><span>   ┌───────────────────┐        Build Service            │               
-</span><span>│  │Open Build Service │                                                 
-</span><span>   └───────────────────┘                                 │               
-</span><span>│            │                                                           
-</span><span> ┌ ─ ─Begins Building─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─             │               
-</span><span>│            │                              │                            
-</span><span> │           ▼               Offline                     │               
-</span><span>│  ┌───────────────────┐     Build Host     │                            
-</span><span> │ │ Signature Checked │                                 │               
-</span><span>│  └───────────────────┘                    │                            
-</span><span> │           │          ◀────────────────────────────────┼───┐           
-</span><span>│        Unpacks                            │                │           
-</span><span> │           │                                           │   │           
-</span><span>│            ▼                              │                │           
-</span><span> │ ┌───────────────────┐                                 │   │           
-</span><span>│  │ Build Application │                    │                │           
-</span><span> │ └───────────────────┘                                 │   │           
-</span><span>│            │                              │                │           
-</span><span> │       Packages                                        │   │           
-</span><span>│            │                              │                │           
-</span><span> │           ▼                                           │   ├──── HERE
-</span><span>│  ┌───────────────────┐                    │                │           
-</span><span> │ │        RPM        │                                 │   │           
-</span><span>│  └───────────────────┘                    │                │           
-</span><span> │           │                                           │   │           
-</span><span>│         Signs                             │                │           
-</span><span> │           │                                           │   │           
-</span><span>│            ▼                              │                │           
-</span><span> │ ┌───────────────────┐                                 │   │           
-</span><span>│  │  Signed Package   │                    │                │           
-</span><span> │ └───────────────────┘                                 │   │           
-</span><span>│            │          ◀───────────────────┼────────────────┘           
-</span><span> ┼ ─ ─ ─Distributes─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤               
-</span><span>             │                                                           
-</span><span> │           ▼                    Package Mirrors        │               
-</span><span>   ┌───────────────────┐                                                 
-</span><span> │ │      Mirrors      │                                 │               
-</span><span>   └───────────────────┘                                                 
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>             │                                           │               </span></span>
+<span class="giallo-l"><span>│            ▼                                                           </span></span>
+<span class="giallo-l"><span>   ┌───────────────────┐        Build Service            │               </span></span>
+<span class="giallo-l"><span>│  │Open Build Service │                                                 </span></span>
+<span class="giallo-l"><span>   └───────────────────┘                                 │               </span></span>
+<span class="giallo-l"><span>│            │                                                           </span></span>
+<span class="giallo-l"><span> ┌ ─ ─Begins Building─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─             │               </span></span>
+<span class="giallo-l"><span>│            │                              │                            </span></span>
+<span class="giallo-l"><span> │           ▼               Offline                     │               </span></span>
+<span class="giallo-l"><span>│  ┌───────────────────┐     Build Host     │                            </span></span>
+<span class="giallo-l"><span> │ │ Signature Checked │                                 │               </span></span>
+<span class="giallo-l"><span>│  └───────────────────┘                    │                            </span></span>
+<span class="giallo-l"><span> │           │          ◀────────────────────────────────┼───┐           </span></span>
+<span class="giallo-l"><span>│        Unpacks                            │                │           </span></span>
+<span class="giallo-l"><span> │           │                                           │   │           </span></span>
+<span class="giallo-l"><span>│            ▼                              │                │           </span></span>
+<span class="giallo-l"><span> │ ┌───────────────────┐                                 │   │           </span></span>
+<span class="giallo-l"><span>│  │ Build Application │                    │                │           </span></span>
+<span class="giallo-l"><span> │ └───────────────────┘                                 │   │           </span></span>
+<span class="giallo-l"><span>│            │                              │                │           </span></span>
+<span class="giallo-l"><span> │       Packages                                        │   │           </span></span>
+<span class="giallo-l"><span>│            │                              │                │           </span></span>
+<span class="giallo-l"><span> │           ▼                                           │   ├──── HERE</span></span>
+<span class="giallo-l"><span>│  ┌───────────────────┐                    │                │           </span></span>
+<span class="giallo-l"><span> │ │        RPM        │                                 │   │           </span></span>
+<span class="giallo-l"><span>│  └───────────────────┘                    │                │           </span></span>
+<span class="giallo-l"><span> │           │                                           │   │           </span></span>
+<span class="giallo-l"><span>│         Signs                             │                │           </span></span>
+<span class="giallo-l"><span> │           │                                           │   │           </span></span>
+<span class="giallo-l"><span>│            ▼                              │                │           </span></span>
+<span class="giallo-l"><span> │ ┌───────────────────┐                                 │   │           </span></span>
+<span class="giallo-l"><span>│  │  Signed Package   │                    │                │           </span></span>
+<span class="giallo-l"><span> │ └───────────────────┘                                 │   │           </span></span>
+<span class="giallo-l"><span>│            │          ◀───────────────────┼────────────────┘           </span></span>
+<span class="giallo-l"><span> ┼ ─ ─ ─Distributes─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤               </span></span>
+<span class="giallo-l"><span>             │                                                           </span></span>
+<span class="giallo-l"><span> │           ▼                    Package Mirrors        │               </span></span>
+<span class="giallo-l"><span>   ┌───────────────────┐                                                 </span></span>
+<span class="giallo-l"><span> │ │      Mirrors      │                                 │               </span></span>
+<span class="giallo-l"><span>   └───────────────────┘                                                 </span></span></code></pre>
 <p>To add to this, to achieve this protection <em>properly</em> you actually need to build the package multiple
 times in parallel to compare the differences. This is discussed further in
-<a href="https://web.archive.org/web/20230517095028/https://blog.cmpxchg8b.com/2020/07/you-dont-need-reproducible-builds.html">Tavis Ormandy's blog</a></p>
+<a rel="external" href="https://web.archive.org/web/20230517095028/https://blog.cmpxchg8b.com/2020/07/you-dont-need-reproducible-builds.html">Tavis Ormandy's blog</a></p>
 <p>This makes reproducible builds expensive from human time and labour to meticulously maintain
 the needed invariants of their software always being binary identical, it is expensive on resources
 requiring multiple parallel hardware/software stacks to isolate build processes, and it is expensive
@@ -321,7 +319,7 @@ on energy as we require double to triple the electricity to compile things in du
 <p>Lets now examine a number of recent attacks and how they were carried out, what could have mitigated
 these attacks, and if reproducible builds was one of those things.</p>
 <h3 id="xz">XZ</h3>
-<p>The <a href="https://boehs.org/node/everything-i-know-about-the-xz-backdoor">XZ incident</a> was the discovery
+<p>The <a rel="external" href="https://boehs.org/node/everything-i-know-about-the-xz-backdoor">XZ incident</a> was the discovery
 of a backdoor added to the XZ decompression library. This library was indirectly included in SSH
 processes on certain distros which would have allowed an attacker to remotely access a system.</p>
 <p>This attack was carried out through an extended social engineering campaign. The backdoor was then
@@ -329,7 +327,7 @@ inserted into autotools scripts and test artefacts.</p>
 <p>Reproducible builds would <em>not</em> have detected this backdoor, since reproducing the build from the
 same compromised autotools outputs would have resulted in two identical compromised binaries.</p>
 <h3 id="solar-winds">Solar Winds</h3>
-<p><a href="https://en.wikipedia.org/wiki/SolarWinds#2019%E2%80%932020_supply_chain_attacks">Solar Winds</a> was
+<p><a rel="external" href="https://en.wikipedia.org/wiki/SolarWinds#2019%E2%80%932020_supply_chain_attacks">Solar Winds</a> was
 subject to a supply chain attack in 2019-2020. The documented and suspected access vector was "the
 attackers might have compromised internal build or distribution systems of SolarWinds". A second attack
 was then discovered which relied on injected code into a http library.</p>
@@ -337,12 +335,12 @@ was then discovered which relied on injected code into a http library.</p>
 compromise of the build host and the injection of code would mean that hosts are reproducing the
 same compromised binaries in each case.</p>
 <h3 id="other-attacks">Other Attacks</h3>
-<p>The CNCF maintains a <a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises">list of supply chain attacks</a>.
+<p>The CNCF maintains a <a rel="external" href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises">list of supply chain attacks</a>.
 This is likely not comprehensive, but it gives us a good over view to analyse. There are 78 attacks here
-and they are helpfully <a href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/compromise-definitions.md">categorised by attack type</a>.</p>
+and they are helpfully <a rel="external" href="https://github.com/cncf/tag-security/blob/main/supply-chain-security/compromises/compromise-definitions.md">categorised by attack type</a>.</p>
 <p>Within this set of attacks, only three may have been detected by reproducible builds.</p>
 <ul>
-<li><a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2017/ccleaner.md">CCleaner</a></li>
+<li><a rel="external" href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2017/ccleaner.md">CCleaner</a></li>
 </ul>
 <p>Developer signing keys were stolen.</p>
 <p>This application is not opensource, so users would be unable to rebuild and validate the results.</p>
@@ -352,7 +350,7 @@ be certificate transparency style logs that are issued in parallel which list th
 a signing key has made such that an attacker would not be able to upload their signatures into
 the CT log, or if they were, that it would allow notification and detection of the compromise.</p>
 <ul>
-<li><a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2003/kernel-repository.md">Kernel Alternate Mirror</a></li>
+<li><a rel="external" href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2003/kernel-repository.md">Kernel Alternate Mirror</a></li>
 </ul>
 <p>A mirror of the source code had alterations.</p>
 <p>This would rely on a user downloading and building the kernel from <em>different</em> mirrors. At this point
@@ -361,11 +359,11 @@ not match nor would other elements. Again, reproducible builds could find this, 
 easier ways to detect this in the first place such as signed archives or only using trust mirrors
 with https.</p>
 <ul>
-<li><a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2016/keydnap.md">Transmission / Keydnap</a></li>
+<li><a rel="external" href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2016/keydnap.md">Transmission / Keydnap</a></li>
 </ul>
 <p>The developers signing keys were stolen allowing fake builds to be uploaded.</p>
 <p>The user would be able to detect the subterfuge by building transmission themself, however as
-<a href="https://web.archive.org/web/20230517095028/https://blog.cmpxchg8b.com/2020/07/you-dont-need-reproducible-builds.html">Tavis Ormandy's blog</a>
+<a rel="external" href="https://web.archive.org/web/20230517095028/https://blog.cmpxchg8b.com/2020/07/you-dont-need-reproducible-builds.html">Tavis Ormandy's blog</a>
 points out "The only way to verify that the untrusted binary is bit-for-bit identical to the binary that would be produced by building the source code, is to produce your own trusted binary first and then compare it. At that point you already have a trusted binary you can use, so what value did reproducible builds provide?"</p>
 <p>Additionally the same applies as to CCleaner where key handling improvements would have helped
 prevent or detect this compromise.</p>
@@ -406,10 +404,10 @@ to analyse the data, the possible attacks, and then derive solutions that protec
 propose solutions and force them to stick.</p>
 <blockquote>
 <p>"Complex problems have simple, easy to understand, wrong answers."</p>
-<p>Benno Rice, <a href="https://www.youtube.com/watch?v=9-IWMbJXoLM">What Unix Cost Us</a></p>
+<p>Benno Rice, <a rel="external" href="https://www.youtube.com/watch?v=9-IWMbJXoLM">What Unix Cost Us</a></p>
 </blockquote>
 <h2 id="special-mention">Special Mention</h2>
-<p>I noticed in the review of each compromise, the <a href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2016/mint.md">Linux Mint ISO compromise</a>.</p>
+<p>I noticed in the review of each compromise, the <a rel="external" href="https://github.com/cncf/tag-security/tree/main/community/catalog/compromises/2016/mint.md">Linux Mint ISO compromise</a>.</p>
 <p>This attack would actually still be viable today because of how many distributions rely on third party
 mirrors that operate over http. Most of these distributions still attempt to ask users to perform
 complex and obtuse GPG verification steps of ISOs. Security must be accessible and usable to all

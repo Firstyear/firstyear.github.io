@@ -84,10 +84,10 @@
         <p>At around 11pm last night my partner went to change our lounge room lights with our home
 light control system. When she tried to login, her account couldn't be accessed. Her Apple
 Keychain had deleted the Passkey she was using on that site.</p>
-<p>This is just the icing on a long trail of <a href="https://en.wikipedia.org/wiki/Enshittification">enshittification</a>
+<p>This is just the icing on a long trail of <a rel="external" href="https://en.wikipedia.org/wiki/Enshittification">enshittification</a>
 that has undermined Webauthn. I'm over it at this point, and I think it's time to pour one out
 for Passkeys. The irony is not lost on me that I'm about to release a new major version of
-<a href="https://crates.io/crates/webauthn-rs">webauthn-rs</a> today as I write this.</p>
+<a rel="external" href="https://crates.io/crates/webauthn-rs">webauthn-rs</a> today as I write this.</p>
 <h2 id="the-dream">The Dream</h2>
 <p>In 2019 I flew to my mates place in Sydney and spent a week starting to write what is now
 <em>the</em> Webauthn library for Rust. In that time I found a number of issues in the standard and
@@ -106,8 +106,8 @@ in an account name then authenticate with PIN+Touch to your security key, and us
 the identity for your account was resident (discoverable) on the key. This was (from my view) seen
 as a niche concept by developers since really - how hard is it for a site to have a checkbox that
 says "remember me"?</p>
-<p>This library ended up with <a href="https://kanidm.com/">Kanidm</a> being (to my knowledge) the very first OpenSource IDM to implement
-passwordless (now passkeys). The experience was wonderful. You went to <a href="https://kanidm.com/">Kanidm</a>, typed
+<p>This library ended up with <a rel="external" href="https://kanidm.com/">Kanidm</a> being (to my knowledge) the very first OpenSource IDM to implement
+passwordless (now passkeys). The experience was wonderful. You went to <a rel="external" href="https://kanidm.com/">Kanidm</a>, typed
 in your username and then were prompted to type your PIN and touch your key. Simple, fast, easy.</p>
 <p>For devices like your iPhone or Android, you would do similar - just use your Touch ID and you're in.</p>
 <p>It was so easy, so accessible, I remember how it almost felt impossible. That authentication could
@@ -122,14 +122,14 @@ not understate how humbled I am of the influence webauthn-rs has had.</p>
 <p>However warnings started to appear that the standard was not as open as people envisaged. The issue
 we have is well known - Chrome controls a huge portion of the browser market, and development is
 tightly controlled by Google.</p>
-<p>An example of this was the <a href="https://www.w3.org/TR/webauthn-1/#sctn-authenticator-selection-extension">Authenticator Selection Extension</a>.</p>
+<p>An example of this was the <a rel="external" href="https://www.w3.org/TR/webauthn-1/#sctn-authenticator-selection-extension">Authenticator Selection Extension</a>.</p>
 <p>This extension is <em>important</em> for sites that have strict security requirements because they will
 attest the make and model of the authenticator in use. If you know that the attestation will only
 accept certain devices, then the browser should filter out and only allow those devices to participate.</p>
-<p>However Chrome simply never implemented it leading to it being <a href="https://github.com/w3c/webauthn/issues/1386">removed</a>.
+<p>However Chrome simply never implemented it leading to it being <a rel="external" href="https://github.com/w3c/webauthn/issues/1386">removed</a>.
 And it was removed because Chrome never implemented it. As a result, if Chrome doesn't like something
 in the specification they can just veto it without consequence.</p>
-<p>Later the <a href="https://github.com/w3c/webauthn/issues/1688#issuecomment-1011516074">justification</a> for
+<p>Later the <a rel="external" href="https://github.com/w3c/webauthn/issues/1688#issuecomment-1011516074">justification</a> for
 this not being implemented was: "We have never implemented it because we don't feel that authenticator
 discrimination is broadly a good thing. ... they [users] <em>should</em> have the expectation that a given
 security key will broadly work where they want to use it."</p>
@@ -149,13 +149,13 @@ everyone else has to have a lesser experience.</p>
 <p>The greater warning here is that many of these decisions are made at "F2F" or Face to Face meetings
 held in the US. This excludes the majority of international participants leading some voices to be
 stronger than others. It's hard to convince someone when you aren't in the room, even more so
-when the room is in a country that has a list of <a href="https://www.smartraveller.gov.au/destinations/americas/united-states-america">travel advisories</a>
+when the room is in a country that has a list of <a rel="external" href="https://www.smartraveller.gov.au/destinations/americas/united-states-america">travel advisories</a>
 including "Violent crime is more common in the US than in Australia", "There is a persistent threat
 of mass casualty violence and terrorist attacks in the US" and "Medical costs in the US are extremely
 high. You may need to pay up-front for medical assistance". (As an aside, there are countries that
 have a "do not travel" warning for less, but somehow the US gets a pass ...).</p>
 <h2 id="the-descent">The Descent</h2>
-<p>In 2022 Apple annouced <a href="https://appleinsider.com/articles/22/06/07/apple-passkey-feature-will-be-our-first-taste-of-a-truly-password-less-future">Passkeys</a>.</p>
+<p>In 2022 Apple annouced <a rel="external" href="https://appleinsider.com/articles/22/06/07/apple-passkey-feature-will-be-our-first-taste-of-a-truly-password-less-future">Passkeys</a>.</p>
 <p>At the time this was just a really nice "marketing" term for passwordless, and Apple's Passkeys had
 the ability to oppurtunistically be usernameless. It was all in all very polished and well done.</p>
 <p>But of course, thought leaders exist, and Apple hadn't defined what a Passkey was. One of those
@@ -178,19 +178,19 @@ and even better, credentials that can't be extracted or exported in any capacity
 <p>Both Chrome and Safari will try to force you into using either hybrid (caBLE) where you scan a QR code
 with your phone to authenticate - you have to click through menus to use a security key. caBLE is
 not even a good experience, taking more than 60 seconds work in most cases. The UI is beyond
-obnoxious at this point. Sometimes I think <a href="https://neal.fun/password-game/">the password game has a better ux</a>.</p>
-<p>The more egregious offender is Android, which <a href="https://github.com/kanidm/webauthn-rs/issues/365#issuecomment-1756605203">won't even activate your security key</a>
+obnoxious at this point. Sometimes I think <a rel="external" href="https://neal.fun/password-game/">the password game has a better ux</a>.</p>
+<p>The more egregious offender is Android, which <a rel="external" href="https://github.com/kanidm/webauthn-rs/issues/365#issuecomment-1756605203">won't even activate your security key</a>
 if the website sends the set of options that are needed for Passkeys. This means the IDP gets to
 choose what device you enroll without your input. And of course, all the developer examples only
 show you the options to activate "Google Passkeys stored in Google Password Manager". After all,
 why would you want to use anything else?</p>
-<p>A sobering pair of reads are the <a href="https://github.com/orgs/community/discussions/54450">Github Passkey Beta</a>
-and <a href="https://github.com/orgs/community/discussions/67791">Github Passkey</a> threads. There are instances of
+<p>A sobering pair of reads are the <a rel="external" href="https://github.com/orgs/community/discussions/54450">Github Passkey Beta</a>
+and <a rel="external" href="https://github.com/orgs/community/discussions/67791">Github Passkey</a> threads. There are instances of
 users whose security keys are not able to be enrolled as the resident key slots are filled. Multiple
 users describe that Android can not create Passkeys due to platform bugs. Some devices need firmware
 resets to create Passkeys. Keys can be saved on the client but not the server leading to duplicate
 account presence and credentials that don't work, or worse lead users to delete the
-<a href="https://bugs.webkit.org/show_bug.cgi?id=270553">real credentials</a>.</p>
+<a rel="external" href="https://bugs.webkit.org/show_bug.cgi?id=270553">real credentials</a>.</p>
 <p>The helplessness of users on these threads is obvious - and these are technical early adopters. The
 users we need to be advocates for changing from passwords to passkeys. If these users can't make it
 work how will people from other disciplines fare?</p>
@@ -221,8 +221,8 @@ has sworn off Passkeys because the user experience is so shit. She wants to go b
 <p>That's right. I'm here saying <em>passwords are a better experience than passkeys</em>. Do you know how much
 it pains me to write this sentence? (and yes, that means MFA with TOTP is still important for
 passwords that require memorisation outside of a password manager).</p>
-<p>So do yourself a favour. Get something like <a href="https://bitwarden.com/">bitwarden</a> or if you like
-self hosting get <a href="https://github.com/dani-garcia/vaultwarden">vaultwarden</a>. Let it generate your
+<p>So do yourself a favour. Get something like <a rel="external" href="https://bitwarden.com/">bitwarden</a> or if you like
+self hosting get <a rel="external" href="https://github.com/dani-garcia/vaultwarden">vaultwarden</a>. Let it generate your
 passwords and manage them. If you really want passkeys, put them in a password manager you control.
 But don't use a platform controlled passkey store, and be very careful with security keys.</p>
 <p>And if you do want to use a security key, just use it to unlock your password manager and your email.</p>
@@ -234,7 +234,7 @@ your IDP will only accept certain security models, so you're still likely to hav
 users.</p>
 <p>Despite all this, I will continue to maintain webauuthn-rs and it's related projects. They are still
 important to me even if I feel disappointed in the direction of the ecosystem.</p>
-<p>But at this point, in <a href="https://kanidm.com/">Kanidm</a> we are looking into device certificates and smartcards instead. The UI
+<p>But at this point, in <a rel="external" href="https://kanidm.com/">Kanidm</a> we are looking into device certificates and smartcards instead. The UI
 is genuinely better. Which says a lot considering the PKCS11 and PIV specifications. But at least
 PIV won't fall prone to attempts to enshittify it.</p>
 

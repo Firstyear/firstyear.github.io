@@ -98,31 +98,30 @@ authenticate your security key, it will provide you a "credential id".
 That credential ID is an encrypted blob that only your security key can
 decrypt. If your security key can decrypt that blob it yields a private
 key that is specific to that single RP that you can use for signatures.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌────────────────┐            ┌────────────────┐          ┌────────────────┐ 
-</span><span>│ Relying Party  │      │     │    Browser     │     │    │  Security Key  │ 
-</span><span>└────────────────┘            └────────────────┘          └────────────────┘ 
-</span><span>                        │                            │                       
-</span><span>     1. Send                                                                 
-</span><span>   Credential ──────────┼───────▶                    │                       
-</span><span>       IDs                                                                   
-</span><span>                        │      2. Forward to─────────┼─────▶   3. Decrypt    
-</span><span>                               Security Key                   Credential ID  
-</span><span>                        │                            │       with Master Key 
-</span><span>                                                                    │        
-</span><span>                        │                            │              │        
-</span><span>                                                                    │        
-</span><span>                        │                            │              ▼        
-</span><span>                                                            4. Sign Challenge
-</span><span>                        │                            │       with Decrypted  
-</span><span>                                                                   Key       
-</span><span>                        │                            │              │        
-</span><span>                                                                    │        
-</span><span>                        │                            │              │        
-</span><span>                                                                    ▼        
-</span><span>                        │          6. Return  ◀──────┼───────── 5. Return    
-</span><span>                 ◀──────────────── Signature                    Signature    
-</span><span>                        │                            │                       
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>┌────────────────┐            ┌────────────────┐          ┌────────────────┐ </span></span>
+<span class="giallo-l"><span>│ Relying Party  │      │     │    Browser     │     │    │  Security Key  │ </span></span>
+<span class="giallo-l"><span>└────────────────┘            └────────────────┘          └────────────────┘ </span></span>
+<span class="giallo-l"><span>                        │                            │                       </span></span>
+<span class="giallo-l"><span>     1. Send                                                                 </span></span>
+<span class="giallo-l"><span>   Credential ──────────┼───────▶                    │                       </span></span>
+<span class="giallo-l"><span>       IDs                                                                   </span></span>
+<span class="giallo-l"><span>                        │      2. Forward to─────────┼─────▶   3. Decrypt    </span></span>
+<span class="giallo-l"><span>                               Security Key                   Credential ID  </span></span>
+<span class="giallo-l"><span>                        │                            │       with Master Key </span></span>
+<span class="giallo-l"><span>                                                                    │        </span></span>
+<span class="giallo-l"><span>                        │                            │              │        </span></span>
+<span class="giallo-l"><span>                                                                    │        </span></span>
+<span class="giallo-l"><span>                        │                            │              ▼        </span></span>
+<span class="giallo-l"><span>                                                            4. Sign Challenge</span></span>
+<span class="giallo-l"><span>                        │                            │       with Decrypted  </span></span>
+<span class="giallo-l"><span>                                                                   Key       </span></span>
+<span class="giallo-l"><span>                        │                            │              │        </span></span>
+<span class="giallo-l"><span>                                                                    │        </span></span>
+<span class="giallo-l"><span>                        │                            │              │        </span></span>
+<span class="giallo-l"><span>                                                                    ▼        </span></span>
+<span class="giallo-l"><span>                        │          6. Return  ◀──────┼───────── 5. Return    </span></span>
+<span class="giallo-l"><span>                 ◀──────────────── Signature                    Signature    </span></span>
+<span class="giallo-l"><span>                        │                            │                       </span></span></code></pre>
 <p>This is what is called a non-resident or non-discoverable credential.
 The reason is that the private key can <em>not be discovered</em> by the security
 key without the Credential ID provided to it externally. This is because
@@ -132,31 +131,30 @@ the master key is.</p>
 the private key is <em>stored</em> in the security key itself. This allows the
 security key to discover (hence the name) what private keys might be
 used in the authentication.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌────────────────┐            ┌────────────────┐          ┌────────────────┐ 
-</span><span>│ Relying Party  │      │     │    Browser     │     │    │  Security Key  │ 
-</span><span>└────────────────┘            └────────────────┘          └────────────────┘ 
-</span><span>                        │                            │                       
-</span><span>  1. Send Empty                                                              
-</span><span>   CredID list──────────┼───────▶                    │                       
-</span><span>                                 2. Query  ───────────────▶                  
-</span><span>                        │      Security Key          │      3. Discover Keys 
-</span><span>                                                                 for RP      
-</span><span>                        │       4. Select a ◀────────┼─────                  
-</span><span>                               Security Key                                  
-</span><span>                        │                   ─────────┼────▶ 5. Sign Challenge
-</span><span>                                                            with Resident Key
-</span><span>                        │                            │             │         
-</span><span>                                                                   │         
-</span><span>                        │                            │             │         
-</span><span>                                                                   ▼         
-</span><span>                        │         7. Return  ◀───────┼──────── 6. Return     
-</span><span>                ◀──────────────── Signature                    Signature     
-</span><span>                        │                            │                       
-</span><span>
-</span><span>                        │                            │                       
-</span><span>
-</span><span>                        │                            │                       
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>┌────────────────┐            ┌────────────────┐          ┌────────────────┐ </span></span>
+<span class="giallo-l"><span>│ Relying Party  │      │     │    Browser     │     │    │  Security Key  │ </span></span>
+<span class="giallo-l"><span>└────────────────┘            └────────────────┘          └────────────────┘ </span></span>
+<span class="giallo-l"><span>                        │                            │                       </span></span>
+<span class="giallo-l"><span>  1. Send Empty                                                              </span></span>
+<span class="giallo-l"><span>   CredID list──────────┼───────▶                    │                       </span></span>
+<span class="giallo-l"><span>                                 2. Query  ───────────────▶                  </span></span>
+<span class="giallo-l"><span>                        │      Security Key          │      3. Discover Keys </span></span>
+<span class="giallo-l"><span>                                                                 for RP      </span></span>
+<span class="giallo-l"><span>                        │       4. Select a ◀────────┼─────                  </span></span>
+<span class="giallo-l"><span>                               Security Key                                  </span></span>
+<span class="giallo-l"><span>                        │                   ─────────┼────▶ 5. Sign Challenge</span></span>
+<span class="giallo-l"><span>                                                            with Resident Key</span></span>
+<span class="giallo-l"><span>                        │                            │             │         </span></span>
+<span class="giallo-l"><span>                                                                   │         </span></span>
+<span class="giallo-l"><span>                        │                            │             │         </span></span>
+<span class="giallo-l"><span>                                                                   ▼         </span></span>
+<span class="giallo-l"><span>                        │         7. Return  ◀───────┼──────── 6. Return     </span></span>
+<span class="giallo-l"><span>                ◀──────────────── Signature                    Signature     </span></span>
+<span class="giallo-l"><span>                        │                            │                       </span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>                        │                            │                       </span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>                        │                            │                       </span></span></code></pre>
 <p>Now, the primary difference here is that resident/discoverable keys
 consume <em>space</em> on the security key to store them since they need to
 persist - there is no credential id to rely on to decrypt with our
@@ -228,7 +226,7 @@ used.</p>
 <p>Some months later a person took the stage at FIDO's Authenticate
 conference and annouced "a passkey is a resident key". Because of the
 scale and size of the platform, this definition has now stuck. This
-definition has become so invasive that even <em>FIDO</em> now use it as <a href="https://fidoalliance.org/passkeys/#faq">their
+definition has become so invasive that even <em>FIDO</em> now use it as <a rel="external" href="https://fidoalliance.org/passkeys/#faq">their
 definition</a>.</p>
 <p>Part of the reason this definition is hyped is because it works with an
 upcoming browser feature that allows autocomplete of a username and
@@ -268,25 +266,24 @@ resident keys.</p>
 <p>Currently there are three levels of request an RP can make to request
 resident keys. Discouraged, Preferred and Required. Here is what happens
 with different authenticator types when you submit each level.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>                           ┌────────────────────┬────────────────────┬────────────────────┐
-</span><span>                           │      Roaming       │      Platform      │      Platform      │
-</span><span>                           │   Authenticator    │   Authenticator    │   Authenticator    │
-</span><span>                           │     (Yubikey)      │(Android Behaviour) │  (iOS Behaviour)   │
-</span><span>                           └────────────────────┴────────────────────┴────────────────────┘
-</span><span>    ┌────────────────────┐ ┌────────────────────┬────────────────────┬────────────────────┐
-</span><span>    │                    │ │                    │                    │                    │
-</span><span>    │   rk=discouraged   │ │      RK false      │     RK false       │      RK true       │
-</span><span>    │                    │ │                    │                    │                    │
-</span><span>    ├────────────────────┤ ├────────────────────┼────────────────────┼────────────────────┤
-</span><span>    │                    │ │                    │                    │                    │
-</span><span>    │   rk=preferred     │ │      RK true (!)   │      RK true       │      RK true       │
-</span><span>    │                    │ │                    │                    │                    │
-</span><span>    ├────────────────────┤ ├────────────────────┼────────────────────┼────────────────────┤
-</span><span>    │                    │ │                    │                    │                    │
-</span><span>    │    rk=required     │ │      RK true       │      RK true       │      RK true       │
-</span><span>    │                    │ │                    │                    │                    │
-</span><span>    └────────────────────┘ └────────────────────┴────────────────────┴────────────────────┘
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>                           ┌────────────────────┬────────────────────┬────────────────────┐</span></span>
+<span class="giallo-l"><span>                           │      Roaming       │      Platform      │      Platform      │</span></span>
+<span class="giallo-l"><span>                           │   Authenticator    │   Authenticator    │   Authenticator    │</span></span>
+<span class="giallo-l"><span>                           │     (Yubikey)      │(Android Behaviour) │  (iOS Behaviour)   │</span></span>
+<span class="giallo-l"><span>                           └────────────────────┴────────────────────┴────────────────────┘</span></span>
+<span class="giallo-l"><span>    ┌────────────────────┐ ┌────────────────────┬────────────────────┬────────────────────┐</span></span>
+<span class="giallo-l"><span>    │                    │ │                    │                    │                    │</span></span>
+<span class="giallo-l"><span>    │   rk=discouraged   │ │      RK false      │     RK false       │      RK true       │</span></span>
+<span class="giallo-l"><span>    │                    │ │                    │                    │                    │</span></span>
+<span class="giallo-l"><span>    ├────────────────────┤ ├────────────────────┼────────────────────┼────────────────────┤</span></span>
+<span class="giallo-l"><span>    │                    │ │                    │                    │                    │</span></span>
+<span class="giallo-l"><span>    │   rk=preferred     │ │      RK true (!)   │      RK true       │      RK true       │</span></span>
+<span class="giallo-l"><span>    │                    │ │                    │                    │                    │</span></span>
+<span class="giallo-l"><span>    ├────────────────────┤ ├────────────────────┼────────────────────┼────────────────────┤</span></span>
+<span class="giallo-l"><span>    │                    │ │                    │                    │                    │</span></span>
+<span class="giallo-l"><span>    │    rk=required     │ │      RK true       │      RK true       │      RK true       │</span></span>
+<span class="giallo-l"><span>    │                    │ │                    │                    │                    │</span></span>
+<span class="giallo-l"><span>    └────────────────────┘ └────────────────────┴────────────────────┴────────────────────┘</span></span></code></pre>
 <p>Notice that in rk=preferred the three columns behave the same as
 rk=required?</p>
 <p>Rather than passkeys setting rk=required, if rk=preferred were softened

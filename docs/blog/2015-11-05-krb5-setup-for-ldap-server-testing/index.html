@@ -93,87 +93,75 @@ machine. It should be the first entry.</p>
 <p>Edit /etc/krb5.conf.d/example.com</p>
 <p>NOTE: This doesn't work, you need to add it to krb5.conf. Why doesn't
 it work?</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[realms]
-</span><span>EXAMPLE.COM = {
-</span><span> kdc = kerberos.example.com
-</span><span> admin_server = kerberos.example.com
-</span><span>}
-</span><span>
-</span><span>[domain_realm]
-</span><span>.example.com = EXAMPLE.COM
-</span><span>example.com = EXAMPLE.COM
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[realms]</span></span>
+<span class="giallo-l"><span>EXAMPLE.COM = {</span></span>
+<span class="giallo-l"><span> kdc = kerberos.example.com</span></span>
+<span class="giallo-l"><span> admin_server = kerberos.example.com</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[domain_realm]</span></span>
+<span class="giallo-l"><span>.example.com = EXAMPLE.COM</span></span>
+<span class="giallo-l"><span>example.com = EXAMPLE.COM</span></span></code></pre>
 <p>Edit /var/kerberos/krb5kdc/kdc.conf</p>
 <p># Note, I think the defalt kdc.conf is good. :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[kdcdefaults]
-</span><span> kdc_ports = 88
-</span><span> kdc_tcp_ports = 88
-</span><span>
-</span><span>[realms]
-</span><span> EXAMPLE.COM = {
-</span><span>  #master_key_type = aes256-cts
-</span><span>  acl_file = /var/kerberos/krb5kdc/kadm5.acl
-</span><span>  dict_file = /usr/share/dict/words
-</span><span>  admin_keytab = /var/kerberos/krb5kdc/kadm5.keytab
-</span><span>  supported_enctypes = aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal camellia256-cts:normal camellia128-cts:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal
-</span><span> }
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[kdcdefaults]</span></span>
+<span class="giallo-l"><span> kdc_ports = 88</span></span>
+<span class="giallo-l"><span> kdc_tcp_ports = 88</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[realms]</span></span>
+<span class="giallo-l"><span> EXAMPLE.COM = {</span></span>
+<span class="giallo-l"><span>  #master_key_type = aes256-cts</span></span>
+<span class="giallo-l"><span>  acl_file = /var/kerberos/krb5kdc/kadm5.acl</span></span>
+<span class="giallo-l"><span>  dict_file = /usr/share/dict/words</span></span>
+<span class="giallo-l"><span>  admin_keytab = /var/kerberos/krb5kdc/kadm5.keytab</span></span>
+<span class="giallo-l"><span>  supported_enctypes = aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal camellia256-cts:normal camellia128-cts:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal</span></span>
+<span class="giallo-l"><span> }</span></span></code></pre>
 <p>Now setup the database.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/sbin/kdb5_util create -r EXAMPLE.COM -s  # Prompts for password. Is there a way to avoid prompt?
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/sbin/kdb5_util create -r EXAMPLE.COM -s  # Prompts for password. Is there a way to avoid prompt?</span></span></code></pre>
 <p>Edit /var/kerberos/krb5kdc/kadm5.acl</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/sbin/kadmin.local -r EXAMPLE.COM -q listprincs
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/sbin/kadmin.local -r EXAMPLE.COM -q listprincs</span></span></code></pre>
 <p>Add our LDAP servers</p>
 <p># There is a way to submit these on the CLI, but I get kadmin.local:
 Cannot find master key record in database while initializing
 kadmin.local interface</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/sbin/kadmin.local -r EXAMPLE.COM                                                                
-</span><span>add_principal -randkey ldap/kerberos.example.com@EXAMPLE.COM
-</span><span>ktadd -k /opt/dirsrv/etc/dirsrv/slapd-localhost/ldap.keytab ldap/kerberos.example.com
-</span><span>add_principal -pw password client
-</span><span>exit
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/sbin/kadmin.local -r EXAMPLE.COM                                                                </span></span>
+<span class="giallo-l"><span>add_principal -randkey ldap/kerberos.example.com@EXAMPLE.COM</span></span>
+<span class="giallo-l"><span>ktadd -k /opt/dirsrv/etc/dirsrv/slapd-localhost/ldap.keytab ldap/kerberos.example.com</span></span>
+<span class="giallo-l"><span>add_principal -pw password client</span></span>
+<span class="giallo-l"><span>exit</span></span></code></pre>
 <p>Start the kdc</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/sbin/krb5kdc -P /var/run/krb5kdc.pid -r EXAMPLE.COM
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/sbin/krb5kdc -P /var/run/krb5kdc.pid -r EXAMPLE.COM</span></span></code></pre>
 <p>OR</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># You need to edit /etc/sysconfig/krb5kdc and put -r EXAMPLE.COM into args
-</span><span>systemctl start krb5kdc
-</span><span>
-</span><span>KRB5_TRACE=/tmp/foo kinit client@EXAMPLE.COM
-</span><span>klist
-</span><span>Ticket cache: KEYRING:persistent:0:0
-</span><span>Default principal: client@EXAMPLE.COM
-</span><span>
-</span><span>Valid starting     Expires            Service principal
-</span><span>05/11/15 11:35:37  06/11/15 11:35:37  krbtgt/EXAMPLE.COM@EXAMPLE.COM
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># You need to edit /etc/sysconfig/krb5kdc and put -r EXAMPLE.COM into args</span></span>
+<span class="giallo-l"><span>systemctl start krb5kdc</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>KRB5_TRACE=/tmp/foo kinit client@EXAMPLE.COM</span></span>
+<span class="giallo-l"><span>klist</span></span>
+<span class="giallo-l"><span>Ticket cache: KEYRING:persistent:0:0</span></span>
+<span class="giallo-l"><span>Default principal: client@EXAMPLE.COM</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Valid starting     Expires            Service principal</span></span>
+<span class="giallo-l"><span>05/11/15 11:35:37  06/11/15 11:35:37  krbtgt/EXAMPLE.COM@EXAMPLE.COM</span></span></code></pre>
 <p>Now setup the DS instance.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># Note, might be dirsrv in newer installs.
-</span><span>chown nobody: /opt/dirsrv/etc/dirsrv/slapd-localhost/ldap.keytab
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># Note, might be dirsrv in newer installs.</span></span>
+<span class="giallo-l"><span>chown nobody: /opt/dirsrv/etc/dirsrv/slapd-localhost/ldap.keytab</span></span></code></pre>
 <p>Add:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>KRB5_KTNAME=/opt/dirsrv/etc/dirsrv/slapd-localhost/ldap.keytab ; export KRB5_KTNAME    
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>KRB5_KTNAME=/opt/dirsrv/etc/dirsrv/slapd-localhost/ldap.keytab ; export KRB5_KTNAME    </span></span></code></pre>
 <p>To /opt/dirsrv/etc/sysconfig/dirsrv-localhost</p>
 <p>Now restart the DS</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/opt/dirsrv/etc/rc.d/init.d/dirsrv restart
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/opt/dirsrv/etc/rc.d/init.d/dirsrv restart</span></span></code></pre>
 <p>Add a client object:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>uid=client,ou=People,dc=example,dc=com
-</span><span>objectClass: top
-</span><span>objectClass: account
-</span><span>uid: client
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>uid=client,ou=People,dc=example,dc=com</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: account</span></span>
+<span class="giallo-l"><span>uid: client</span></span></code></pre>
 <p>Now check the GSSAPI is working.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ldapwhoami -Y GSSAPI -H ldap://kerberos.example.com:389    
-</span><span>SASL/GSSAPI authentication started
-</span><span>SASL username: client@EXAMPLE.COM
-</span><span>SASL SSF: 56
-</span><span>SASL data security layer installed.
-</span><span>dn: uid=client,ou=people,dc=example,dc=com
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ldapwhoami -Y GSSAPI -H ldap://kerberos.example.com:389    </span></span>
+<span class="giallo-l"><span>SASL/GSSAPI authentication started</span></span>
+<span class="giallo-l"><span>SASL username: client@EXAMPLE.COM</span></span>
+<span class="giallo-l"><span>SASL SSF: 56</span></span>
+<span class="giallo-l"><span>SASL data security layer installed.</span></span>
+<span class="giallo-l"><span>dn: uid=client,ou=people,dc=example,dc=com</span></span></code></pre>
 <p>All ready to go!</p>
 <p>I have created some helpers in lib389 that are able to do this now.</p>
 <p>TODO: How to setup krb5 with ldap backend.</p>

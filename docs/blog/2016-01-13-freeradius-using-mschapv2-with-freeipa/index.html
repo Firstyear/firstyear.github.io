@@ -121,60 +121,54 @@ QUICKLY.</p>
 <p>Thankfully, the developers provide an excellent default configuration
 that should only need minimal tweaks to make this configuration work.</p>
 <p>first, symlink ldap to mods-enabled</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cd /etc/raddb/mods-enabled
-</span><span>ln -s ../mods-available/ldap ./ldap
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cd /etc/raddb/mods-enabled</span></span>
+<span class="giallo-l"><span>ln -s ../mods-available/ldap ./ldap</span></span></code></pre>
 <p>Now, edit the ldap config in mods-available (That way if a swap file is
 made, it's not put into mods-enabled where it may do damage)</p>
 <p>You need to change the parameters to match your site, however the most
 important setting is:</p>
 <p>:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>identity = krbprincipalname=radius/host.ipa.example.net.au@IPA.EXAMPLE.NET.AU,cn=services,cn=accounts,dc=ipa,dc=example,dc=net,dc=au
-</span><span>password = SERVICE ACCOUNT BIND PW
-</span><span>
-</span><span>....snip.....
-</span><span>
-</span><span>update {
-</span><span>      ....snip......
-</span><span>      control:NT-Password··   := &#39;ipaNTHash&#39;
-</span><span>}
-</span><span>
-</span><span> .....snip ....
-</span><span>
-</span><span>user {
-</span><span>       base_dn = &quot;cn=users,cn=accounts,dc=ipa,dc=example,dc=net,dc=au&quot;
-</span><span>       filter = &quot;(uid=%{%{Stripped-User-Name}:-%{User-Name}})&quot;
-</span><span>        ....snip....
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>identity = krbprincipalname=radius/host.ipa.example.net.au@IPA.EXAMPLE.NET.AU,cn=services,cn=accounts,dc=ipa,dc=example,dc=net,dc=au</span></span>
+<span class="giallo-l"><span>password = SERVICE ACCOUNT BIND PW</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>....snip.....</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>update {</span></span>
+<span class="giallo-l"><span>      ....snip......</span></span>
+<span class="giallo-l"><span>      control:NT-Password··   := &#39;ipaNTHash&#39;</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span> .....snip ....</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>user {</span></span>
+<span class="giallo-l"><span>       base_dn = &quot;cn=users,cn=accounts,dc=ipa,dc=example,dc=net,dc=au&quot;</span></span>
+<span class="giallo-l"><span>       filter = &quot;(uid=%{%{Stripped-User-Name}:-%{User-Name}})&quot;</span></span>
+<span class="giallo-l"><span>        ....snip....</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>Next, you want to edit the mods-available/eap</p>
 <p>you want to change the value of default_eap_type to:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>default_eap_type = mschapv2
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>default_eap_type = mschapv2</span></span></code></pre>
 <p>Finally, you need to update your sites-available, most likely
 inner-tunnel and default to make sure that they contain:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>authorize {
-</span><span>
-</span><span>      ....snip .....
-</span><span>      -ldap
-</span><span>
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>authorize {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>      ....snip .....</span></span>
+<span class="giallo-l"><span>      -ldap</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>That's it! Now you should be able to test an ldap account with radtest,
 using the default NAS configured in /etc/raddb/clients.conf.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>radtest -t mschap william password 127.0.0.1:1812 0 testing123
-</span><span>    User-Name = &#39;william&#39;
-</span><span>    NAS-IP-Address = 172.24.16.13
-</span><span>    NAS-Port = 0
-</span><span>    Message-Authenticator = 0x00
-</span><span>    MS-CHAP-Challenge = 0x642690f62148e238
-</span><span>        MS-CHAP-Response = ....
-</span><span>Received Access-Accept Id 130 from 127.0.0.1:1812 to 127.0.0.1:56617 length 84
-</span><span>    MS-CHAP-MPPE-Keys = 0x
-</span><span>    MS-MPPE-Encryption-Policy = Encryption-Allowed
-</span><span>    MS-MPPE-Encryption-Types = RC4-40or128-bit-Allowed
-</span></code></pre>
-<h2 id="why-not-use-krb">Why not use KRB?</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>radtest -t mschap william password 127.0.0.1:1812 0 testing123</span></span>
+<span class="giallo-l"><span>    User-Name = &#39;william&#39;</span></span>
+<span class="giallo-l"><span>    NAS-IP-Address = 172.24.16.13</span></span>
+<span class="giallo-l"><span>    NAS-Port = 0</span></span>
+<span class="giallo-l"><span>    Message-Authenticator = 0x00</span></span>
+<span class="giallo-l"><span>    MS-CHAP-Challenge = 0x642690f62148e238</span></span>
+<span class="giallo-l"><span>        MS-CHAP-Response = ....</span></span>
+<span class="giallo-l"><span>Received Access-Accept Id 130 from 127.0.0.1:1812 to 127.0.0.1:56617 length 84</span></span>
+<span class="giallo-l"><span>    MS-CHAP-MPPE-Keys = 0x</span></span>
+<span class="giallo-l"><span>    MS-MPPE-Encryption-Policy = Encryption-Allowed</span></span>
+<span class="giallo-l"><span>    MS-MPPE-Encryption-Types = RC4-40or128-bit-Allowed</span></span></code></pre><h2 id="why-not-use-krb">Why not use KRB?</h2>
 <p>I was asked in IRC about using KRB keytabs for authenticating the
 service account. Now the configuration is quite easy - but I won't put
 it hear.</p>

@@ -94,11 +94,10 @@ Console.app and search for "bluetooth" to see all the bluetooth
 related logs.</p>
 <p>I noticed that when the audio stutter occured that the following pattern
 was observed.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>default 11:25:45.840532 +1000   wirelessproxd   About to scan for type: 9 - rssi: -90 - payload: &lt;00000000 00000000 00000000 00000000 00000000 0000&gt; - mask: &lt;00000000 00000000 00000000 00000000 00000000 0000&gt; - peers: 0
-</span><span>default 11:25:45.840878 +1000   wirelessproxd   Scan options changed: YES
-</span><span>error   11:25:46.225839 +1000   bluetoothaudiod Error sending audio packet: 0xe00002e8
-</span><span>error   11:25:46.225899 +1000   bluetoothaudiod Too many outstanding packets. Drop packet of 8 frames (total drops:451 total sent:60685 percentDropped:0.737700) Outstanding:17
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>default 11:25:45.840532 +1000   wirelessproxd   About to scan for type: 9 - rssi: -90 - payload: &lt;00000000 00000000 00000000 00000000 00000000 0000&gt; - mask: &lt;00000000 00000000 00000000 00000000 00000000 0000&gt; - peers: 0</span></span>
+<span class="giallo-l"><span>default 11:25:45.840878 +1000   wirelessproxd   Scan options changed: YES</span></span>
+<span class="giallo-l"><span>error   11:25:46.225839 +1000   bluetoothaudiod Error sending audio packet: 0xe00002e8</span></span>
+<span class="giallo-l"><span>error   11:25:46.225899 +1000   bluetoothaudiod Too many outstanding packets. Drop packet of 8 frames (total drops:451 total sent:60685 percentDropped:0.737700) Outstanding:17</span></span></code></pre>
 <p>There was always a scan, just before the stutter initiated. So what was
 scanning?</p>
 <p>I searched for the error related to packets, and there were a lot of

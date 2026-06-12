@@ -91,7 +91,7 @@ concurrent structures are safe.</p>
 <h2 id="cpu-memory-model-crash-course">CPU Memory Model Crash Course</h2>
 <p>In no way is this a thorough, complete, or 100% accurate representation
 of CPU memory. My goal is to give you a quick brief on how it works. I
-highly recommend you read <a href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf">"what every programmer should know about
+highly recommend you read <a rel="external" href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf">"what every programmer should know about
 memory"</a>
 if you want to learn more.</p>
 <p>In a CPU we have a view of a memory space. That could be in the order of
@@ -99,7 +99,7 @@ KB to TB. But it's a single coherent view of that space.</p>
 <p>Of course, over time systems and people have demanded more and more
 performance. But we also have languages like C, that won't change from
 their view of a system as a single memory space, or change how they
-work. Of course, it turns out <a href="https://queue.acm.org/detail.cfm?id=3212479">C is not a low level
+work. Of course, it turns out <a rel="external" href="https://queue.acm.org/detail.cfm?id=3212479">C is not a low level
 language</a> but we like to
 convince ourselves it is.</p>
 <p>To keep working with C and others, CPU's have acquired cache's that

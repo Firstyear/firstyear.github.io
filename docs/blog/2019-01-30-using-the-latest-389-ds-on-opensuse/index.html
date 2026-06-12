@@ -86,36 +86,28 @@
 good package in review for submission to tumbleweed. However, if you are
 impatient and want to use the "latest" and greatest 389-ds version on
 OpenSUSE.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper ar obs://network:ldap network:ldap
-</span><span>zypper in 389-ds
-</span></code></pre>
-<h2 id="docker">Docker</h2>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker run --rm -i -t registry.opensuse.org/home/firstyear/containers/389-ds-container:latest
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>zypper ar obs://network:ldap network:ldap</span></span>
+<span class="giallo-l"><span>zypper in 389-ds</span></span></code></pre><h2 id="docker">Docker</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker run --rm -i -t registry.opensuse.org/home/firstyear/containers/389-ds-container:latest</span></span></code></pre>
 <p>To make it persistent:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker run -v 389ds_data:/data &lt;your options here ...&gt; registry.opensuse.org/home/firstyear/containers/389-ds-container:latest
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker run -v 389ds_data:/data &lt;your options here ...&gt; registry.opensuse.org/home/firstyear/containers/389-ds-container:latest</span></span></code></pre>
 <p>Then to run the admin tools:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker exec -i -t &lt;container name&gt; /usr/sbin/dsconf ...
-</span><span>docker exec -i -t &lt;container name&gt; /usr/sbin/dsidm ...
-</span></code></pre>
-<h2 id="testing-in-docker">Testing in docker?</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker exec -i -t &lt;container name&gt; /usr/sbin/dsconf ...</span></span>
+<span class="giallo-l"><span>docker exec -i -t &lt;container name&gt; /usr/sbin/dsidm ...</span></span></code></pre><h2 id="testing-in-docker">Testing in docker?</h2>
 <p>If you are "testing" in docker (please don't do this in production:
 for production see above) you'll need to do some tweaks to get around
 the lack of systemd.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker run -i -t opensuse/tumbleweed:latest
-</span><span>zypper ar obs://network:ldap network:ldap
-</span><span>zypper in 389-ds
-</span><span>
-</span><span>vim /usr/share/dirsrv/inf/defaults.inf
-</span><span># change the following to match:
-</span><span>with_systemd = 0
-</span></code></pre>
-<h2 id="what-next">What next?</h2>
-<p>After this, you should now be able to follow our <a href="http://www.port389.org/docs/389ds/howto/quickstart.html">new quickstart
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker run -i -t opensuse/tumbleweed:latest</span></span>
+<span class="giallo-l"><span>zypper ar obs://network:ldap network:ldap</span></span>
+<span class="giallo-l"><span>zypper in 389-ds</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>vim /usr/share/dirsrv/inf/defaults.inf</span></span>
+<span class="giallo-l"><span># change the following to match:</span></span>
+<span class="giallo-l"><span>with_systemd = 0</span></span></code></pre><h2 id="what-next">What next?</h2>
+<p>After this, you should now be able to follow our <a rel="external" href="http://www.port389.org/docs/389ds/howto/quickstart.html">new quickstart
 guide</a> on the
 389-ds website.</p>
-<p>If you followed the docker steps, skip to <a href="http://www.port389.org/docs/389ds/howto/quickstart.html#add-users-and-groups">adding users and
+<p>If you followed the docker steps, skip to <a rel="external" href="http://www.port389.org/docs/389ds/howto/quickstart.html#add-users-and-groups">adding users and
 groups</a></p>
 <p>The network:ldap repo and the container listed are updated when upstream
 makes releases so you'll always get the latest 389-ds</p>

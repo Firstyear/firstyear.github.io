@@ -82,9 +82,9 @@
     </div>
     <div itemprop="articleBody">
         <h1 id="there-are-no-root-causes">There are no root causes</h1>
-<p>At Gold Coast LCA2020 I gave a <a href="https://www.youtube.com/watch?v=eqQUepwTHjA&amp;t=25m47s">lightning talk on swiss
+<p>At Gold Coast LCA2020 I gave a <a rel="external" href="https://www.youtube.com/watch?v=eqQUepwTHjA&amp;t=25m47s">lightning talk on swiss
 cheese</a>. Well,
-maybe not really swiss cheese. But it was about the <a href="https://en.wikipedia.org/wiki/Swiss_cheese_model">swiss cheese
+maybe not really swiss cheese. But it was about the <a rel="external" href="https://en.wikipedia.org/wiki/Swiss_cheese_model">swiss cheese
 failure model</a> which
 was proposed at the university of manchester.</p>
 <p>Please note this will cover some of the same topics as the talk, but in
@@ -105,28 +105,26 @@ us have been taught. Often we believe that a CPU thread/core is
 executing "one instruction/operation" at a time. However this isn't
 how most CPU's work. Most work by having a pipeline of instructions
 that are in various stages of execution. You could imagine it like this:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>let mut x = 0
-</span><span>let mut y = 0
-</span><span>x = 15 * some_input;
-</span><span>y = 10 * other_input;
-</span><span>if x &gt; y {
-</span><span>    return true;
-</span><span>} else {
-</span><span>    return false;
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>let mut x = 0</span></span>
+<span class="giallo-l"><span>let mut y = 0</span></span>
+<span class="giallo-l"><span>x = 15 * some_input;</span></span>
+<span class="giallo-l"><span>y = 10 * other_input;</span></span>
+<span class="giallo-l"><span>if x &gt; y {</span></span>
+<span class="giallo-l"><span>    return true;</span></span>
+<span class="giallo-l"><span>} else {</span></span>
+<span class="giallo-l"><span>    return false;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>This is some made up code, but in a CPU, every part of this could be in
 the "pipeline" at once.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>let mut x = 0                   &lt;&lt;-- at the head of the queue and &quot;further&quot; along completion
-</span><span>let mut y = 0                   &lt;&lt;-- it&#39;s executed part way, but not to completion
-</span><span>x = 15 * some_input;
-</span><span>y = 10 * other_input;           &lt;&lt;-- all of these are in pipeline, and partially complete
-</span><span>if x &gt; y {                      &lt;&lt;-- what happens here?
-</span><span>    return true;
-</span><span>} else {
-</span><span>    return false;
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>let mut x = 0                   &lt;&lt;-- at the head of the queue and &quot;further&quot; along completion</span></span>
+<span class="giallo-l"><span>let mut y = 0                   &lt;&lt;-- it&#39;s executed part way, but not to completion</span></span>
+<span class="giallo-l"><span>x = 15 * some_input;</span></span>
+<span class="giallo-l"><span>y = 10 * other_input;           &lt;&lt;-- all of these are in pipeline, and partially complete</span></span>
+<span class="giallo-l"><span>if x &gt; y {                      &lt;&lt;-- what happens here?</span></span>
+<span class="giallo-l"><span>    return true;</span></span>
+<span class="giallo-l"><span>} else {</span></span>
+<span class="giallo-l"><span>    return false;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>So how does this "pipeline" handle the if statement? If the pipeline
 is looking ahead, how can we handle a choice like an if? Can we really
 predict the future?</p>
@@ -158,7 +156,7 @@ from areas they are not allowed to access, breaking isolation.</p>
 <p>Since this has been found, a large amount of the community reaction has
 been about the "root cause". 'Clearly' the root cause is "Intel are
 bad at making CPU's" and so everyone should buy AMD instead because
-they "weren't affected quite as badly" (Narrators voice: <a href="https://www.zdnet.com/article/amd-processors-from-2011-to-2019-vulnerable-to-two-new-attacks/">They were
+they "weren't affected quite as badly" (Narrators voice: <a rel="external" href="https://www.zdnet.com/article/amd-processors-from-2011-to-2019-vulnerable-to-two-new-attacks/">They were
 absolutely just as
 bad</a>).
 We've had some intel CPU updates and kernel/program fixes so all good

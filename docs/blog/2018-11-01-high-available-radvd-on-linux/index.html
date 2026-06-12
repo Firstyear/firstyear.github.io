@@ -93,8 +93,7 @@ router advertisments still must continue for client renewals.</p>
 special RADVD configuration.</p>
 <p>Because of howe ipv6 routers work, all traffic (even global) is still
 sent to your link local router. We can use an address like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fe80::1:1
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>fe80::1:1</span></span></code></pre>
 <p>This doesn't clash with any reserved or special ipv6 addresses, and
 it's easy to remember. Because of how link local works, we can put this
 on many interfaces of the router (many vlans) with no conflict.</p>
@@ -104,30 +103,29 @@ on many interfaces of the router (many vlans) with no conflict.</p>
 documentation and sometimes uses some implementation specific language,
 but it works well for what it does.</p>
 <p>Our configuration looks like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>#  /etc/keepalived/keepalived.conf
-</span><span>global_defs {
-</span><span>  vrrp_version 3
-</span><span>}
-</span><span>
-</span><span>vrrp_sync_group G1 {
-</span><span> group {
-</span><span>   ipv6_ens256
-</span><span> }
-</span><span>}
-</span><span>
-</span><span>vrrp_instance ipv6_ens256 {
-</span><span>   interface ens256
-</span><span>   virtual_router_id 62
-</span><span>   priority 50
-</span><span>   advert_int 1.0
-</span><span>   virtual_ipaddress {
-</span><span>    fe80::1:1
-</span><span>    2001:db8::1
-</span><span>   }
-</span><span>   nopreempt
-</span><span>   garp_master_delay 1
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>#  /etc/keepalived/keepalived.conf</span></span>
+<span class="giallo-l"><span>global_defs {</span></span>
+<span class="giallo-l"><span>  vrrp_version 3</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>vrrp_sync_group G1 {</span></span>
+<span class="giallo-l"><span> group {</span></span>
+<span class="giallo-l"><span>   ipv6_ens256</span></span>
+<span class="giallo-l"><span> }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>vrrp_instance ipv6_ens256 {</span></span>
+<span class="giallo-l"><span>   interface ens256</span></span>
+<span class="giallo-l"><span>   virtual_router_id 62</span></span>
+<span class="giallo-l"><span>   priority 50</span></span>
+<span class="giallo-l"><span>   advert_int 1.0</span></span>
+<span class="giallo-l"><span>   virtual_ipaddress {</span></span>
+<span class="giallo-l"><span>    fe80::1:1</span></span>
+<span class="giallo-l"><span>    2001:db8::1</span></span>
+<span class="giallo-l"><span>   }</span></span>
+<span class="giallo-l"><span>   nopreempt</span></span>
+<span class="giallo-l"><span>   garp_master_delay 1</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>Note that we provide both a global address and an LL address for the
 failover. This is important for services and DNS for the router to have
 the global, but you could omit this. The LL address however is critical
@@ -142,30 +140,28 @@ required.</p>
 advertises for the router, rather than assuming the interface LL
 autoconf address is the address to advertise. The configuration appears
 as:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /etc/radvd.conf
-</span><span>interface ens256
-</span><span>{
-</span><span>    AdvSendAdvert on;
-</span><span>    MinRtrAdvInterval 30;
-</span><span>    MaxRtrAdvInterval 100;
-</span><span>    AdvRASrcAddress {
-</span><span>        fe80::1:1;
-</span><span>    };
-</span><span>    prefix 2001:db8::/64
-</span><span>    {
-</span><span>        AdvOnLink on;
-</span><span>        AdvAutonomous on;
-</span><span>        AdvRouterAddr off;
-</span><span>    };
-</span><span>};
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /etc/radvd.conf</span></span>
+<span class="giallo-l"><span>interface ens256</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    AdvSendAdvert on;</span></span>
+<span class="giallo-l"><span>    MinRtrAdvInterval 30;</span></span>
+<span class="giallo-l"><span>    MaxRtrAdvInterval 100;</span></span>
+<span class="giallo-l"><span>    AdvRASrcAddress {</span></span>
+<span class="giallo-l"><span>        fe80::1:1;</span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>    prefix 2001:db8::/64</span></span>
+<span class="giallo-l"><span>    {</span></span>
+<span class="giallo-l"><span>        AdvOnLink on;</span></span>
+<span class="giallo-l"><span>        AdvAutonomous on;</span></span>
+<span class="giallo-l"><span>        AdvRouterAddr off;</span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>};</span></span></code></pre>
 <p>Note the AdvRASrcAddress parameter? This defines a priority list of
 address to advertise that could be available on the interface.</p>
 <p>Now start up radvd on your two routers, and try failing over between
 them while you ping from your client. Remember to ping LL from a client
 you need something like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ping6 fe80::1:1%en1
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ping6 fe80::1:1%en1</span></span></code></pre>
 <p>Where the outgoing interface of your client traffic is denoted after the
 '%'.</p>
 <p>Happy failover routing!</p>

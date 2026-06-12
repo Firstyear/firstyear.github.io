@@ -89,39 +89,38 @@ around the syntax of these structures, very little existed explaining
 how to use them effectively.</p>
 <h2 id="what-s-in-an-ace">What's in an ACE?</h2>
 <p>If you look at the the ACL of an entry in AD you'll see something like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>O:DAG:DAD:AI
-</span><span>(A;CI;RPLCLORC;;;AN)
-</span><span>(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;SY)
-</span><span>(A;;RPWPCRCCDCLCLORCWOWDSW;;;DA)
-</span><span>(OA;;CCDC;bf967aba-0de6-11d0-a285-00aa003049e2;;AO)
-</span><span>(OA;;CCDC;bf967a9c-0de6-11d0-a285-00aa003049e2;;AO)
-</span><span>(OA;;CCDC;bf967aa8-0de6-11d0-a285-00aa003049e2;;PO)
-</span><span>(A;;RPLCLORC;;;AU)
-</span><span>(OA;;CCDC;4828cc14-1437-45bc-9b07-ad6f015e5f28;;AO)
-</span><span>(OA;CIIOID;RP;4c164200-20c0-11d0-a768-00aa006e0529;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)
-</span><span>(OA;CIIOID;RP;4c164200-20c0-11d0-a768-00aa006e0529;bf967aba-0de6-11d0-a285-00aa003049e2;RU)
-</span><span>(OA;CIIOID;RP;5f202010-79a5-11d0-9020-00c04fc2d4cf;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)
-</span><span>(OA;CIIOID;RP;5f202010-79a5-11d0-9020-00c04fc2d4cf;bf967aba-0de6-11d0-a285-00aa003049e2;RU)
-</span><span>(OA;CIIOID;RP;bc0ac240-79a9-11d0-9020-00c04fc2d4cf;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)
-</span><span>(OA;CIIOID;RP;bc0ac240-79a9-11d0-9020-00c04fc2d4cf;bf967aba-0de6-11d0-a285-00aa003049e2;RU)
-</span><span>(OA;CIIOID;RP;59ba2f42-79a2-11d0-9020-00c04fc2d3cf;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)
-</span><span>(OA;CIIOID;RP;59ba2f42-79a2-11d0-9020-00c04fc2d3cf;bf967aba-0de6-11d0-a285-00aa003049e2;RU)
-</span><span>(OA;CIIOID;RP;037088f8-0ae1-11d2-b422-00a0c968f939;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)
-</span><span>(OA;CIIOID;RP;037088f8-0ae1-11d2-b422-00a0c968f939;bf967aba-0de6-11d0-a285-00aa003049e2;RU)
-</span><span>(OA;CIIOID;RP;b7c69e6d-2cc7-11d2-854e-00a0c983f608;bf967a86-0de6-11d0-a285-00aa003049e2;ED)
-</span><span>(OA;CIIOID;RP;b7c69e6d-2cc7-11d2-854e-00a0c983f608;bf967a9c-0de6-11d0-a285-00aa003049e2;ED)
-</span><span>(OA;CIIOID;RP;b7c69e6d-2cc7-11d2-854e-00a0c983f608;bf967aba-0de6-11d0-a285-00aa003049e2;ED)
-</span><span>(OA;CIIOID;RPLCLORC;;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)
-</span><span>(OA;CIIOID;RPLCLORC;;bf967a9c-0de6-11d0-a285-00aa003049e2;RU)
-</span><span>(OA;CIIOID;RPLCLORC;;bf967aba-0de6-11d0-a285-00aa003049e2;RU)
-</span><span>(OA;CIID;RPWPCR;91e647de-d96f-4b70-9557-d63ff4f3ccd8;;PS)
-</span><span>(A;CIID;RPWPCRCCDCLCLORCWOWDSDDTSW;;;EA)
-</span><span>(A;CIID;LC;;;RU)
-</span><span>(A;CIID;RPWPCRCCLCLORCWOWDSDSW;;;BA)
-</span><span>S:AI
-</span><span>(OU;CIIOIDSA;WP;f30e3bbe-9ff0-11d1-b603-0000f80367c1;bf967aa5-0de6-11d0-a285-00aa003049e2;WD)
-</span><span>(OU;CIIOIDSA;WP;f30e3bbf-9ff0-11d1-b603-0000f80367c1;bf967aa5-0de6-11d0-a285-00aa003049e2;WD)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>O:DAG:DAD:AI</span></span>
+<span class="giallo-l"><span>(A;CI;RPLCLORC;;;AN)</span></span>
+<span class="giallo-l"><span>(A;;RPWPCRCCDCLCLORCWOWDSDDTSW;;;SY)</span></span>
+<span class="giallo-l"><span>(A;;RPWPCRCCDCLCLORCWOWDSW;;;DA)</span></span>
+<span class="giallo-l"><span>(OA;;CCDC;bf967aba-0de6-11d0-a285-00aa003049e2;;AO)</span></span>
+<span class="giallo-l"><span>(OA;;CCDC;bf967a9c-0de6-11d0-a285-00aa003049e2;;AO)</span></span>
+<span class="giallo-l"><span>(OA;;CCDC;bf967aa8-0de6-11d0-a285-00aa003049e2;;PO)</span></span>
+<span class="giallo-l"><span>(A;;RPLCLORC;;;AU)</span></span>
+<span class="giallo-l"><span>(OA;;CCDC;4828cc14-1437-45bc-9b07-ad6f015e5f28;;AO)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;4c164200-20c0-11d0-a768-00aa006e0529;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;4c164200-20c0-11d0-a768-00aa006e0529;bf967aba-0de6-11d0-a285-00aa003049e2;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;5f202010-79a5-11d0-9020-00c04fc2d4cf;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;5f202010-79a5-11d0-9020-00c04fc2d4cf;bf967aba-0de6-11d0-a285-00aa003049e2;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;bc0ac240-79a9-11d0-9020-00c04fc2d4cf;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;bc0ac240-79a9-11d0-9020-00c04fc2d4cf;bf967aba-0de6-11d0-a285-00aa003049e2;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;59ba2f42-79a2-11d0-9020-00c04fc2d3cf;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;59ba2f42-79a2-11d0-9020-00c04fc2d3cf;bf967aba-0de6-11d0-a285-00aa003049e2;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;037088f8-0ae1-11d2-b422-00a0c968f939;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;037088f8-0ae1-11d2-b422-00a0c968f939;bf967aba-0de6-11d0-a285-00aa003049e2;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;b7c69e6d-2cc7-11d2-854e-00a0c983f608;bf967a86-0de6-11d0-a285-00aa003049e2;ED)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;b7c69e6d-2cc7-11d2-854e-00a0c983f608;bf967a9c-0de6-11d0-a285-00aa003049e2;ED)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RP;b7c69e6d-2cc7-11d2-854e-00a0c983f608;bf967aba-0de6-11d0-a285-00aa003049e2;ED)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RPLCLORC;;4828cc14-1437-45bc-9b07-ad6f015e5f28;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RPLCLORC;;bf967a9c-0de6-11d0-a285-00aa003049e2;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIIOID;RPLCLORC;;bf967aba-0de6-11d0-a285-00aa003049e2;RU)</span></span>
+<span class="giallo-l"><span>(OA;CIID;RPWPCR;91e647de-d96f-4b70-9557-d63ff4f3ccd8;;PS)</span></span>
+<span class="giallo-l"><span>(A;CIID;RPWPCRCCDCLCLORCWOWDSDDTSW;;;EA)</span></span>
+<span class="giallo-l"><span>(A;CIID;LC;;;RU)</span></span>
+<span class="giallo-l"><span>(A;CIID;RPWPCRCCLCLORCWOWDSDSW;;;BA)</span></span>
+<span class="giallo-l"><span>S:AI</span></span>
+<span class="giallo-l"><span>(OU;CIIOIDSA;WP;f30e3bbe-9ff0-11d1-b603-0000f80367c1;bf967aa5-0de6-11d0-a285-00aa003049e2;WD)</span></span>
+<span class="giallo-l"><span>(OU;CIIOIDSA;WP;f30e3bbf-9ff0-11d1-b603-0000f80367c1;bf967aa5-0de6-11d0-a285-00aa003049e2;WD)</span></span></code></pre>
 <p>This seems very confusing and complex (and someone should write a tool
 to explain these ... maybe me). But once you can see the structure it
 starts to make sense.</p>
@@ -131,14 +130,13 @@ output after 'O:DAG:DAD:AI'. TODO: What does 'O:DAG:DAD:AI' mean
 completely?</p>
 <p>After that there are many ACEs defined in SDDL or ???. The structure is
 as follows:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>(type;flags;rights;object_guid;inherit_object_guid;sid(;attribute))
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>(type;flags;rights;object_guid;inherit_object_guid;sid(;attribute))</span></span></code></pre>
 <p>Each of these fields can take varies types. These interact to form the
 access control rules that allow or deny access. Thankfully, you don't
 need to adjust many fields to make useful ACE entries.</p>
-<p>MS maintains a document of these <a href="https://msdn.microsoft.com/en-us/library/aa374928(d=printer,v=vs.85).aspx">field values
+<p>MS maintains a document of these <a rel="external" href="https://msdn.microsoft.com/en-us/library/aa374928(d=printer,v=vs.85).aspx">field values
 here.</a></p>
-<p>They also maintain a list of wellknown <a href="https://msdn.microsoft.com/en-us/library/aa379602(d=printer,v=vs.85).aspx">SID values
+<p>They also maintain a list of wellknown <a rel="external" href="https://msdn.microsoft.com/en-us/library/aa379602(d=printer,v=vs.85).aspx">SID values
 here</a></p>
 <p>I want to cover some common values you may see though:</p>
 <h2 id="type">type</h2>

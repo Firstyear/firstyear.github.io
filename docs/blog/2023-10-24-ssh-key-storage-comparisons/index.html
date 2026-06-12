@@ -95,7 +95,7 @@ methods.</p>
 <p>Of course, just using cryptographic authentication isn't free. While we no longer have the risks
 of passwords, the threats that exist against cryptographic keys are quite different. This means
 we now need to ensure that we follow and keep up to date with developments in crytpgraphy.</p>
-<p>There are many sites that can assist with key requirements such as <a href="https://www.keylength.com">keylength.com</a>.
+<p>There are many sites that can assist with key requirements such as <a rel="external" href="https://www.keylength.com">keylength.com</a>.
 The following table was generated on 2023-09-25 with the year set to 2030 (meaning these key sizes values are
 <em>predicted</em> to be safe until 2030).</p>
 <blockquote>
@@ -206,28 +206,22 @@ sk keys can fufil. While it's nice to trust our users, strictly enforced require
 when it comes to security.</p>
 <h2 id="things-not-to-do">Things Not To Do</h2>
 <h3 id="sshfp-dns-records">SSHFP DNS Records</h3>
-<p>Using SSHFP DNS records is insecure. This is because even if you have DNSSEC, it <a href="https://sockpuppet.org/blog/2015/01/15/against-dnssec/">does nothing to protect you.</a></p>
+<p>Using SSHFP DNS records is insecure. This is because even if you have DNSSEC, it <a rel="external" href="https://sockpuppet.org/blog/2015/01/15/against-dnssec/">does nothing to protect you.</a></p>
 <p>This approaches leaves you open to MITM attacks which is effectively a path to remote unauthorised access.</p>
 <h3 id="ssh-key-distribution-with-ldap-starttls">SSH Key Distribution with LDAP StartTLS</h3>
 <p>When distributing keys with LDAP, you must always use LDAPS. This is because <a href="/2021/08/12/starttls_in_ldap.html">LDAP with StartTLS is insecure.</a></p>
 <h2 id="ssh-key-creation-reference">SSH Key Creation Reference</h2>
 <h3 id="files-on-disk-1">Files on Disk</h3>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -t [rsa | ecdsa | ed25519] -b &lt;bits&gt;
-</span><span>ssh-keygen -t ed25519
-</span><span>ssh-keygen -t ecdsa -b 512
-</span><span>ssh-keygen -t rsa -b 3072
-</span></code></pre>
-<h3 id="security-keys-basic">Security Keys (Basic)</h3>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -t [ecdsa-sk | ed25519-sk]
-</span><span>ssh-keygen -t ecdsa-sk
-</span><span>// Note: Not all keys support ed25519
-</span><span>ssh-keygen -t ed25519-sk
-</span></code></pre>
-<h3 id="security-keys-user-verified">Security Keys (User Verified)</h3>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -t [ecdsa-sk | ed25519-sk] -O verify-required
-</span><span>ssh-keygen -t ecdsa-sk -O verify-required
-</span></code></pre>
-<h3 id="certificate-authority">Certificate Authority</h3>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh-keygen -t [rsa | ecdsa | ed25519] -b &lt;bits&gt;</span></span>
+<span class="giallo-l"><span>ssh-keygen -t ed25519</span></span>
+<span class="giallo-l"><span>ssh-keygen -t ecdsa -b 512</span></span>
+<span class="giallo-l"><span>ssh-keygen -t rsa -b 3072</span></span></code></pre><h3 id="security-keys-basic">Security Keys (Basic)</h3>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh-keygen -t [ecdsa-sk | ed25519-sk]</span></span>
+<span class="giallo-l"><span>ssh-keygen -t ecdsa-sk</span></span>
+<span class="giallo-l"><span>// Note: Not all keys support ed25519</span></span>
+<span class="giallo-l"><span>ssh-keygen -t ed25519-sk</span></span></code></pre><h3 id="security-keys-user-verified">Security Keys (User Verified)</h3>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh-keygen -t [ecdsa-sk | ed25519-sk] -O verify-required</span></span>
+<span class="giallo-l"><span>ssh-keygen -t ecdsa-sk -O verify-required</span></span></code></pre><h3 id="certificate-authority">Certificate Authority</h3>
 
     </div>
 </article>

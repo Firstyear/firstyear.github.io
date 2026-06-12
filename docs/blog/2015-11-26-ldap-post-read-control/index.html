@@ -89,22 +89,21 @@ post read control so that after the add/mod/modrdn is complete, we can
 immediately check the result of usn atomically. This lets us compare
 entryusn to know if the object has changed or not.</p>
 <p>To use in python:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt;&gt;&gt; conn.modify_ext( &#39;cn=Directory Administrators,dc=example,dc=com&#39;,
-</span><span>      ldap.modlist.modifyModlist({}, {&#39;description&#39; : [&#39;oeusoeutlnsoe&#39;] } ),
-</span><span>     [PostReadControl(criticality=True,attrList=[&#39;nsUniqueId&#39;])]  
-</span><span>     ) 
-</span><span>6
-</span><span>&gt;&gt;&gt; _,_,_,resp_ctrls = conn.result3(6)
-</span><span>&gt;&gt;&gt; resp_ctrls
-</span><span>[&lt;ldap.controls.readentry.PostReadControl instance at 0x2389cf8&gt;]
-</span><span>&gt;&gt;&gt; resp_ctrls[0].dn
-</span><span>&#39;cn=Directory Administrators,dc=example,dc=com&#39;
-</span><span>&gt;&gt;&gt; resp_ctrls[0].entry
-</span><span>{&#39;nsUniqueId&#39;: [&#39;826cc526-8caf11e5-93ba8a51-c5ee9f85&#39;]}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt;&gt;&gt; conn.modify_ext( &#39;cn=Directory Administrators,dc=example,dc=com&#39;,</span></span>
+<span class="giallo-l"><span>      ldap.modlist.modifyModlist({}, {&#39;description&#39; : [&#39;oeusoeutlnsoe&#39;] } ),</span></span>
+<span class="giallo-l"><span>     [PostReadControl(criticality=True,attrList=[&#39;nsUniqueId&#39;])]  </span></span>
+<span class="giallo-l"><span>     ) </span></span>
+<span class="giallo-l"><span>6</span></span>
+<span class="giallo-l"><span>&gt;&gt;&gt; _,_,_,resp_ctrls = conn.result3(6)</span></span>
+<span class="giallo-l"><span>&gt;&gt;&gt; resp_ctrls</span></span>
+<span class="giallo-l"><span>[&lt;ldap.controls.readentry.PostReadControl instance at 0x2389cf8&gt;]</span></span>
+<span class="giallo-l"><span>&gt;&gt;&gt; resp_ctrls[0].dn</span></span>
+<span class="giallo-l"><span>&#39;cn=Directory Administrators,dc=example,dc=com&#39;</span></span>
+<span class="giallo-l"><span>&gt;&gt;&gt; resp_ctrls[0].entry</span></span>
+<span class="giallo-l"><span>{&#39;nsUniqueId&#39;: [&#39;826cc526-8caf11e5-93ba8a51-c5ee9f85&#39;]}</span></span></code></pre>
 <p>See also,
-<a href="http://www.python-ldap.org/doc/html/ldap-controls.html">PostRead</a> and
-<a href="http://www.python-ldap.org/doc/html/ldap.html">python-ldap</a>.</p>
+<a rel="external" href="http://www.python-ldap.org/doc/html/ldap-controls.html">PostRead</a> and
+<a rel="external" href="http://www.python-ldap.org/doc/html/ldap.html">python-ldap</a>.</p>
 
     </div>
 </article>

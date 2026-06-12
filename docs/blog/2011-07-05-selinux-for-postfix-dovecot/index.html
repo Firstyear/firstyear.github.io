@@ -92,51 +92,48 @@ to go with postfix + dovecot for the doctors needs.</p>
 enabled. However, SELinux has decided to hate on everything I do for
 this, and thus in my inability to accept defeat, I have created an
 SELinux module that should allow postfix and dovecot to work as per
-following <a href="http://www.1a-centosserver.com/centos_linux_mail_server/centos_mail_server.php">this email setup
+following <a rel="external" href="http://www.1a-centosserver.com/centos_linux_mail_server/centos_mail_server.php">this email setup
 guide</a>.</p>
 <p>the module is</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>module postfixmysql 1.0;
-</span><span>
-</span><span>require {
-</span><span>    type mysqld_var_run_t;
-</span><span>    type postfix_map_t;
-</span><span>    type usr_t;
-</span><span>    type mysqld_t;
-</span><span>    type mysqld_db_t;
-</span><span>    type postfix_virtual_t;
-</span><span>    type postfix_smtpd_t;
-</span><span>    type postfix_cleanup_t;
-</span><span>    class sock_file write;
-</span><span>    class unix_stream_socket connectto;
-</span><span>    class file getattr;
-</span><span>    class dir search;
-</span><span>}
-</span><span>
-</span><span>#============= postfix_cleanup_t ==============
-</span><span>allow postfix_cleanup_t mysqld_db_t:dir search;
-</span><span>allow postfix_cleanup_t mysqld_t:unix_stream_socket connectto;
-</span><span>allow postfix_cleanup_t mysqld_var_run_t:sock_file write;
-</span><span>allow postfix_cleanup_t usr_t:file getattr;
-</span><span>
-</span><span>#============= postfix_map_t ==============
-</span><span>allow postfix_map_t mysqld_db_t:dir search;
-</span><span>allow postfix_map_t mysqld_t:unix_stream_socket connectto;
-</span><span>allow postfix_map_t mysqld_var_run_t:sock_file write;
-</span><span>
-</span><span>#============= postfix_smtpd_t ==============
-</span><span>allow postfix_smtpd_t mysqld_db_t:dir search;
-</span><span>allow postfix_smtpd_t mysqld_t:unix_stream_socket connectto;
-</span><span>allow postfix_smtpd_t mysqld_var_run_t:sock_file write;
-</span><span>
-</span><span>#============= postfix_virtual_t ==============
-</span><span>allow postfix_virtual_t mysqld_db_t:dir search;
-</span><span>allow postfix_virtual_t mysqld_t:unix_stream_socket connectto;
-</span><span>allow postfix_virtual_t mysqld_var_run_t:sock_file write;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>module postfixmysql 1.0;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>require {</span></span>
+<span class="giallo-l"><span>    type mysqld_var_run_t;</span></span>
+<span class="giallo-l"><span>    type postfix_map_t;</span></span>
+<span class="giallo-l"><span>    type usr_t;</span></span>
+<span class="giallo-l"><span>    type mysqld_t;</span></span>
+<span class="giallo-l"><span>    type mysqld_db_t;</span></span>
+<span class="giallo-l"><span>    type postfix_virtual_t;</span></span>
+<span class="giallo-l"><span>    type postfix_smtpd_t;</span></span>
+<span class="giallo-l"><span>    type postfix_cleanup_t;</span></span>
+<span class="giallo-l"><span>    class sock_file write;</span></span>
+<span class="giallo-l"><span>    class unix_stream_socket connectto;</span></span>
+<span class="giallo-l"><span>    class file getattr;</span></span>
+<span class="giallo-l"><span>    class dir search;</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#============= postfix_cleanup_t ==============</span></span>
+<span class="giallo-l"><span>allow postfix_cleanup_t mysqld_db_t:dir search;</span></span>
+<span class="giallo-l"><span>allow postfix_cleanup_t mysqld_t:unix_stream_socket connectto;</span></span>
+<span class="giallo-l"><span>allow postfix_cleanup_t mysqld_var_run_t:sock_file write;</span></span>
+<span class="giallo-l"><span>allow postfix_cleanup_t usr_t:file getattr;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#============= postfix_map_t ==============</span></span>
+<span class="giallo-l"><span>allow postfix_map_t mysqld_db_t:dir search;</span></span>
+<span class="giallo-l"><span>allow postfix_map_t mysqld_t:unix_stream_socket connectto;</span></span>
+<span class="giallo-l"><span>allow postfix_map_t mysqld_var_run_t:sock_file write;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#============= postfix_smtpd_t ==============</span></span>
+<span class="giallo-l"><span>allow postfix_smtpd_t mysqld_db_t:dir search;</span></span>
+<span class="giallo-l"><span>allow postfix_smtpd_t mysqld_t:unix_stream_socket connectto;</span></span>
+<span class="giallo-l"><span>allow postfix_smtpd_t mysqld_var_run_t:sock_file write;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#============= postfix_virtual_t ==============</span></span>
+<span class="giallo-l"><span>allow postfix_virtual_t mysqld_db_t:dir search;</span></span>
+<span class="giallo-l"><span>allow postfix_virtual_t mysqld_t:unix_stream_socket connectto;</span></span>
+<span class="giallo-l"><span>allow postfix_virtual_t mysqld_var_run_t:sock_file write;</span></span></code></pre>
 <p>This can be built and installed with a command like such (as root)</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>checkmodule -M -m -o postfixmysql.mod postfixmysql.te; semodule_package -m postfixmysql.mod -o postfixmysql.pp; semodule -i postfixmysql.pp 
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>checkmodule -M -m -o postfixmysql.mod postfixmysql.te; semodule_package -m postfixmysql.mod -o postfixmysql.pp; semodule -i postfixmysql.pp </span></span></code></pre>
     </div>
 </article>
 

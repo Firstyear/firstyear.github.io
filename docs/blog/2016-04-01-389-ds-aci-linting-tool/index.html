@@ -91,92 +91,90 @@ how to correct them.</p>
 <p>This will be in a release of lib389 in the future. For now, it's under
 review and hopefully will be accepted soon!</p>
 <p>Here is sample output below.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>-------------------------------------------------------------------------------
-</span><span>Directory Server Aci Lint Error: DSALE0001
-</span><span>Severity: HIGH
-</span><span>
-</span><span>Affected Acis:
-</span><span>(targetattr!=&quot;userPassword&quot;)(version 3.0; acl &quot;Enable anonymous access&quot;; allow (read, search, compare) userdn=&quot;ldap:///anyone&quot;;)
-</span><span>(targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>(targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>(targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>(targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>
-</span><span>Details: 
-</span><span>An aci of the form &quot;(targetAttr!=&quot;attr&quot;)&quot; exists on your system. This aci
-</span><span>will internally be expanded to mean &quot;all possible attributes including system,
-</span><span>excluding the listed attributes&quot;.
-</span><span>
-</span><span>This may allow access to a bound user or anonymous to read more data about
-</span><span>directory internals, including aci state or user limits. In the case of write 
-</span><span>acis it may allow a dn to set their own resource limits, unlock passwords or
-</span><span>their own aci.
-</span><span>
-</span><span>The ability to change the aci on the object may lead to privilege escalation in
-</span><span>some cases.
-</span><span>
-</span><span>
-</span><span>Advice: 
-</span><span>Convert the aci to the form &quot;(targetAttr=&quot;x || y || z&quot;)&quot;.
-</span><span>
-</span><span>-------------------------------------------------------------------------------
-</span><span>Directory Server Aci Lint Error: DSALE0002
-</span><span>Severity: HIGH
-</span><span>
-</span><span>Affected Acis:
-</span><span>ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>
-</span><span>ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>
-</span><span>ou=People,dc=example,dc=com (targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>
-</span><span>ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)
-</span><span>
-</span><span>
-</span><span>Details: 
-</span><span>Acis on your system exist which are both not equals targetattr, and overlap in
-</span><span>scope.
-</span><span>
-</span><span>The way that directory server processes these, is to invert them to to white
-</span><span>lists, then union the results.
-</span><span>
-</span><span>As a result, these acis *may* allow access to the attributes you want them to
-</span><span>exclude.
-</span><span>
-</span><span>Consider:
-</span><span>
-</span><span>aci: (targetattr !=&quot;cn&quot;)(version 3.0;acl &quot;Self write all but cn&quot;;allow (write)
-</span><span>    (userdn = &quot;ldap:///self&quot;);)
-</span><span>aci: (targetattr !=&quot;sn&quot;)(version 3.0;acl &quot;Self write all but sn&quot;;allow (write)
-</span><span>    (userdn = &quot;ldap:///self&quot;);)
-</span><span>
-</span><span>This combination allows self write to *all* attributes within the subtree.
-</span><span>
-</span><span>In cases where the target is members of a group, it may allow a member who is
-</span><span>within two groups to have elevated privilege.
-</span><span>
-</span><span>
-</span><span>Advice: 
-</span><span>Convert the aci to the form &quot;(targetAttr=&quot;x || y || z&quot;)&quot;.
-</span><span>
-</span><span>Prevent the acis from overlapping, and have them on unique subtrees.
-</span><span>
-</span><span>-------------------------------------------------------------------------------
-</span><span>FAIL
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>-------------------------------------------------------------------------------</span></span>
+<span class="giallo-l"><span>Directory Server Aci Lint Error: DSALE0001</span></span>
+<span class="giallo-l"><span>Severity: HIGH</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Affected Acis:</span></span>
+<span class="giallo-l"><span>(targetattr!=&quot;userPassword&quot;)(version 3.0; acl &quot;Enable anonymous access&quot;; allow (read, search, compare) userdn=&quot;ldap:///anyone&quot;;)</span></span>
+<span class="giallo-l"><span>(targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>(targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>(targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>(targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Details: </span></span>
+<span class="giallo-l"><span>An aci of the form &quot;(targetAttr!=&quot;attr&quot;)&quot; exists on your system. This aci</span></span>
+<span class="giallo-l"><span>will internally be expanded to mean &quot;all possible attributes including system,</span></span>
+<span class="giallo-l"><span>excluding the listed attributes&quot;.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>This may allow access to a bound user or anonymous to read more data about</span></span>
+<span class="giallo-l"><span>directory internals, including aci state or user limits. In the case of write </span></span>
+<span class="giallo-l"><span>acis it may allow a dn to set their own resource limits, unlock passwords or</span></span>
+<span class="giallo-l"><span>their own aci.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>The ability to change the aci on the object may lead to privilege escalation in</span></span>
+<span class="giallo-l"><span>some cases.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Advice: </span></span>
+<span class="giallo-l"><span>Convert the aci to the form &quot;(targetAttr=&quot;x || y || z&quot;)&quot;.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>-------------------------------------------------------------------------------</span></span>
+<span class="giallo-l"><span>Directory Server Aci Lint Error: DSALE0002</span></span>
+<span class="giallo-l"><span>Severity: HIGH</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Affected Acis:</span></span>
+<span class="giallo-l"><span>ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>ou=People,dc=example,dc=com (targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Product Development)&quot;)(version 3.0;acl &quot;Engineering Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=PD Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Accounting)&quot;)(version 3.0;acl &quot;Accounting Managers Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=Accounting Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn || sn || uid&quot;)(targetfilter =&quot;(ou=Human Resources)&quot;)(version 3.0;acl &quot;HR Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=HR Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"><span>|- ou=People,dc=example,dc=com (targetattr !=&quot;cn ||sn || uid&quot;)(targetfilter =&quot;(ou=Product Testing)&quot;)(version 3.0;acl &quot;QA Group Permissions&quot;;allow (write)(groupdn = &quot;ldap:///cn=QA Managers,ou=groups,dc=example,dc=com&quot;);)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Details: </span></span>
+<span class="giallo-l"><span>Acis on your system exist which are both not equals targetattr, and overlap in</span></span>
+<span class="giallo-l"><span>scope.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>The way that directory server processes these, is to invert them to to white</span></span>
+<span class="giallo-l"><span>lists, then union the results.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>As a result, these acis *may* allow access to the attributes you want them to</span></span>
+<span class="giallo-l"><span>exclude.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Consider:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>aci: (targetattr !=&quot;cn&quot;)(version 3.0;acl &quot;Self write all but cn&quot;;allow (write)</span></span>
+<span class="giallo-l"><span>    (userdn = &quot;ldap:///self&quot;);)</span></span>
+<span class="giallo-l"><span>aci: (targetattr !=&quot;sn&quot;)(version 3.0;acl &quot;Self write all but sn&quot;;allow (write)</span></span>
+<span class="giallo-l"><span>    (userdn = &quot;ldap:///self&quot;);)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>This combination allows self write to *all* attributes within the subtree.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>In cases where the target is members of a group, it may allow a member who is</span></span>
+<span class="giallo-l"><span>within two groups to have elevated privilege.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Advice: </span></span>
+<span class="giallo-l"><span>Convert the aci to the form &quot;(targetAttr=&quot;x || y || z&quot;)&quot;.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Prevent the acis from overlapping, and have them on unique subtrees.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>-------------------------------------------------------------------------------</span></span>
+<span class="giallo-l"><span>FAIL</span></span></code></pre>
     </div>
 </article>
 

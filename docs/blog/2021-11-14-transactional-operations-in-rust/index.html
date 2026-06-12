@@ -82,59 +82,55 @@
     </div>
     <div itemprop="articleBody">
         <h1 id="transactional-operations-in-rust">Transactional Operations in Rust</h1>
-<p>Earlier I was chatting to Yoshua, the author of this <a href="https://blog.yoshuawuyts.com/async-cancellation-1/">async
+<p>Earlier I was chatting to Yoshua, the author of this <a rel="external" href="https://blog.yoshuawuyts.com/async-cancellation-1/">async
 cancellation</a> blog
 about the section on halt-safety. The blog is a great read so I highly
 recommend it! The section on halt-safety is bang on correct too, but I
 wanted to expand on this topic further from what they have written.</p>
 <h2 id="memory-safety-vs-application-safety">Memory Safety vs Application Safety</h2>
 <p>Yoshua provides the following code example in their blog:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>// Regardless of where in the function we stop execution, destructors will be
-</span><span>// run and resources will be cleaned up.
-</span><span>async fn do_something(path: PathBuf) -&gt; io::Result&lt;Output&gt; {
-</span><span>                                        // 1. the future is not guaranteed to progress after instantiation
-</span><span>    let file = fs::open(&amp;path).await?;  // 2. `.await` and 3. `?` can cause the function to halt
-</span><span>    let res = parse(file).await;        // 4. `.await` can the function to halt
-</span><span>    res                                 // 5. execution has finished, return a value
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>// Regardless of where in the function we stop execution, destructors will be</span></span>
+<span class="giallo-l"><span>// run and resources will be cleaned up.</span></span>
+<span class="giallo-l"><span>async fn do_something(path: PathBuf) -&gt; io::Result&lt;Output&gt; {</span></span>
+<span class="giallo-l"><span>                                        // 1. the future is not guaranteed to progress after instantiation</span></span>
+<span class="giallo-l"><span>    let file = fs::open(&amp;path).await?;  // 2. `.await` and 3. `?` can cause the function to halt</span></span>
+<span class="giallo-l"><span>    let res = parse(file).await;        // 4. `.await` can the function to halt</span></span>
+<span class="giallo-l"><span>    res                                 // 5. execution has finished, return a value</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>In the example, we can see that at each await point the async behaviour
 could cause the function to return. This would be similar to the
 non-async code of:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fn do_something(path: PathBuf) -&gt; io::Result&lt;Output&gt; {
-</span><span>    let file = fs::open(&amp;path)?;  // 1. `?` will return an Err if present
-</span><span>    let res = parse(file);        //
-</span><span>    res                           // 2. res may be an Err at this point.
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>fn do_something(path: PathBuf) -&gt; io::Result&lt;Output&gt; {</span></span>
+<span class="giallo-l"><span>    let file = fs::open(&amp;path)?;  // 1. `?` will return an Err if present</span></span>
+<span class="giallo-l"><span>    let res = parse(file);        //</span></span>
+<span class="giallo-l"><span>    res                           // 2. res may be an Err at this point.</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>In this example we can see that both cancelation <em>or</em> and Err condition
 could both cause our function to return, regardless of async or not. In
 this example, since there are no side-effects, it's not a big deal, but
 let's consider a different example that does have side-effects:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fn do_something(path: PathBuf, files_read_counter: &amp;Mutex&lt;u64&gt;) -&gt; io::Result&lt;Output&gt; {
-</span><span>    let mut guard = files_read_counter.lock();
-</span><span>    let file = fs::open(&amp;path)?;  // 1. `?` will return an Err if present
-</span><span>    guard += 1;                   //
-</span><span>    let res = parse(file);        //
-</span><span>    res                           // 2. res may be an Err at this point.
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>fn do_something(path: PathBuf, files_read_counter: &amp;Mutex&lt;u64&gt;) -&gt; io::Result&lt;Output&gt; {</span></span>
+<span class="giallo-l"><span>    let mut guard = files_read_counter.lock();</span></span>
+<span class="giallo-l"><span>    let file = fs::open(&amp;path)?;  // 1. `?` will return an Err if present</span></span>
+<span class="giallo-l"><span>    guard += 1;                   //</span></span>
+<span class="giallo-l"><span>    let res = parse(file);        //</span></span>
+<span class="giallo-l"><span>    res                           // 2. res may be an Err at this point.</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>This is a nonsensical example, but it illustrates the point. The files
 read is incremented <em>before</em> we know that the success occured. Even
 though this is memory safe, it's created an inconsistent data point
 that is not reflective of the true state. It's trivial to resolve when
 we look at this (relocation of the guard increment), but in a larger
 example it may not be as easy:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>// This is more psuedo rust vs actual rust for simplicities sake.
-</span><span>fn do_something(...) -&gt; Result&lt;..., ...&gt; {
-</span><span>    let mut guard = map.lock();
-</span><span>    guard
-</span><span>        .values_mut()
-</span><span>        .try_for_each(|(k, v)| {
-</span><span>            v.update(...)
-</span><span>        })
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>// This is more psuedo rust vs actual rust for simplicities sake.</span></span>
+<span class="giallo-l"><span>fn do_something(...) -&gt; Result&lt;..., ...&gt; {</span></span>
+<span class="giallo-l"><span>    let mut guard = map.lock();</span></span>
+<span class="giallo-l"><span>    guard</span></span>
+<span class="giallo-l"><span>        .values_mut()</span></span>
+<span class="giallo-l"><span>        .try_for_each(|(k, v)| {</span></span>
+<span class="giallo-l"><span>            v.update(...)</span></span>
+<span class="giallo-l"><span>        })</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>In our example we have a fallible value update function, which is inside
 our locked datastructure. It would be very simple to see a situation
 where while updating some values, an error is encountered somewhere into
@@ -178,28 +174,27 @@ maintained.</p>
 <p>An approach that can be used is software transactional memory. There are
 multiple ways to structure this, but copy-on-write is a common technique
 to achieve this. An example of a copy-on-write cell type is in
-<a href="https://crates.io/crates/concread">concread</a>. This type allows for ACI
+<a rel="external" href="https://crates.io/crates/concread">concread</a>. This type allows for ACI
 (but not D) compliance.</p>
 <p>Due to the design of this type, we can seperate functions that are
 acquiring the guard (operations) and the functions that comprise that
 operation as they are a passed a transaction that is in progress. For
 example:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>// This is more psuedo rust vs actual rust for simplicities sake.
-</span><span>fn update_map(write_txn: &amp;mut WriteTxn&lt;Map&lt;..., ...&gt;&gt;) -&gt; Result&lt;..., ...&gt; {
-</span><span>    write_txn
-</span><span>        .values_mut()
-</span><span>        .try_for_each(|(k, v)| {
-</span><span>            v.update(...)
-</span><span>        })
-</span><span>}
-</span><span>
-</span><span>fn do_something(...) -&gt; Result&lt;..., ...&gt; {
-</span><span>    let write_txn = data.write();
-</span><span>    let res = update_map(write_txn)?;
-</span><span>    write_txn.commit();
-</span><span>    Ok(res)
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>// This is more psuedo rust vs actual rust for simplicities sake.</span></span>
+<span class="giallo-l"><span>fn update_map(write_txn: &amp;mut WriteTxn&lt;Map&lt;..., ...&gt;&gt;) -&gt; Result&lt;..., ...&gt; {</span></span>
+<span class="giallo-l"><span>    write_txn</span></span>
+<span class="giallo-l"><span>        .values_mut()</span></span>
+<span class="giallo-l"><span>        .try_for_each(|(k, v)| {</span></span>
+<span class="giallo-l"><span>            v.update(...)</span></span>
+<span class="giallo-l"><span>        })</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn do_something(...) -&gt; Result&lt;..., ...&gt; {</span></span>
+<span class="giallo-l"><span>    let write_txn = data.write();</span></span>
+<span class="giallo-l"><span>    let res = update_map(write_txn)?;</span></span>
+<span class="giallo-l"><span>    write_txn.commit();</span></span>
+<span class="giallo-l"><span>    Ok(res)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>Here we can already see a difference in our approach. We know that for
 update_map to be called we must be within a transaction - we can not
 "hold it wrong", and the compiler checks this for us. We can also see
@@ -222,11 +217,11 @@ on to allow the creation of a manager that can allow arbitary structures
 of multiple datatypes to be protected under a single transaction
 manager, however this work is extremely [unsafe]{.title-ref} though due
 to the potential for memory safety violations with incorrect
-construction of the structures. For more details see the <a href="https://docs.rs/concread/0.2.19/concread/internals/index.html">concread
+construction of the structures. For more details see the <a rel="external" href="https://docs.rs/concread/0.2.19/concread/internals/index.html">concread
 internals</a>
-, <a href="https://docs.rs/concread/0.2.19/concread/internals/lincowcell/trait.LinCowCellCapable.html">concread linear
+, <a rel="external" href="https://docs.rs/concread/0.2.19/concread/internals/lincowcell/trait.LinCowCellCapable.html">concread linear
 cowcell</a>
-and, <a href="https://github.com/kanidm/concread/blob/master/src/internals/bptree/cursor.rs#L76">concread impl
+and, <a rel="external" href="https://github.com/kanidm/concread/blob/master/src/internals/bptree/cursor.rs#L76">concread impl
 lincowcell</a></p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Within async and sync programming, we can have cancellations or errors

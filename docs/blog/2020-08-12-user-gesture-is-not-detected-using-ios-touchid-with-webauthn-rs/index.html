@@ -83,7 +83,7 @@
     <div itemprop="articleBody">
         <h1 id="user-gesture-is-not-detected-using-ios-touchid-with-webauthn-rs">User gesture is not detected - using iOS TouchID with webauthn-rs</h1>
 <p>I was recently contacted by a future user of
-<a href="https://github.com/kanidm/webauthn-rs">webauthn-rs</a> who indicated that
+<a rel="external" href="https://github.com/kanidm/webauthn-rs">webauthn-rs</a> who indicated that
 the library may not currently support Windows Hello as an authenticator.
 This is due to the nature of the device being a platform attached
 authenticator and that webauthn-rs at the time did not support
@@ -92,41 +92,39 @@ attachment preferences.</p>
 upgrade to iPadOS 14 beta to try out webauthn via touch (and handwriting
 support).</p>
 <h2 id="the-issue">The Issue</h2>
-<p>After watching <a href="https://developer.apple.com/videos/play/wwdc2020/10670/">Jiewen's WWDC
+<p>After watching <a rel="external" href="https://developer.apple.com/videos/play/wwdc2020/10670/">Jiewen's WWDC
 presentation</a>
 about using TouchID with webauthn, I had a better idea about some of the
 server side requirements to work with this.</p>
 <p>Once I started to test though, I would recieve the following error in
 the safari debug console.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>User gesture is not detected. To use the platform authenticator,
-</span><span>call &#39;navigator.credentials.create&#39; within user activated events.
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>User gesture is not detected. To use the platform authenticator,</span></span>
+<span class="giallo-l"><span>call &#39;navigator.credentials.create&#39; within user activated events.</span></span></code></pre>
 <p>I was quite confused by this error - a user activated event seems to be
 a bit of an unknown term, and asking other people they also didn't
 quite know what it meant. My demo site was using a button input with
 onclick event handlers to call javascript similar to the following:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>function register() {
-</span><span>fetch(REG_CHALLENGE_URL + username, {method: &quot;POST&quot;})
-</span><span>   .then(res =&gt; {
-</span><span>      ... // error handling
-</span><span>   })
-</span><span>   .then(res =&gt; res.json())
-</span><span>   .then(challenge =&gt; {
-</span><span>     challenge.publicKey.challenge = fromBase64(challenge.publicKey.challenge);
-</span><span>     challenge.publicKey.user.id = fromBase64(challenge.publicKey.user.id);
-</span><span>     return navigator.credentials.create(challenge)
-</span><span>       .then(newCredential =&gt; {
-</span><span>         console.log(&quot;PublicKeyCredential Created&quot;);
-</span><span>              .... 
-</span><span>         return fetch(REGISTER_URL + username, {
-</span><span>           method: &quot;POST&quot;,
-</span><span>           body: JSON.stringify(cc),
-</span><span>           headers: {
-</span><span>             &quot;Content-Type&quot;: &quot;application/json&quot;,
-</span><span>           },
-</span><span>         })
-</span><span>       })
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>function register() {</span></span>
+<span class="giallo-l"><span>fetch(REG_CHALLENGE_URL + username, {method: &quot;POST&quot;})</span></span>
+<span class="giallo-l"><span>   .then(res =&gt; {</span></span>
+<span class="giallo-l"><span>      ... // error handling</span></span>
+<span class="giallo-l"><span>   })</span></span>
+<span class="giallo-l"><span>   .then(res =&gt; res.json())</span></span>
+<span class="giallo-l"><span>   .then(challenge =&gt; {</span></span>
+<span class="giallo-l"><span>     challenge.publicKey.challenge = fromBase64(challenge.publicKey.challenge);</span></span>
+<span class="giallo-l"><span>     challenge.publicKey.user.id = fromBase64(challenge.publicKey.user.id);</span></span>
+<span class="giallo-l"><span>     return navigator.credentials.create(challenge)</span></span>
+<span class="giallo-l"><span>       .then(newCredential =&gt; {</span></span>
+<span class="giallo-l"><span>         console.log(&quot;PublicKeyCredential Created&quot;);</span></span>
+<span class="giallo-l"><span>              .... </span></span>
+<span class="giallo-l"><span>         return fetch(REGISTER_URL + username, {</span></span>
+<span class="giallo-l"><span>           method: &quot;POST&quot;,</span></span>
+<span class="giallo-l"><span>           body: JSON.stringify(cc),</span></span>
+<span class="giallo-l"><span>           headers: {</span></span>
+<span class="giallo-l"><span>             &quot;Content-Type&quot;: &quot;application/json&quot;,</span></span>
+<span class="giallo-l"><span>           },</span></span>
+<span class="giallo-l"><span>         })</span></span>
+<span class="giallo-l"><span>       })</span></span></code></pre>
 <p>This works happily in Firefox and Chrome, and for iPadOS it event works
 with my yubikey 5ci.</p>
 <p>I investigated further to determine if the issue was in the way I was
@@ -149,7 +147,7 @@ async boundary to the fetch API. (note: it's quite reasonable to expect
 user interaction to use [navigator.credentials]{.title-ref} to prevent
 tricking or manipulating users into activating their webauthn devices).</p>
 <p>I emailed Jiewen, who responded overnight and informed me that this is
-an issue, and it's being tracked in the <a href="https://bugs.webkit.org/show_bug.cgi?id=214722">webkit
+an issue, and it's being tracked in the <a rel="external" href="https://bugs.webkit.org/show_bug.cgi?id=214722">webkit
 bugzilla</a> . He assures
 me that it will be resolved in a future release. Many thanks to him for
 helping me with this issue!</p>
@@ -160,9 +158,8 @@ can submit some updates to the library to help support this.</p>
 differences I have observed with webauthn on real devices.</p>
 <p>In the presentation it is recommended that in your Credential Creation
 Options, that you (must?) define the options listed to work with TouchID</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>authenticatorSelection: { authenticatorAttachment: &quot;platform&quot; },
-</span><span>attestation: &quot;direct&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>authenticatorSelection: { authenticatorAttachment: &quot;platform&quot; },</span></span>
+<span class="giallo-l"><span>attestation: &quot;direct&quot;</span></span></code></pre>
 <p>It's worth pointing out that authenticatorAttachment is only a <em>hint</em>
 to the client to which credentials it should use. This allows your web
 page to streamline the UI flow (such as detection of platform key and
@@ -181,7 +178,7 @@ to work with the majority of webauthn devices.</p>
 <p>Finally, the WWDC video glosses over the server side process. Be sure to
 follow the w3c standard for verifying attestations, or use a library
 that implementes this standard (such as
-<a href="https://github.com/kanidm/webauthn-rs">webauthn-rs</a> or <a href="https://github.com/duo-labs/webauthn/">duo-labs go
+<a rel="external" href="https://github.com/kanidm/webauthn-rs">webauthn-rs</a> or <a rel="external" href="https://github.com/duo-labs/webauthn/">duo-labs go
 webauthn</a>). I'm sure that other
 libraries exist, but it's critical that they follow the w3c process as
 webauthn is quite complex and fiddly to implement in a correct and

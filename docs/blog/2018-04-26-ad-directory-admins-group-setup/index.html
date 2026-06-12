@@ -98,25 +98,21 @@ controls to enable this scheme.</p>
 <h2 id="create-our-group">Create our group</h2>
 <p>First, lets create a "Directory Admins" group which will contain our
 members that have the rights to modify or grant other privileges.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /usr/local/samba/bin/samba-tool group add &#39;Directory Admins&#39;
-</span><span>Added group Directory Admins
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group add &#39;Directory Admins&#39;</span></span>
+<span class="giallo-l"><span>Added group Directory Admins</span></span></code></pre>
 <p>It's a really good idea to add this to the "Denied RODC Password
 Replication Group" to limit the risk of these accounts being
 compromised during an attack. Additionally, you probably want to make
 your "admin storage" group also a member of this, but I'll leave that
 to you.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /usr/local/samba/bin/samba-tool group addmembers &quot;Denied RODC Password Replication Group&quot; &quot;Directory Admins&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group addmembers &quot;Denied RODC Password Replication Group&quot; &quot;Directory Admins&quot;</span></span></code></pre>
 <p>Now that we have this, lets add a member to it. I strongly advise you
 create special accounts just for the purpose of directory
 administration - don't use your daily account for this!</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /usr/local/samba/bin/samba-tool user create da_william
-</span><span>User &#39;da_william&#39; created successfully
-</span><span># /usr/local/samba/bin/samba-tool group addmembers &#39;Directory Admins&#39; da_william
-</span><span>Added members to group Directory Admins
-</span></code></pre>
-<h2 id="configure-the-permissions">Configure the permissions</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /usr/local/samba/bin/samba-tool user create da_william</span></span>
+<span class="giallo-l"><span>User &#39;da_william&#39; created successfully</span></span>
+<span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group addmembers &#39;Directory Admins&#39; da_william</span></span>
+<span class="giallo-l"><span>Added members to group Directory Admins</span></span></code></pre><h2 id="configure-the-permissions">Configure the permissions</h2>
 <p>Now we need to configure the correct dsacls to allow Directory Admins
 full control over directory objects. It could be possible to constrain
 this to <em>only</em> modification of the cn=builtin and cn=users container
@@ -126,14 +122,12 @@ like dns modification.</p>
 cn=builtins instead - or even just the target groups like Domain Admins.</p>
 <p>First we need the objectSID of our Directory Admins group so we can
 build the ACE.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /usr/local/samba/bin/samba-tool group show &#39;directory admins&#39; --attributes=cn,objectsid
-</span><span>dn: CN=Directory Admins,CN=Users,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>cn: Directory Admins
-</span><span>objectSid: S-1-5-21-2488910578-3334016764-1009705076-1104
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group show &#39;directory admins&#39; --attributes=cn,objectsid</span></span>
+<span class="giallo-l"><span>dn: CN=Directory Admins,CN=Users,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>cn: Directory Admins</span></span>
+<span class="giallo-l"><span>objectSid: S-1-5-21-2488910578-3334016764-1009705076-1104</span></span></code></pre>
 <p>Now with this we can construct the ACE.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>(A;CI;RPWPLCLORC;;;S-1-5-21-2488910578-3334016764-1009705076-1104)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>(A;CI;RPWPLCLORC;;;S-1-5-21-2488910578-3334016764-1009705076-1104)</span></span></code></pre>
 <p>This permission grants:</p>
 <ul>
 <li>RP: read property</li>
@@ -146,31 +140,26 @@ build the ACE.</p>
 directory admins to be able to do "day to day" ad control jobs, or if
 you just use them for granting of privileges. That's up to you. An
 expanded ACE might be:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># Same as Enterprise Admins
-</span><span>(A;CI;RPWPCRCCDCLCLORCWOWDSW;;;S-1-5-21-2488910578-3334016764-1009705076-1104)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># Same as Enterprise Admins</span></span>
+<span class="giallo-l"><span>(A;CI;RPWPCRCCDCLCLORCWOWDSW;;;S-1-5-21-2488910578-3334016764-1009705076-1104)</span></span></code></pre>
 <p>Now lets actually apply this and do a test:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /usr/local/samba/bin/samba-tool dsacl set --sddl=&#39;(A;CI;RPWPLCLORC;;;S-1-5-21-2488910578-3334016764-1009705076-1104)&#39; --objectdn=&#39;dc=adt,dc=blackhats,dc=net,dc=au&#39;
-</span><span># /usr/local/samba/bin/samba-tool group addmembers &#39;directory admins&#39; administrator -U &#39;da_william%...&#39;
-</span><span>Added members to group directory admins
-</span><span># /usr/local/samba/bin/samba-tool group listmembers &#39;directory admins&#39; -U &#39;da_william%...&#39;
-</span><span>da_william
-</span><span>Administrator
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /usr/local/samba/bin/samba-tool dsacl set --sddl=&#39;(A;CI;RPWPLCLORC;;;S-1-5-21-2488910578-3334016764-1009705076-1104)&#39; --objectdn=&#39;dc=adt,dc=blackhats,dc=net,dc=au&#39;</span></span>
+<span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group addmembers &#39;directory admins&#39; administrator -U &#39;da_william%...&#39;</span></span>
+<span class="giallo-l"><span>Added members to group directory admins</span></span>
+<span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group listmembers &#39;directory admins&#39; -U &#39;da_william%...&#39;</span></span>
+<span class="giallo-l"><span>da_william</span></span>
+<span class="giallo-l"><span>Administrator</span></span></code></pre>
 <p>After we have completed our tasks, we remove da_william from the
 directory admins group as we no longer required the privileges. You can
 self-remove, or have the Administrator account do the removal.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /usr/local/samba/bin/samba-tool group removemembers &#39;directory admins&#39; da_william -U &#39;da_william%...&#39;
-</span><span>Removed members from group directory admins
-</span><span>
-</span><span># /usr/local/samba/bin/samba-tool group removemembers &#39;directory admins&#39; da_william -U &#39;Administrator&#39;
-</span><span>Removed members from group directory admins
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group removemembers &#39;directory admins&#39; da_william -U &#39;da_william%...&#39;</span></span>
+<span class="giallo-l"><span>Removed members from group directory admins</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group removemembers &#39;directory admins&#39; da_william -U &#39;Administrator&#39;</span></span>
+<span class="giallo-l"><span>Removed members from group directory admins</span></span></code></pre>
 <p>Finally check that da_william is no longer in the group.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /usr/local/samba/bin/samba-tool group listmembers &#39;directory admins&#39; -U &#39;da_william%...&#39;
-</span><span>Administrator
-</span></code></pre>
-<h2 id="conclusion">Conclusion</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /usr/local/samba/bin/samba-tool group listmembers &#39;directory admins&#39; -U &#39;da_william%...&#39;</span></span>
+<span class="giallo-l"><span>Administrator</span></span></code></pre><h2 id="conclusion">Conclusion</h2>
 <p>With these steps we have created a secure account that has limited admin
 rights, able to temporarily promote users with privileges for
 administrative work - and able to remove it once the work is complete.</p>

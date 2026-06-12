@@ -95,46 +95,40 @@ install to give me an X server.</p>
 <p>Now you need to add the Remote Desktop session type.</p>
 <p>Create the file "/usr/bin/rdesktop-session" (Or /opt or /srv. Up to
 you - but make sure it's executable)</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>#!/bin/bash
-</span><span>/usr/bin/rdesktop -d domain.example.com -b -a 32 -x lan -f termserv.example.com
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>#!/bin/bash</span></span>
+<span class="giallo-l"><span>/usr/bin/rdesktop -d domain.example.com -b -a 32 -x lan -f termserv.example.com</span></span></code></pre>
 <p>Now you need to create a session type that GDM will recognise. Put this
 into "/usr/share/xsessions/rdesktop.desktop". These options could be
 improved etc.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[Desktop Entry]
-</span><span>Name=RDesktop
-</span><span>Comment=This session logs you into RDesktop
-</span><span>Exec=/usr/bin/rdesktop-session
-</span><span>TryExec=/usr/bin/rdesktop-session
-</span><span>Terminal=True
-</span><span>Type=Application
-</span><span>
-</span><span>[Window Manager]
-</span><span>SessionManaged=true
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[Desktop Entry]</span></span>
+<span class="giallo-l"><span>Name=RDesktop</span></span>
+<span class="giallo-l"><span>Comment=This session logs you into RDesktop</span></span>
+<span class="giallo-l"><span>Exec=/usr/bin/rdesktop-session</span></span>
+<span class="giallo-l"><span>TryExec=/usr/bin/rdesktop-session</span></span>
+<span class="giallo-l"><span>Terminal=True</span></span>
+<span class="giallo-l"><span>Type=Application</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[Window Manager]</span></span>
+<span class="giallo-l"><span>SessionManaged=true</span></span></code></pre>
 <p>Create a user who will automatically connect to the TS.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>useradd remote_login
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>useradd remote_login</span></span></code></pre>
 <p>Configure GDM to automatically login after a time delay. The reason for
 the time delay, is so that after the rdesktop session is over, at the
 GDM display, a staff member can shutdown the thin client.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[daemon]
-</span><span>TimedLoginEnable=True
-</span><span>TimedLogin=remote_login
-</span><span>TimedLoginDelay=15
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[daemon]</span></span>
+<span class="giallo-l"><span>TimedLoginEnable=True</span></span>
+<span class="giallo-l"><span>TimedLogin=remote_login</span></span>
+<span class="giallo-l"><span>TimedLoginDelay=15</span></span></code></pre>
 <p>Finally, set the remote login user's session to RDesktop
 "/home/remote_login/.dmrc"</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[Desktop]
-</span><span>Session=rdesktop
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[Desktop]</span></span>
+<span class="giallo-l"><span>Session=rdesktop</span></span></code></pre>
 <p>And that's it!</p>
 <p>If you are using windows terminal services, you will notice that the
 login times out after about a minute, GDM will reset, wait 15 seconds
 and connect again, causing a loop of this action. To prevent this, you
 should extend the windows server login timeout. On the terminal server:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\[[Connection endpoint]]\LogonTimeout (DWord, seconds for timeout)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\[[Connection endpoint]]\LogonTimeout (DWord, seconds for timeout)</span></span></code></pre>
 <p>[[Connection endpoint]] is the name in RD Session Host
 configurations : I had rebuilt mine as default and was wondering why
 this no longer worked. This way you can apply the logon timeout to

@@ -95,51 +95,45 @@ you can't do this... At least that's what the documentation tells
 you.</p>
 <p>You can enable logging for search operations on a plugin through the
 value:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nsslapd-logAccess: on
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>nsslapd-logAccess: on</span></span></code></pre>
 <p>You can enabled logging for mod/modrdn/del/add operations on a plugin
 through the value:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nsslapd-logAudit: on
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>nsslapd-logAudit: on</span></span></code></pre>
 <p>This will yield logs such as:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>time: 20151204143353
-</span><span>dn: uid=test1,ou=People,dc=example,dc=com
-</span><span>result: 0
-</span><span>changetype: modify
-</span><span>delete: memberOf
-</span><span>-
-</span><span>replace: modifiersname
-</span><span>modifiersname: cn=MemberOf Plugin,cn=plugins,cn=config
-</span><span>-
-</span><span>replace: modifytimestamp
-</span><span>modifytimestamp: 20151204043353Z
-</span><span>-
-</span><span>
-</span><span>time: 20151204143353
-</span><span>dn: cn=Test Managers,ou=Groups,dc=example,dc=com
-</span><span>result: 0
-</span><span>changetype: modify
-</span><span>delete: member
-</span><span>member: uid=test1,ou=People,dc=example,dc=com
-</span><span>-
-</span><span>replace: modifiersname
-</span><span>modifiersname: cn=directory manager
-</span><span>-
-</span><span>replace: modifytimestamp
-</span><span>modifytimestamp: 20151204043353Z
-</span><span>-
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>time: 20151204143353</span></span>
+<span class="giallo-l"><span>dn: uid=test1,ou=People,dc=example,dc=com</span></span>
+<span class="giallo-l"><span>result: 0</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>delete: memberOf</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"><span>replace: modifiersname</span></span>
+<span class="giallo-l"><span>modifiersname: cn=MemberOf Plugin,cn=plugins,cn=config</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"><span>replace: modifytimestamp</span></span>
+<span class="giallo-l"><span>modifytimestamp: 20151204043353Z</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>time: 20151204143353</span></span>
+<span class="giallo-l"><span>dn: cn=Test Managers,ou=Groups,dc=example,dc=com</span></span>
+<span class="giallo-l"><span>result: 0</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>delete: member</span></span>
+<span class="giallo-l"><span>member: uid=test1,ou=People,dc=example,dc=com</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"><span>replace: modifiersname</span></span>
+<span class="giallo-l"><span>modifiersname: cn=directory manager</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"><span>replace: modifytimestamp</span></span>
+<span class="giallo-l"><span>modifytimestamp: 20151204043353Z</span></span>
+<span class="giallo-l"><span>-</span></span></code></pre>
 <p>Finally, a new option has been added that will enable both on all
 plugins in the server.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nsslapd-plugin-logging: on
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>nsslapd-plugin-logging: on</span></span></code></pre>
 <p>All of these configurations are bound by and respect the following
 settings:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nsslapd-accesslog-logging-enabled
-</span><span>nsslapd-auditlog-logging-enabled
-</span><span>nsslapd-auditfaillog-logging-enabled
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>nsslapd-accesslog-logging-enabled</span></span>
+<span class="giallo-l"><span>nsslapd-auditlog-logging-enabled</span></span>
+<span class="giallo-l"><span>nsslapd-auditfaillog-logging-enabled</span></span></code></pre>
     </div>
 </article>
 

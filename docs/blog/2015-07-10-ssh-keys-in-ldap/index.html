@@ -97,59 +97,56 @@ default. However, we all don't have the luxury of just setting up IPA.
 We have existing systems to maintain, in my case, 389ds.</p>
 <p>So I had to work out how to setup this system myself.</p>
 <p>First, you need to setup the LDAP server parts. I applied this ldif:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: cn=schema
-</span><span>changetype: modify
-</span><span>add: attributetypes
-</span><span>attributetypes: ( 1.3.6.1.4.1.24552.500.1.1.1.13 NAME &#39;sshPublicKey&#39; DESC &#39;MANDATORY: OpenSSH Public key&#39; EQUALITY octetStringMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )
-</span><span>-
-</span><span>add: objectclasses
-</span><span>objectClasses: ( 1.3.6.1.4.1.24552.500.1.1.2.0 NAME &#39;ldapPublicKey&#39; SUP top AUXILIARY DESC &#39;MANDATORY: OpenSSH LPK objectclass&#39; MUST ( uid ) MAY ( sshPublicKey ) )
-</span><span>-
-</span><span>
-</span><span>dn: cn=sshpublickey,cn=default indexes,cn=config,cn=ldbm database,cn=plugins,cn=config
-</span><span>changetype: add
-</span><span>cn: sshpublickey
-</span><span>nsIndexType: eq
-</span><span>nsIndexType: pres
-</span><span>nsSystemIndex: false
-</span><span>objectClass: top
-</span><span>objectClass: nsIndex
-</span><span>
-</span><span>dn: cn=sshpublickey_self_manage,ou=groups,dc=example,dc=com
-</span><span>changetype: add
-</span><span>objectClass: top
-</span><span>objectClass: groupofuniquenames
-</span><span>cn: sshpublickey_self_manage
-</span><span>description: Members of this group gain the ability to edit their own sshPublicKey field
-</span><span>
-</span><span>dn: dc=example,dc=com
-</span><span>changetype: modify
-</span><span>add: aci
-</span><span>aci: (targetattr = &quot;sshPublicKey&quot;) (version 3.0; acl &quot;Allow members of sshpublickey_self_manage to edit their keys&quot;; allow(write) (groupdn = &quot;ldap:///cn=sshpublickey_self_manage,ou=groups,dc=example,dc=com&quot; and userdn=&quot;ldap:///self&quot; ); )
-</span><span>-
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: cn=schema</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>add: attributetypes</span></span>
+<span class="giallo-l"><span>attributetypes: ( 1.3.6.1.4.1.24552.500.1.1.1.13 NAME &#39;sshPublicKey&#39; DESC &#39;MANDATORY: OpenSSH Public key&#39; EQUALITY octetStringMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 )</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"><span>add: objectclasses</span></span>
+<span class="giallo-l"><span>objectClasses: ( 1.3.6.1.4.1.24552.500.1.1.2.0 NAME &#39;ldapPublicKey&#39; SUP top AUXILIARY DESC &#39;MANDATORY: OpenSSH LPK objectclass&#39; MUST ( uid ) MAY ( sshPublicKey ) )</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: cn=sshpublickey,cn=default indexes,cn=config,cn=ldbm database,cn=plugins,cn=config</span></span>
+<span class="giallo-l"><span>changetype: add</span></span>
+<span class="giallo-l"><span>cn: sshpublickey</span></span>
+<span class="giallo-l"><span>nsIndexType: eq</span></span>
+<span class="giallo-l"><span>nsIndexType: pres</span></span>
+<span class="giallo-l"><span>nsSystemIndex: false</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: nsIndex</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: cn=sshpublickey_self_manage,ou=groups,dc=example,dc=com</span></span>
+<span class="giallo-l"><span>changetype: add</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: groupofuniquenames</span></span>
+<span class="giallo-l"><span>cn: sshpublickey_self_manage</span></span>
+<span class="giallo-l"><span>description: Members of this group gain the ability to edit their own sshPublicKey field</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: dc=example,dc=com</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>add: aci</span></span>
+<span class="giallo-l"><span>aci: (targetattr = &quot;sshPublicKey&quot;) (version 3.0; acl &quot;Allow members of sshpublickey_self_manage to edit their keys&quot;; allow(write) (groupdn = &quot;ldap:///cn=sshpublickey_self_manage,ou=groups,dc=example,dc=com&quot; and userdn=&quot;ldap:///self&quot; ); )</span></span>
+<span class="giallo-l"><span>-</span></span></code></pre>
 <p>For the keen eyed, this is the schema from openssd-ldap but with the
 objectClass altered to MAY instead of MUST take sshPublicKey. This
 allows me to add the objectClass to our staff accounts, without needing
 to set a key for them.</p>
 <p>Members of the group in question can now self edit their ssh key. It
 will look like :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: uid=william,ou=People,dc=example,dc=com
-</span><span>sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDI/xgEMzqNwkXMIjjdDO2+xfru
-</span><span> HK248uIKZ2CHFGIM+BlEhBjqvLpbrFZDYVsme8997p98ENPHGItFch87GCbRhWrpDHINQAnMQkLvD
-</span><span> eykE1CpYpMWaeyygRZwCUaFfYJD3OgxVoqcUpAc8ZvtGQmHpo++RD5WPNedXOeq/vZzEPbp96ndOn
-</span><span> b3WejCxl a1176360@strawberry
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: uid=william,ou=People,dc=example,dc=com</span></span>
+<span class="giallo-l"><span>sshPublicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDI/xgEMzqNwkXMIjjdDO2+xfru</span></span>
+<span class="giallo-l"><span> HK248uIKZ2CHFGIM+BlEhBjqvLpbrFZDYVsme8997p98ENPHGItFch87GCbRhWrpDHINQAnMQkLvD</span></span>
+<span class="giallo-l"><span> eykE1CpYpMWaeyygRZwCUaFfYJD3OgxVoqcUpAc8ZvtGQmHpo++RD5WPNedXOeq/vZzEPbp96ndOn</span></span>
+<span class="giallo-l"><span> b3WejCxl a1176360@strawberry</span></span></code></pre>
 <p>Now we configure SSSD.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[domain/foo]
-</span><span>ldap_account_expire_policy = rhds
-</span><span>ldap_access_order = filter, expire
-</span><span>ldap_user_ssh_public_key = sshPublicKey
-</span><span>
-</span><span>[sssd]
-</span><span>...
-</span><span>services = nss, pam, ssh
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[domain/foo]</span></span>
+<span class="giallo-l"><span>ldap_account_expire_policy = rhds</span></span>
+<span class="giallo-l"><span>ldap_access_order = filter, expire</span></span>
+<span class="giallo-l"><span>ldap_user_ssh_public_key = sshPublicKey</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[sssd]</span></span>
+<span class="giallo-l"><span>...</span></span>
+<span class="giallo-l"><span>services = nss, pam, ssh</span></span></code></pre>
 <p>The expire policy is extremely important. In 389ds we set nsAccountLock
 to true to lock out an account. Normally this would cause the password
 auth to fail, effectively denying access to servers.</p>
@@ -159,13 +156,11 @@ even if the account lock was set.</p>
 <p>So we setup this policy, to make sure that the account is locked out
 from servers even if ssh key authentication is used.</p>
 <p>This configuration can be tested by running:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sss_ssh_authorizedkeys william
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>sss_ssh_authorizedkeys william</span></span></code></pre>
 <p>You should see a public key.</p>
 <p>Finally, we configure sshd to check for these keys</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys
-</span><span>AuthorizedKeysCommandUser root
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>AuthorizedKeysCommand /usr/bin/sss_ssh_authorizedkeys</span></span>
+<span class="giallo-l"><span>AuthorizedKeysCommandUser root</span></span></code></pre>
 <p>Now you should be able to ssh into your systems.</p>
 <p>It's a really simple setup to achieve this, and can have some really
 great outcomes in the business.</p>

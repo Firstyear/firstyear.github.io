@@ -82,7 +82,7 @@
     </div>
     <div itemprop="articleBody">
         <h1 id="time-safety-and-rust">Time safety and Rust</h1>
-<p>Recently I have had the great fortune to work on <a href="https://pagure.io/389-ds-base/issue/49316">this
+<p>Recently I have had the great fortune to work on <a rel="external" href="https://pagure.io/389-ds-base/issue/49316">this
 ticket</a> . This was an issue
 that stemmed from an attempt to make clock performance faster.
 Previously, a call to time or clock_gettime would involve a context
@@ -96,49 +96,47 @@ codebase. But this would mean context switches.</p>
 <p>So a wrapper was made called "current_time()", which would cache a
 recent output of time(), and then provide that to the caller instead of
 making the costly context switch. So the code had the following:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>static time_t   currenttime;
-</span><span>static int      currenttime_set = 0;
-</span><span>
-</span><span>time_t
-</span><span>poll_current_time()
-</span><span>{
-</span><span>    if ( !currenttime_set ) {
-</span><span>        currenttime_set = 1;
-</span><span>    }
-</span><span>
-</span><span>    time( &amp;currenttime );
-</span><span>    return( currenttime );
-</span><span>}
-</span><span>
-</span><span>time_t
-</span><span>current_time( void )
-</span><span>{
-</span><span>    if ( currenttime_set ) {
-</span><span>        return( currenttime );
-</span><span>    } else {
-</span><span>        return( time( (time_t *)0 ));
-</span><span>    }
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>static time_t   currenttime;</span></span>
+<span class="giallo-l"><span>static int      currenttime_set = 0;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>time_t</span></span>
+<span class="giallo-l"><span>poll_current_time()</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    if ( !currenttime_set ) {</span></span>
+<span class="giallo-l"><span>        currenttime_set = 1;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    time( &amp;currenttime );</span></span>
+<span class="giallo-l"><span>    return( currenttime );</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>time_t</span></span>
+<span class="giallo-l"><span>current_time( void )</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    if ( currenttime_set ) {</span></span>
+<span class="giallo-l"><span>        return( currenttime );</span></span>
+<span class="giallo-l"><span>    } else {</span></span>
+<span class="giallo-l"><span>        return( time( (time_t *)0 ));</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>In another thread, we would poll this every second to update the
 currenttime value:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>void * 
-</span><span>time_thread(void *nothing __attribute__((unused)))
-</span><span>{
-</span><span>    PRIntervalTime    interval;
-</span><span>
-</span><span>    interval = PR_SecondsToInterval(1);
-</span><span>
-</span><span>    while(!time_shutdown) {
-</span><span>        poll_current_time();
-</span><span>        csngen_update_time ();
-</span><span>        DS_Sleep(interval);
-</span><span>    }
-</span><span>
-</span><span>    /*NOTREACHED*/
-</span><span>    return(NULL);
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>void * </span></span>
+<span class="giallo-l"><span>time_thread(void *nothing __attribute__((unused)))</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    PRIntervalTime    interval;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    interval = PR_SecondsToInterval(1);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    while(!time_shutdown) {</span></span>
+<span class="giallo-l"><span>        poll_current_time();</span></span>
+<span class="giallo-l"><span>        csngen_update_time ();</span></span>
+<span class="giallo-l"><span>        DS_Sleep(interval);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /*NOTREACHED*/</span></span>
+<span class="giallo-l"><span>    return(NULL);</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p><em>So what is the problem here</em></p>
 <p>Besides the fact that we may not poll accurately (meaning we miss
 seconds but always advance), this is not <em>thread safe</em>. The reason is
@@ -155,55 +153,53 @@ just be wrong.</p>
 <p>Rust touts mulithread safety high on it's list. So lets try and
 recreate this in rust.</p>
 <p>First, the exact same way:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>use std::time::{SystemTime, Duration};
-</span><span>use std::thread;
-</span><span>
-</span><span>
-</span><span>static mut currenttime: Option&lt;SystemTime&gt; = None;
-</span><span>
-</span><span>fn read_thread() {
-</span><span>    let interval = Duration::from_secs(1);
-</span><span>
-</span><span>    for x in 0..10 {
-</span><span>        thread::sleep(interval);
-</span><span>        let c_time = currenttime.unwrap();
-</span><span>        println!(&quot;reading time {:?}&quot;, c_time);
-</span><span>    }
-</span><span>}
-</span><span>
-</span><span>fn poll_thread() {
-</span><span>    let interval = Duration::from_secs(1);
-</span><span>
-</span><span>    for x in 0..10 {
-</span><span>        currenttime = Some(SystemTime::now());
-</span><span>        println!(&quot;polling time&quot;);
-</span><span>        thread::sleep(interval);
-</span><span>    }
-</span><span>}
-</span><span>
-</span><span>fn main() {
-</span><span>    let poll = thread::spawn(poll_thread);
-</span><span>    let read = thread::spawn(read_thread);
-</span><span>    read.join().unwrap();
-</span><span>    poll.join().unwrap();
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>use std::time::{SystemTime, Duration};</span></span>
+<span class="giallo-l"><span>use std::thread;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>static mut currenttime: Option&lt;SystemTime&gt; = None;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn read_thread() {</span></span>
+<span class="giallo-l"><span>    let interval = Duration::from_secs(1);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for x in 0..10 {</span></span>
+<span class="giallo-l"><span>        thread::sleep(interval);</span></span>
+<span class="giallo-l"><span>        let c_time = currenttime.unwrap();</span></span>
+<span class="giallo-l"><span>        println!(&quot;reading time {:?}&quot;, c_time);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn poll_thread() {</span></span>
+<span class="giallo-l"><span>    let interval = Duration::from_secs(1);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    for x in 0..10 {</span></span>
+<span class="giallo-l"><span>        currenttime = Some(SystemTime::now());</span></span>
+<span class="giallo-l"><span>        println!(&quot;polling time&quot;);</span></span>
+<span class="giallo-l"><span>        thread::sleep(interval);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn main() {</span></span>
+<span class="giallo-l"><span>    let poll = thread::spawn(poll_thread);</span></span>
+<span class="giallo-l"><span>    let read = thread::spawn(read_thread);</span></span>
+<span class="giallo-l"><span>    read.join().unwrap();</span></span>
+<span class="giallo-l"><span>    poll.join().unwrap();</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p><em>Rust will not compile this code</em>.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; rustc clock.rs
-</span><span>error[E0133]: use of mutable static requires unsafe function or block
-</span><span>  --&gt; clock.rs:13:22
-</span><span>   |
-</span><span>13 |         let c_time = currenttime.unwrap();
-</span><span>   |                      ^^^^^^^^^^^ use of mutable static
-</span><span>
-</span><span>error[E0133]: use of mutable static requires unsafe function or block
-</span><span>  --&gt; clock.rs:22:9
-</span><span>   |
-</span><span>22 |         currenttime = Some(SystemTime::now());
-</span><span>   |         ^^^^^^^^^^^ use of mutable static
-</span><span>
-</span><span>error: aborting due to 2 previous errors
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; rustc clock.rs</span></span>
+<span class="giallo-l"><span>error[E0133]: use of mutable static requires unsafe function or block</span></span>
+<span class="giallo-l"><span>  --&gt; clock.rs:13:22</span></span>
+<span class="giallo-l"><span>   |</span></span>
+<span class="giallo-l"><span>13 |         let c_time = currenttime.unwrap();</span></span>
+<span class="giallo-l"><span>   |                      ^^^^^^^^^^^ use of mutable static</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>error[E0133]: use of mutable static requires unsafe function or block</span></span>
+<span class="giallo-l"><span>  --&gt; clock.rs:22:9</span></span>
+<span class="giallo-l"><span>   |</span></span>
+<span class="giallo-l"><span>22 |         currenttime = Some(SystemTime::now());</span></span>
+<span class="giallo-l"><span>   |         ^^^^^^^^^^^ use of mutable static</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>error: aborting due to 2 previous errors</span></span></code></pre>
 <p>Rust has told us that this action is <em>unsafe</em>, and that we shouldn't be
 modifying a global static like this.</p>
 <p>This alone is a great reason and demonstration of why we need a language
@@ -212,8 +208,7 @@ dangerous at compile time, rather than being allowed to sit in
 production code for years.</p>
 <p>For bonus marks, because Rust is stricter about types than C, we don't
 have issues like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>int c_time = time();
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>int c_time = time();</span></span></code></pre>
 <p>Which is a 2038 problem in the making :)</p>
 
     </div>

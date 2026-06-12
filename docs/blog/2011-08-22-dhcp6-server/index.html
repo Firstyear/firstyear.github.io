@@ -92,62 +92,57 @@ when you look at a business, a LAN party, or those who want DDNS
 updates, it is essential.</p>
 <p>First, we need to setup RADVD properly. The order of these directives is
 <em>very</em> important.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>interface eth0
-</span><span>{
-</span><span>    AdvManagedFlag on;
-</span><span>    AdvOtherConfigFlag on;
-</span><span>    AdvSendAdvert on;
-</span><span>    MinRtrAdvInterval 5;
-</span><span>    MaxRtrAdvInterval 60;
-</span><span>    prefix 2001:db8:1234:4321/64
-</span><span>    {
-</span><span>        AdvOnLink on;
-</span><span>        AdvAutonomous on;
-</span><span>        AdvRouterAddr on;
-</span><span>    };
-</span><span>};
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>interface eth0</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    AdvManagedFlag on;</span></span>
+<span class="giallo-l"><span>    AdvOtherConfigFlag on;</span></span>
+<span class="giallo-l"><span>    AdvSendAdvert on;</span></span>
+<span class="giallo-l"><span>    MinRtrAdvInterval 5;</span></span>
+<span class="giallo-l"><span>    MaxRtrAdvInterval 60;</span></span>
+<span class="giallo-l"><span>    prefix 2001:db8:1234:4321/64</span></span>
+<span class="giallo-l"><span>    {</span></span>
+<span class="giallo-l"><span>        AdvOnLink on;</span></span>
+<span class="giallo-l"><span>        AdvAutonomous on;</span></span>
+<span class="giallo-l"><span>        AdvRouterAddr on;</span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>};</span></span></code></pre>
 <p>Next, we need to configure DHCP6. I am using the ISC-DHCP4 server. DHCP6
 needs its own instance. Fedora provides a seperate script for this
 (dhcpd6.service) that you can use. On other OSes' you may not have this
 and will need to start DHCPD manually with the -6 flag. Here is the
 config you need.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>server-name &quot;server.example.com&quot; ;
-</span><span>server-identifier server.example.com ;
-</span><span>
-</span><span>authoritative;
-</span><span>option dhcp6.name-servers 2001:db8:1234:4321::1 ;
-</span><span>ddns-update-style interim ;
-</span><span>ddns-domainname &quot;example.com&quot;;
-</span><span>
-</span><span>subnet6 2001:db8:1234:4321::/64 {
-</span><span>        range6 2001:db8:1234:4321::10 2001:db8:1234:4321::110 ;
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>server-name &quot;server.example.com&quot; ;</span></span>
+<span class="giallo-l"><span>server-identifier server.example.com ;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>authoritative;</span></span>
+<span class="giallo-l"><span>option dhcp6.name-servers 2001:db8:1234:4321::1 ;</span></span>
+<span class="giallo-l"><span>ddns-update-style interim ;</span></span>
+<span class="giallo-l"><span>ddns-domainname &quot;example.com&quot;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>subnet6 2001:db8:1234:4321::/64 {</span></span>
+<span class="giallo-l"><span>        range6 2001:db8:1234:4321::10 2001:db8:1234:4321::110 ;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>Now, since DHCP6 uses UDP / TCP (Its layer 3, and runs across link
 local), you must consider your firewall. On both client and server you
 need to accept icmp6, port 546 and 547 from the following addresses</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Server:
-</span><span>Source - fe80::/16 
-</span><span>Destination - ff02::1:2
-</span><span>
-</span><span>Client
-</span><span>Source - ff02::1:2
-</span><span>Source - fe80::/16 
-</span><span>Destination - fe80::/16
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>Server:</span></span>
+<span class="giallo-l"><span>Source - fe80::/16 </span></span>
+<span class="giallo-l"><span>Destination - ff02::1:2</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Client</span></span>
+<span class="giallo-l"><span>Source - ff02::1:2</span></span>
+<span class="giallo-l"><span>Source - fe80::/16 </span></span>
+<span class="giallo-l"><span>Destination - fe80::/16</span></span></code></pre>
 <p>A set of example iptables rules on the server side would be</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>-A INPUT -p ipv6-icmp -j ACCEPT
-</span><span>-A INPUT -s fe80::/16 -d ff02::1:2 -i eth0 -p udp -m udp --dport 546 -j ACCEPT
-</span><span>-A INPUT -s fe80::/16 -d ff02::1:2 -i eth0 -p tcp -m tcp --dport 546 -j ACCEPT
-</span><span>-A INPUT -s fe80::/16 -d ff02::1:2 -i eth0 -p udp -m udp --dport 547 -j ACCEPT
-</span><span>-A INPUT -s fe80::/16 -d ff02::1:2 -i eth0 -p tcp -m tcp --dport 547 -j ACCEPT
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>-A INPUT -p ipv6-icmp -j ACCEPT</span></span>
+<span class="giallo-l"><span>-A INPUT -s fe80::/16 -d ff02::1:2 -i eth0 -p udp -m udp --dport 546 -j ACCEPT</span></span>
+<span class="giallo-l"><span>-A INPUT -s fe80::/16 -d ff02::1:2 -i eth0 -p tcp -m tcp --dport 546 -j ACCEPT</span></span>
+<span class="giallo-l"><span>-A INPUT -s fe80::/16 -d ff02::1:2 -i eth0 -p udp -m udp --dport 547 -j ACCEPT</span></span>
+<span class="giallo-l"><span>-A INPUT -s fe80::/16 -d ff02::1:2 -i eth0 -p tcp -m tcp --dport 547 -j ACCEPT</span></span></code></pre>
 <p>And similar enough for the client.</p>
 <p>Now start radvd, dhcp6 and your firewalls. Then on your client run.
 Enjoy your DHCP6! :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dhclient -d -v -6 interface
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dhclient -d -v -6 interface</span></span></code></pre>
 <p>From here, it is very similar to DHCP4 to add things like DDNS updates
 to your DHCP6 server.</p>
 

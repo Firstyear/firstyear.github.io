@@ -148,11 +148,10 @@ retrieve, but the path through the tree from the root to our target node
 with the RDN.</p>
 <p>This is done by walking down the tree til we find what we want. Looking
 at the image above, consider:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dc=com
-</span><span>dc=example,dc=com
-</span><span>ou=People,dc=example,dc=com
-</span><span>uid=user,ou=People,dc=example,dc=com
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dc=com</span></span>
+<span class="giallo-l"><span>dc=example,dc=com</span></span>
+<span class="giallo-l"><span>ou=People,dc=example,dc=com</span></span>
+<span class="giallo-l"><span>uid=user,ou=People,dc=example,dc=com</span></span></code></pre>
 <p>We can make a Fully Qualified Distinguished Name (FQDN), or just
 Distinguished Name(DN), by joining the RDN components. For our example,
 uid=user,ou=People,dc=example,dc=com. This is a unique path through the

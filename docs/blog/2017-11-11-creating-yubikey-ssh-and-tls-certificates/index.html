@@ -90,41 +90,30 @@ to prevent this issue.</p>
 <h2 id="ssh">SSH</h2>
 <p>First, we'll create a new NSS DB on an airgapped secure machine (with
 disk encryption or in memory storage!)</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>certutil -N -d . -f pwdfile.txt
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>certutil -N -d . -f pwdfile.txt</span></span></code></pre>
 <p>Now into this, we'll create a self-signed cert valid for 10 years.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>certutil -S -f pwdfile.txt -d . -t &quot;C,,&quot; -x -n &quot;SSH&quot; -g 2048 -s &quot;cn=william,O=ssh,L=Brisbane,ST=Queensland,C=AU&quot; -v 120
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>certutil -S -f pwdfile.txt -d . -t &quot;C,,&quot; -x -n &quot;SSH&quot; -g 2048 -s &quot;cn=william,O=ssh,L=Brisbane,ST=Queensland,C=AU&quot; -v 120</span></span></code></pre>
 <p>We export this now to PKCS12 for our key to import.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pk12util -o ssh.p12 -d . -k pwdfile.txt -n SSH
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>pk12util -o ssh.p12 -d . -k pwdfile.txt -n SSH</span></span></code></pre>
 <p>Next we import the key and cert to the hardware in slot 9c</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yubico-piv-tool -s9c -i ssh.p12 -K PKCS12 -aimport-key -aimport-certificate -k
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>yubico-piv-tool -s9c -i ssh.p12 -K PKCS12 -aimport-key -aimport-certificate -k</span></span></code></pre>
 <p>Finally, we can display the ssh-key from the token.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -D /usr/lib64/opensc-pkcs11.so -e
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh-keygen -D /usr/lib64/opensc-pkcs11.so -e</span></span></code></pre>
 <p>Note, we can make this always used by ssh client by adding the following
 into .ssh/config:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>PKCS11Provider /usr/lib64/opensc-pkcs11.so
-</span></code></pre>
-<h2 id="tls-identities">TLS Identities</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>PKCS11Provider /usr/lib64/opensc-pkcs11.so</span></span></code></pre><h2 id="tls-identities">TLS Identities</h2>
 <p>The process is almost identical for user certificates.</p>
 <p>First, create the request:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>certutil -d . -R -a -o user.csr -f pwdfile.txt -g 4096 -Z SHA256 -v 24 \
-</span><span>--keyUsage digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment --nsCertType sslClient --extKeyUsage clientAuth \
-</span><span>-s &quot;CN=username,O=Testing,L=example,ST=Queensland,C=AU&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>certutil -d . -R -a -o user.csr -f pwdfile.txt -g 4096 -Z SHA256 -v 24 \</span></span>
+<span class="giallo-l"><span>--keyUsage digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment --nsCertType sslClient --extKeyUsage clientAuth \</span></span>
+<span class="giallo-l"><span>-s &quot;CN=username,O=Testing,L=example,ST=Queensland,C=AU&quot;</span></span></code></pre>
 <p>Once the request is signed, we should have a user.crt back. Import that
 to our database:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>certutil -A -d . -f pwdfile.txt -i user.crt -a -n TLS -t &quot;,,&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>certutil -A -d . -f pwdfile.txt -i user.crt -a -n TLS -t &quot;,,&quot;</span></span></code></pre>
 <p>Import our CA certificate also. Next export this to p12:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>pk12util -o user.p12 -d . -k pwdfile.txt -n TLS
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>pk12util -o user.p12 -d . -k pwdfile.txt -n TLS</span></span></code></pre>
 <p>Now import this to the yubikey - remember to use slot 9a this time!</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yubico-piv-tool -s9a -i user.p12 -K PKCS12 -aimport-key -aimport-certificate -k --touch-policy=always
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>yubico-piv-tool -s9a -i user.p12 -K PKCS12 -aimport-key -aimport-certificate -k --touch-policy=always</span></span></code></pre>
 <p>Done!</p>
 
     </div>

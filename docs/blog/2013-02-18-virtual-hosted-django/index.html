@@ -90,17 +90,14 @@ pools.</p>
 <p>To fix it.</p>
 <p>In your /etc/httpd/conf.d/wsgi.conf Make sure to comment out the
 WSGIPythonPath line. :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>#WSGIPythonPath
-</span><span>WSGISocketPrefix run/wsgi
-</span><span>#You can add many process groups. 
-</span><span>WSGIDaemonProcess group_wsgi python-path=&quot;/var/www/django/group&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>#WSGIPythonPath</span></span>
+<span class="giallo-l"><span>WSGISocketPrefix run/wsgi</span></span>
+<span class="giallo-l"><span>#You can add many process groups. </span></span>
+<span class="giallo-l"><span>WSGIDaemonProcess group_wsgi python-path=&quot;/var/www/django/group&quot;</span></span></code></pre>
 <p>Now in your VHost add the line (If your script alias is "/") :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&lt;location &quot;/&quot;&gt;
-</span><span>WSGIProcessGroup group_wsgi
-</span><span>&lt;/location&gt;
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&lt;location &quot;/&quot;&gt;</span></span>
+<span class="giallo-l"><span>WSGIProcessGroup group_wsgi</span></span>
+<span class="giallo-l"><span>&lt;/location&gt;</span></span></code></pre>
     </div>
 </article>
 

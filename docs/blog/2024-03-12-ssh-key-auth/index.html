@@ -88,18 +88,17 @@ or building.</p>
 <p>Because of this SSH is a very attractive target for attackers.</p>
 <h2 id="defaults">Defaults</h2>
 <p>The default is to login with a username and password.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌───────┐                         ┌───────┐
-</span><span>│       │                         │       │
-</span><span>│       │───────Username─────────▶│       │
-</span><span>│       │                         │       │
-</span><span>│  SSH  │◀────Request Password────│  SSH  │
-</span><span>│Client │                         │Server │
-</span><span>│       │───────Password─────────▶│       │
-</span><span>│       │                         │       │
-</span><span>│       │◀────────Success!────────│       │
-</span><span>│       │                         │       │
-</span><span>└───────┘                         └───────┘
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>┌───────┐                         ┌───────┐</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>│       │───────Username─────────▶│       │</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>│  SSH  │◀────Request Password────│  SSH  │</span></span>
+<span class="giallo-l"><span>│Client │                         │Server │</span></span>
+<span class="giallo-l"><span>│       │───────Password─────────▶│       │</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>│       │◀────────Success!────────│       │</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>└───────┘                         └───────┘</span></span></code></pre>
 <p>The problem with this model is that passwords can be bruteforced (weak passwords), they can be
 reused and then leaked in password breaches (credential stuffing). Generally SSH with only passwords
 is not a great idea.</p>
@@ -108,54 +107,53 @@ is not a great idea.</p>
 a public key.</p>
 <p>Given a piece of data, the private key can create a signature. The signature can be verified by
 the public key and the original data. However the public key can not create it's own signature.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌─────────┐                                        ┌──────────┐
-</span><span>│         │                                        │          │
-</span><span>│         │               ┌─────────┐              │          │
-</span><span>│ Private │     Signs     │         │              │  Public  │
-</span><span>│   Key   │───────┬─────▶ │Signature│              │   Key    │
-</span><span>│         │       │       │         │              │          │
-</span><span>│         │       │       └─────────┘              │          │
-</span><span>└─────────┘       │                                └──────────┘
-</span><span>                  │                                            
-</span><span>              ┌────────┐                                       
-</span><span>              │        │                                       
-</span><span>              │  Data  │                                       
-</span><span>              │        │                                       
-</span><span>              └────────┘                                       
-</span><span>                                                               
-</span><span>                                                               
-</span><span>┌─────────┐                                        ┌──────────┐
-</span><span>│         │                                        │          │
-</span><span>│         │               ┌─────────┐              │          │
-</span><span>│ Private │               │         │    Verifies  │  Public  │
-</span><span>│   Key   │               │Signature│───────┬─────▶│   Key    │
-</span><span>│         │               │         │       │      │          │
-</span><span>│         │               └─────────┘       │      │          │
-</span><span>└─────────┘                                 │      └──────────┘
-</span><span>                                            │                  
-</span><span>                                       ┌────────┐              
-</span><span>                                       │        │              
-</span><span>                                       │  Data  │              
-</span><span>                                       │        │              
-</span><span>                                       └────────┘              
-</span><span>                                                               
-</span><span>                                                               
-</span><span>                                                               
-</span><span>┌─────────┐                                        ┌──────────┐
-</span><span>│         │                                        │          │
-</span><span>│         │               ┌─────────┐              │          │
-</span><span>│ Private │               │         │    Error!    │  Public  │
-</span><span>│   Key   │               │Signature│ X ◀───┬──────│   Key    │
-</span><span>│         │               │         │       │      │          │
-</span><span>│         │               └─────────┘       │      │          │
-</span><span>└─────────┘                                 │      └──────────┘
-</span><span>                                            │                  
-</span><span>                                       ┌────────┐              
-</span><span>                                       │        │              
-</span><span>                                       │  Data  │              
-</span><span>                                       │        │              
-</span><span>                                       └────────┘              
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>┌─────────┐                                        ┌──────────┐</span></span>
+<span class="giallo-l"><span>│         │                                        │          │</span></span>
+<span class="giallo-l"><span>│         │               ┌─────────┐              │          │</span></span>
+<span class="giallo-l"><span>│ Private │     Signs     │         │              │  Public  │</span></span>
+<span class="giallo-l"><span>│   Key   │───────┬─────▶ │Signature│              │   Key    │</span></span>
+<span class="giallo-l"><span>│         │       │       │         │              │          │</span></span>
+<span class="giallo-l"><span>│         │       │       └─────────┘              │          │</span></span>
+<span class="giallo-l"><span>└─────────┘       │                                └──────────┘</span></span>
+<span class="giallo-l"><span>                  │                                            </span></span>
+<span class="giallo-l"><span>              ┌────────┐                                       </span></span>
+<span class="giallo-l"><span>              │        │                                       </span></span>
+<span class="giallo-l"><span>              │  Data  │                                       </span></span>
+<span class="giallo-l"><span>              │        │                                       </span></span>
+<span class="giallo-l"><span>              └────────┘                                       </span></span>
+<span class="giallo-l"><span>                                                               </span></span>
+<span class="giallo-l"><span>                                                               </span></span>
+<span class="giallo-l"><span>┌─────────┐                                        ┌──────────┐</span></span>
+<span class="giallo-l"><span>│         │                                        │          │</span></span>
+<span class="giallo-l"><span>│         │               ┌─────────┐              │          │</span></span>
+<span class="giallo-l"><span>│ Private │               │         │    Verifies  │  Public  │</span></span>
+<span class="giallo-l"><span>│   Key   │               │Signature│───────┬─────▶│   Key    │</span></span>
+<span class="giallo-l"><span>│         │               │         │       │      │          │</span></span>
+<span class="giallo-l"><span>│         │               └─────────┘       │      │          │</span></span>
+<span class="giallo-l"><span>└─────────┘                                 │      └──────────┘</span></span>
+<span class="giallo-l"><span>                                            │                  </span></span>
+<span class="giallo-l"><span>                                       ┌────────┐              </span></span>
+<span class="giallo-l"><span>                                       │        │              </span></span>
+<span class="giallo-l"><span>                                       │  Data  │              </span></span>
+<span class="giallo-l"><span>                                       │        │              </span></span>
+<span class="giallo-l"><span>                                       └────────┘              </span></span>
+<span class="giallo-l"><span>                                                               </span></span>
+<span class="giallo-l"><span>                                                               </span></span>
+<span class="giallo-l"><span>                                                               </span></span>
+<span class="giallo-l"><span>┌─────────┐                                        ┌──────────┐</span></span>
+<span class="giallo-l"><span>│         │                                        │          │</span></span>
+<span class="giallo-l"><span>│         │               ┌─────────┐              │          │</span></span>
+<span class="giallo-l"><span>│ Private │               │         │    Error!    │  Public  │</span></span>
+<span class="giallo-l"><span>│   Key   │               │Signature│ X ◀───┬──────│   Key    │</span></span>
+<span class="giallo-l"><span>│         │               │         │       │      │          │</span></span>
+<span class="giallo-l"><span>│         │               └─────────┘       │      │          │</span></span>
+<span class="giallo-l"><span>└─────────┘                                 │      └──────────┘</span></span>
+<span class="giallo-l"><span>                                            │                  </span></span>
+<span class="giallo-l"><span>                                       ┌────────┐              </span></span>
+<span class="giallo-l"><span>                                       │        │              </span></span>
+<span class="giallo-l"><span>                                       │  Data  │              </span></span>
+<span class="giallo-l"><span>                                       │        │              </span></span>
+<span class="giallo-l"><span>                                       └────────┘              </span></span></code></pre>
 <p>These signatures are design to be mathematically infeasible to bruteforce or forge, meaning that
 they are very strong compared to passwords.</p>
 <h2 id="ssh-key-pairs">SSH Key Pairs</h2>
@@ -163,28 +161,26 @@ they are very strong compared to passwords.</p>
 to a server holds the private key, and the SSH server has the public key to verify the key is legitimate.</p>
 <p>In reverse, the server with the public key can't use that to authenticate since it is only able
 to verify signatures - not create them.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>┌───────┐                         ┌───────┐
-</span><span>│       │                         │       │
-</span><span>│       │───────Username─────────▶│       │
-</span><span>│       │                         │       │
-</span><span>│       │◀────────Challenge───────│       │
-</span><span>│       │                         │       │
-</span><span>│       │────┐                    │       │
-</span><span>│       │ Private                 │       │
-</span><span>│       │Key Signs                │       │
-</span><span>│  SSH  │◀───┘                    │  SSH  │
-</span><span>│Client │                         │Server │
-</span><span>│       │──────Signature─────────▶│       │
-</span><span>│       │                         │       │
-</span><span>│       │                   ┌─────│       │
-</span><span>│       │              Public Key │       │
-</span><span>│       │               Verifies  │       │
-</span><span>│       │                   └────▶│       │
-</span><span>│       │◀────────Success!────────│       │
-</span><span>│       │                         │       │
-</span><span>└───────┘                         └───────┘
-</span></code></pre>
-<h2 id="practical-setup-guide-linux-macos">Practical Setup Guide (Linux, MacOS)</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>┌───────┐                         ┌───────┐</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>│       │───────Username─────────▶│       │</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>│       │◀────────Challenge───────│       │</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>│       │────┐                    │       │</span></span>
+<span class="giallo-l"><span>│       │ Private                 │       │</span></span>
+<span class="giallo-l"><span>│       │Key Signs                │       │</span></span>
+<span class="giallo-l"><span>│  SSH  │◀───┘                    │  SSH  │</span></span>
+<span class="giallo-l"><span>│Client │                         │Server │</span></span>
+<span class="giallo-l"><span>│       │──────Signature─────────▶│       │</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>│       │                   ┌─────│       │</span></span>
+<span class="giallo-l"><span>│       │              Public Key │       │</span></span>
+<span class="giallo-l"><span>│       │               Verifies  │       │</span></span>
+<span class="giallo-l"><span>│       │                   └────▶│       │</span></span>
+<span class="giallo-l"><span>│       │◀────────Success!────────│       │</span></span>
+<span class="giallo-l"><span>│       │                         │       │</span></span>
+<span class="giallo-l"><span>└───────┘                         └───────┘</span></span></code></pre><h2 id="practical-setup-guide-linux-macos">Practical Setup Guide (Linux, MacOS)</h2>
 <blockquote>
 <p>These commands should all be performed as your regular user account, unless otherwise stated.</p>
 </blockquote>
@@ -192,27 +188,22 @@ to verify signatures - not create them.</p>
 <p>On your SSH client (your destkop, laptop etc). Create a new ssh key pair in the default location
 (<code>/home/$USER/.ssh/id_ecdsa</code>). You will be prompted
 for a passphrase. This is a passphrase to encrypt the private key when not in use.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -t ecdsa
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh-keygen -t ecdsa</span></span></code></pre>
 <blockquote>
 <p>⚠️  <code>/home/$USER/.ssh/id_ecdsa</code> is the private key. Never reveal this to anyone!</p>
 </blockquote>
 <h3 id="add-the-public-key-to-the-server-ssh-copy-id">Add the Public Key to the Server (ssh-copy-id)</h3>
 <p>From the client you can automatically add the public key to the server. You will need to enter
 your username and password for this operation.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-copy-id -f -i /home/$USER/.ssh/id_ecdsa.pub username@server-hostname
-</span></code></pre>
-<h3 id="add-the-public-key-to-the-server-manual">Add the Public Key to the Server (manual)</h3>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh-copy-id -f -i /home/$USER/.ssh/id_ecdsa.pub username@server-hostname</span></span></code></pre><h3 id="add-the-public-key-to-the-server-manual">Add the Public Key to the Server (manual)</h3>
 <p>On the ssh client, view the public key. You may wish to copy-paste this files content.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cat /home/$USER/.ssh/id_ecdsa.pub
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cat /home/$USER/.ssh/id_ecdsa.pub</span></span></code></pre>
 <p>ssh to the server and run the following on the server.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cd ~
-</span><span>mkdir .ssh
-</span><span>touch .ssh/authorized_keys
-</span><span>chmod 600 .ssh/authorized_keys
-</span><span>$EDITOR .ssh/authorized_keys
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cd ~</span></span>
+<span class="giallo-l"><span>mkdir .ssh</span></span>
+<span class="giallo-l"><span>touch .ssh/authorized_keys</span></span>
+<span class="giallo-l"><span>chmod 600 .ssh/authorized_keys</span></span>
+<span class="giallo-l"><span>$EDITOR .ssh/authorized_keys</span></span></code></pre>
 <p>In the editor, paste your ssh public key (one per line) and then save and quit.</p>
 <h3 id="ssh-to-the-server">SSH to the server</h3>
 <p>Now type <code>ssh username@hostname</code> and you will use your key to authenticate!</p>
@@ -220,18 +211,15 @@ your username and password for this operation.</p>
 <p>Now that you have ssh key authentication configured you can harden your ssh server to only
 allow authentication with ssh keys.</p>
 <p>As root (<code>sudo -s</code>) add the following content to <code>/etc/ssh/sshd_config.d/hardening.conf</code></p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>UsePAM yes
-</span><span>PermitRootLogin no
-</span><span>PermitEmptyPasswords no
-</span><span>PasswordAuthentication no
-</span><span>AllowAgentForwarding no
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>UsePAM yes</span></span>
+<span class="giallo-l"><span>PermitRootLogin no</span></span>
+<span class="giallo-l"><span>PermitEmptyPasswords no</span></span>
+<span class="giallo-l"><span>PasswordAuthentication no</span></span>
+<span class="giallo-l"><span>AllowAgentForwarding no</span></span></code></pre>
 <p>Then restart sshd</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>systemctl restart sshd
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>systemctl restart sshd</span></span></code></pre>
 <p>Before logging out of root, ensure you can ssh to the server with key only. Try logging in with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh -o PreferredAuthentications=password username@hostname
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh -o PreferredAuthentications=password username@hostname</span></span></code></pre>
 <p>to ensure that password authentication is rejected correctly.</p>
 
     </div>

@@ -94,9 +94,8 @@ the lid on your MBP, it dumps the contents of ram to sleepimage, and
 then suspends to ram. This means in the case that you lose power while
 suspended, you can still restore your laptop state safely. I don't feel
 I need this, so I ran the following. :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sudo pmset -a hibernatemode 0
-</span><span>sudo rm /private/var/vm/sleepimage
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>sudo pmset -a hibernatemode 0</span></span>
+<span class="giallo-l"><span>sudo rm /private/var/vm/sleepimage</span></span></code></pre>
 <p>Now I have saved 16GB of my SSD (And read write cycles) and my MBP
 sleeps in 2 seconds flat.</p>
 

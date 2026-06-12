@@ -93,20 +93,19 @@ parsed by another human. That means you need to write your program in a
 way they can understand first.</p>
 <p>Rather than rushing into code, and hacking until it works, I find it's
 great to start with comments such as:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fn data_access(search: Search) -&gt; Type {
-</span><span>    // First check the search is valid
-</span><span>    //  * No double terms
-</span><span>    //  * All schema is valid
-</span><span>
-</span><span>    // Retrieve our data based on the search
-</span><span>
-</span><span>    // if debug, do an un-indexed assert the search matches
-</span><span>
-</span><span>    // Do any need transform
-</span><span>
-</span><span>    // Return the data
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>fn data_access(search: Search) -&gt; Type {</span></span>
+<span class="giallo-l"><span>    // First check the search is valid</span></span>
+<span class="giallo-l"><span>    //  * No double terms</span></span>
+<span class="giallo-l"><span>    //  * All schema is valid</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Retrieve our data based on the search</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // if debug, do an un-indexed assert the search matches</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Do any need transform</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Return the data</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>After that, I walk away, think about the issue, come back, maybe tweak
 these comments. When I eventually fill in the code inbetween, I leave
 all the comments in place. This really helps my future self understand
@@ -115,14 +114,13 @@ what I was thinking, but it also helps other people understand too.</p>
 <p>State machines are a way to design and reason about the states a program
 can be in. They allow exhaustive represenations of all possible outcomes
 of a function. A simple example is a microwave door.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/----\            /----- close ----\          /-----\
-</span><span>|     \          /                 v         v      |
-</span><span>|    -------------                ---------------   |
-</span><span>open   | Door Open |                | Door Closed |  close
-</span><span>|    -------------                ---------------   |
-</span><span>|    ^          ^                  /          \     |
-</span><span>\---/            \------ open ----/            \----/
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/----\            /----- close ----\          /-----\</span></span>
+<span class="giallo-l"><span>|     \          /                 v         v      |</span></span>
+<span class="giallo-l"><span>|    -------------                ---------------   |</span></span>
+<span class="giallo-l"><span>open   | Door Open |                | Door Closed |  close</span></span>
+<span class="giallo-l"><span>|    -------------                ---------------   |</span></span>
+<span class="giallo-l"><span>|    ^          ^                  /          \     |</span></span>
+<span class="giallo-l"><span>\---/            \------ open ----/            \----/</span></span></code></pre>
 <p>When the door is open, opening it again does nothing. Only when the door
 is open, and we close the door (and event), does the door close (a
 transition). Once closed, the door can not be closed any more (event
@@ -136,14 +134,11 @@ possible outcomes considered.</p>
 Infinite. It turns out the same is true in a computer too.</p>
 <p>When we are making a function, we can define limits in these terms. For
 example:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fn thing(argument: Type)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>fn thing(argument: Type)</span></span></code></pre>
 <p>In this case, argument is "One" thing, and must be one thing.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fn thing(argument: Option&lt;Type&gt;)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>fn thing(argument: Option&lt;Type&gt;)</span></span></code></pre>
 <p>Now we have argument as an option, so it's "Zero" or "One".</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fn thing(argument: Vec&lt;Type&gt;)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>fn thing(argument: Vec&lt;Type&gt;)</span></span></code></pre>
 <p>Now we have argument as vec (array), so it's "Zero" to "Infinite".</p>
 <p>When we think about this, our functions have to handle these cases
 properly. We don't write functions that take a vec with only two items,
@@ -152,8 +147,7 @@ hard to handle "two" - it's easy to handle two cases of "one".</p>
 <p>It also is a good guide for how to handle data sets, assuming they could
 always be infinite in size (or at least any arbitrary size).</p>
 <p>You can then apply this to tests. In a test given a function of:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>fn test_me(a: Option&lt;Type&gt;, b: Vec&lt;Type&gt;)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>fn test_me(a: Option&lt;Type&gt;, b: Vec&lt;Type&gt;)</span></span></code></pre>
 <p>We know we need to test permutations of:</p>
 <ul>
 <li>a is "Zero" or "One" (Some, None)</li>

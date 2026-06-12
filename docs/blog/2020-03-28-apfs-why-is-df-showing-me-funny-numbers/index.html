@@ -89,11 +89,10 @@ large number of inodes within it.</p>
 <p>However, APFS behaves differently to previous filesystem technology.
 Let's see if we can explain why df reports multiple 932Gi disks like
 this:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; df -h
-</span><span>Filesystem                             Size   Used  Avail Capacity    iused      ifree %iused  Mounted on
-</span><span>/dev/disk1s5                          932Gi   10Gi  380Gi     3%     484322 9767493838    0%   /
-</span><span>/dev/disk1s1                          932Gi  530Gi  380Gi    59%    2072480 9765905680    0%   /System/Volumes/Data
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; df -h</span></span>
+<span class="giallo-l"><span>Filesystem                             Size   Used  Avail Capacity    iused      ifree %iused  Mounted on</span></span>
+<span class="giallo-l"><span>/dev/disk1s5                          932Gi   10Gi  380Gi     3%     484322 9767493838    0%   /</span></span>
+<span class="giallo-l"><span>/dev/disk1s1                          932Gi  530Gi  380Gi    59%    2072480 9765905680    0%   /System/Volumes/Data</span></span></code></pre>
 <p>And if we can explain why when you delete large files, you don't get
 any space back from df either.</p>
 <h2 id="how-it-looked-with-hfs">How it looked with HFS+</h2>
@@ -101,14 +100,13 @@ any space back from df either.</p>
 had partitions (slices of the space in the block device) and those
 partitions were formatted with a filesystem that knew how to store data
 in them. An example:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; diskutil list
-</span><span>...
-</span><span>/dev/disk2 (external, physical):
-</span><span>   #:                       TYPE NAME                    SIZE       IDENTIFIER
-</span><span>   0:      GUID_partition_scheme                         *1.0 TB     disk2
-</span><span>   1:                        EFI EFI                     209.7 MB   disk2s1
-</span><span>   2:                  Apple_HFS tmachine                999.9 GB   disk2s2
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; diskutil list</span></span>
+<span class="giallo-l"><span>...</span></span>
+<span class="giallo-l"><span>/dev/disk2 (external, physical):</span></span>
+<span class="giallo-l"><span>   #:                       TYPE NAME                    SIZE       IDENTIFIER</span></span>
+<span class="giallo-l"><span>   0:      GUID_partition_scheme                         *1.0 TB     disk2</span></span>
+<span class="giallo-l"><span>   1:                        EFI EFI                     209.7 MB   disk2s1</span></span>
+<span class="giallo-l"><span>   2:                  Apple_HFS tmachine                999.9 GB   disk2s2</span></span></code></pre>
 <p>We can see that disk2 is 1.0TB in size, and it contains two partitions,
 the first is 209.7MB for EFI (disk2s1) and the second has data and
 formatted as HFS+ (disk2s2).</p>
@@ -124,30 +122,28 @@ change where applications store data.</p>
 <p>APFS doesn't quite follow this model though. APFS is what's called a
 volume based filesystem. That means there is an intermediate layer in
 here. The layout looks like this in diskutil</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; diskutil list
-</span><span>...
-</span><span>/dev/disk0 (internal, physical):
-</span><span>   #:                       TYPE NAME                    SIZE       IDENTIFIER
-</span><span>   0:      GUID_partition_scheme                        *1.0 TB     disk0
-</span><span>   1:                        EFI EFI                     314.6 MB   disk0s1
-</span><span>   2:                 Apple_APFS Container disk1         1.0 TB     disk0s2
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; diskutil list</span></span>
+<span class="giallo-l"><span>...</span></span>
+<span class="giallo-l"><span>/dev/disk0 (internal, physical):</span></span>
+<span class="giallo-l"><span>   #:                       TYPE NAME                    SIZE       IDENTIFIER</span></span>
+<span class="giallo-l"><span>   0:      GUID_partition_scheme                        *1.0 TB     disk0</span></span>
+<span class="giallo-l"><span>   1:                        EFI EFI                     314.6 MB   disk0s1</span></span>
+<span class="giallo-l"><span>   2:                 Apple_APFS Container disk1         1.0 TB     disk0s2</span></span></code></pre>
 <p>So our disk0 looks like before - an EFI partition, and a very large APFS
 container. However the container itself is NOT the filesystem. The
 contain is a pool of storage that APFS volumes are created into. We can
 see the volumes too.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; diskutil list
-</span><span>...
-</span><span>/dev/disk1 (synthesized):
-</span><span>   #:                       TYPE NAME                    SIZE       IDENTIFIER
-</span><span>   0:      APFS Container Scheme -                      +1.0 TB     disk1
-</span><span>                                 Physical Store disk0s2
-</span><span>   1:                APFS Volume Macintosh HD — Data     569.4 GB   disk1s1
-</span><span>   2:                APFS Volume Preboot                 81.8 MB    disk1s2
-</span><span>   3:                APFS Volume Recovery                526.6 MB   disk1s3
-</span><span>   4:                APFS Volume VM                      10.8 GB    disk1s4
-</span><span>   5:                APFS Volume Macintosh HD            11.0 GB    disk1s5
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; diskutil list</span></span>
+<span class="giallo-l"><span>...</span></span>
+<span class="giallo-l"><span>/dev/disk1 (synthesized):</span></span>
+<span class="giallo-l"><span>   #:                       TYPE NAME                    SIZE       IDENTIFIER</span></span>
+<span class="giallo-l"><span>   0:      APFS Container Scheme -                      +1.0 TB     disk1</span></span>
+<span class="giallo-l"><span>                                 Physical Store disk0s2</span></span>
+<span class="giallo-l"><span>   1:                APFS Volume Macintosh HD — Data     569.4 GB   disk1s1</span></span>
+<span class="giallo-l"><span>   2:                APFS Volume Preboot                 81.8 MB    disk1s2</span></span>
+<span class="giallo-l"><span>   3:                APFS Volume Recovery                526.6 MB   disk1s3</span></span>
+<span class="giallo-l"><span>   4:                APFS Volume VM                      10.8 GB    disk1s4</span></span>
+<span class="giallo-l"><span>   5:                APFS Volume Macintosh HD            11.0 GB    disk1s5</span></span></code></pre>
 <p>Notice how /dev/disk1 is "synthesized"? It's not real - it's there
 to "trick" legacy tools into thinking that the container is a
 "block" device and the volumes are "partitions".</p>
@@ -158,11 +154,10 @@ pool, volume group) is available to <em>all</em> volumes at anytime. Because
 the volumes are a flexible concept, they can have non-contiguous
 geometry on the disk (unlike a partition). That's why in your df output
 you can see:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; df -h
-</span><span>Filesystem                             Size   Used  Avail Capacity    iused      ifree %iused  Mounted on
-</span><span>/dev/disk1s5                          932Gi   10Gi  380Gi     3%     484322 9767493838    0%   /
-</span><span>/dev/disk1s1                          932Gi  530Gi  380Gi    59%    2072480 9765905680    0%   /System/Volumes/Data
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; df -h</span></span>
+<span class="giallo-l"><span>Filesystem                             Size   Used  Avail Capacity    iused      ifree %iused  Mounted on</span></span>
+<span class="giallo-l"><span>/dev/disk1s5                          932Gi   10Gi  380Gi     3%     484322 9767493838    0%   /</span></span>
+<span class="giallo-l"><span>/dev/disk1s1                          932Gi  530Gi  380Gi    59%    2072480 9765905680    0%   /System/Volumes/Data</span></span></code></pre>
 <p>Both disk1s5 (Macintosh HD) and disk1s1 (Macintosh HD --- Data) are APFS
 volumes. The container has 932Gi total space, and 380Gi available in the
 container which either volume could allocate. But you can also see the
@@ -174,9 +169,8 @@ contract - this is because the space is flexibly allocated from the
 container. Neat!</p>
 <p>Each volume also can have different properties applied. For example,
 /dev/disk1s5 (Macintosh HD) in MacOS catalina is read-only:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/dev/disk1s5 on / (apfs, local, read-only, journaled)
-</span><span>/dev/disk1s1 on /System/Volumes/Data (apfs, local, journaled, nobrowse)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/dev/disk1s5 on / (apfs, local, read-only, journaled)</span></span>
+<span class="giallo-l"><span>/dev/disk1s1 on /System/Volumes/Data (apfs, local, journaled, nobrowse)</span></span></code></pre>
 <p>This is to prevent system tampering, and strengthen integrity of the
 system. There are a number of tricks to achieve this such as overlaying
 multiple volumes together. /Applications for example is actually a
@@ -207,35 +201,32 @@ out-and-about, by snapshotting as you work. Because snapshots are just
 "not removing old data" they are low overhead to maintain and take
 snapshots.</p>
 <p>You can see snapshots on your system with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; tmutil listlocalsnapshots /
-</span><span>Snapshots for volume group containing disk /:
-</span><span>com.apple.TimeMachine.2020-03-27-084939.local
-</span><span>com.apple.TimeMachine.2020-03-27-100157.local
-</span><span>com.apple.TimeMachine.2020-03-27-105937.local
-</span><span>com.apple.TimeMachine.2020-03-27-121414.local
-</span><span>...
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; tmutil listlocalsnapshots /</span></span>
+<span class="giallo-l"><span>Snapshots for volume group containing disk /:</span></span>
+<span class="giallo-l"><span>com.apple.TimeMachine.2020-03-27-084939.local</span></span>
+<span class="giallo-l"><span>com.apple.TimeMachine.2020-03-27-100157.local</span></span>
+<span class="giallo-l"><span>com.apple.TimeMachine.2020-03-27-105937.local</span></span>
+<span class="giallo-l"><span>com.apple.TimeMachine.2020-03-27-121414.local</span></span>
+<span class="giallo-l"><span>...</span></span></code></pre>
 <p>You can even take your own snapshots if you want!</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; time tmutil localsnapshot
-</span><span>Created local snapshot with date: 2020-03-28-091943
-</span><span>tmutil localsnapshot  0.01s user 0.01s system 4% cpu 0.439 total
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; time tmutil localsnapshot</span></span>
+<span class="giallo-l"><span>Created local snapshot with date: 2020-03-28-091943</span></span>
+<span class="giallo-l"><span>tmutil localsnapshot  0.01s user 0.01s system 4% cpu 0.439 total</span></span></code></pre>
 <p>See how fast that is! Remember also because this is based on
 copy-on-write, the snapshots only take as much data as the
 <em>differences</em>, or what you are changing as you work.</p>
 <h2 id="space-reclaim">Space Reclaim</h2>
 <p>This leads to the final point of confusion - when people delete files to
 clear space, but df reports no change. For example:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; df -h
-</span><span>Filesystem                             Size   Used  Avail Capacity    iused      ifree %iused  Mounted on
-</span><span>/dev/disk1s1                          932Gi  530Gi  380Gi    59%    2072480 9765905680    0%   /System/Volumes/Data
-</span><span>&gt; ls -alh Downloads/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO
-</span><span>-rwx------@ 1 william  staff   6.5G 10 Oct  2018 Downloads/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO
-</span><span>&gt; rm Downloads/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO
-</span><span>&gt; df -h
-</span><span>Filesystem                             Size   Used  Avail Capacity    iused      ifree %iused  Mounted on
-</span><span>/dev/disk1s1                          932Gi  530Gi  380Gi    59%    2072479 9765905681    0%   /System/Volumes/Data
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; df -h</span></span>
+<span class="giallo-l"><span>Filesystem                             Size   Used  Avail Capacity    iused      ifree %iused  Mounted on</span></span>
+<span class="giallo-l"><span>/dev/disk1s1                          932Gi  530Gi  380Gi    59%    2072480 9765905680    0%   /System/Volumes/Data</span></span>
+<span class="giallo-l"><span>&gt; ls -alh Downloads/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO</span></span>
+<span class="giallo-l"><span>-rwx------@ 1 william  staff   6.5G 10 Oct  2018 Downloads/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO</span></span>
+<span class="giallo-l"><span>&gt; rm Downloads/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO</span></span>
+<span class="giallo-l"><span>&gt; df -h</span></span>
+<span class="giallo-l"><span>Filesystem                             Size   Used  Avail Capacity    iused      ifree %iused  Mounted on</span></span>
+<span class="giallo-l"><span>/dev/disk1s1                          932Gi  530Gi  380Gi    59%    2072479 9765905681    0%   /System/Volumes/Data</span></span></code></pre>
 <p>Now I promise, I really did delete the file - check the "iused" and
 "ifree" columns. But also note that the "Used" space didn't change?
 Surely we should expect to see this value drop to 523Gi since I removed
@@ -258,9 +249,8 @@ we have that much space available". The snapshots are pruned so when
 you come back later, suddenly you have the space.</p>
 <p>Again, you can actually do this yourself. tmutil has a command
 "thinlocalsnapshots" for this. An example usage would be:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&gt; tmutil thinlocalsnapshots /System/Volumes/Data [bytes required]
-</span><span>Thinned local snapshots:
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&gt; tmutil thinlocalsnapshots /System/Volumes/Data [bytes required]</span></span>
+<span class="giallo-l"><span>Thinned local snapshots:</span></span></code></pre>
 <p>In my case I have a lot of space available, so no snapshots are pruned.
 But you may find that multiple snapshots are removed in this process!</p>
 <h2 id="conclusion">Conclusion</h2>

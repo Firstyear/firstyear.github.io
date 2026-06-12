@@ -97,42 +97,41 @@ huge time / download / effort cost.</p>
 <p>Running your own mailserver though, you don't have this issue. It takes
 a few seconds to complete a year rollover. You can even script it like I
 did.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>#!/bin/bash
-</span><span>
-</span><span>export MAILUSER=&#39;email address here&#39;
-</span><span>export LASTYEAR=&#39;2015&#39;
-</span><span>export THISYEAR=&#39;2016&#39;
-</span><span>
-</span><span># Stop postfix first. this way server side filters aren&#39;t being used and mails routed while we fiddle around.
-</span><span>systemctl stop postfix
-</span><span>
-</span><span># Now we can fiddle with mailboxes
-</span><span>
-</span><span># First, we want to make the new archive.
-</span><span>
-</span><span>doveadm mailbox create -u ${MAILUSER} archive.${THISYEAR}
-</span><span>
-</span><span># Create a list of mailboxes.
-</span><span>
-</span><span>export MAILBOXES=`doveadm mailbox list -u ${MAILUSER} &#39;INBOX.*&#39; | awk -F &#39;.&#39; &#39;{print $2}&#39;`
-</span><span>echo $MAILBOXES
-</span><span>
-</span><span># Now move the directories to archive.
-</span><span># Create the new equivalents
-</span><span>
-</span><span>for MAILBOX in ${MAILBOXES}
-</span><span>do
-</span><span>    doveadm mailbox rename -u ${MAILUSER} INBOX.${MAILBOX} archive.${LASTYEAR}.${MAILBOX}
-</span><span>    doveadm mailbox subscribe -u ${MAILUSER} archive.${LASTYEAR}.${MAILBOX}
-</span><span>    doveadm mailbox create -u ${MAILUSER} INBOX.${MAILBOX}
-</span><span>done
-</span><span>
-</span><span>doveadm mailbox list -u ${MAILUSER}
-</span><span>
-</span><span># Start postfix back up
-</span><span>
-</span><span>systemctl start postfix
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>#!/bin/bash</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>export MAILUSER=&#39;email address here&#39;</span></span>
+<span class="giallo-l"><span>export LASTYEAR=&#39;2015&#39;</span></span>
+<span class="giallo-l"><span>export THISYEAR=&#39;2016&#39;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Stop postfix first. this way server side filters aren&#39;t being used and mails routed while we fiddle around.</span></span>
+<span class="giallo-l"><span>systemctl stop postfix</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Now we can fiddle with mailboxes</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># First, we want to make the new archive.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>doveadm mailbox create -u ${MAILUSER} archive.${THISYEAR}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Create a list of mailboxes.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>export MAILBOXES=`doveadm mailbox list -u ${MAILUSER} &#39;INBOX.*&#39; | awk -F &#39;.&#39; &#39;{print $2}&#39;`</span></span>
+<span class="giallo-l"><span>echo $MAILBOXES</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Now move the directories to archive.</span></span>
+<span class="giallo-l"><span># Create the new equivalents</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>for MAILBOX in ${MAILBOXES}</span></span>
+<span class="giallo-l"><span>do</span></span>
+<span class="giallo-l"><span>    doveadm mailbox rename -u ${MAILUSER} INBOX.${MAILBOX} archive.${LASTYEAR}.${MAILBOX}</span></span>
+<span class="giallo-l"><span>    doveadm mailbox subscribe -u ${MAILUSER} archive.${LASTYEAR}.${MAILBOX}</span></span>
+<span class="giallo-l"><span>    doveadm mailbox create -u ${MAILUSER} INBOX.${MAILBOX}</span></span>
+<span class="giallo-l"><span>done</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>doveadm mailbox list -u ${MAILUSER}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Start postfix back up</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>systemctl start postfix</span></span></code></pre>
 <p>Now I have clean, shiny mailboxes, all my filters still work, and my
 previous year's emails are tucked away for safe keeping and posterity.</p>
 <p>The only catch with my script is you need to run it on January 1st, else

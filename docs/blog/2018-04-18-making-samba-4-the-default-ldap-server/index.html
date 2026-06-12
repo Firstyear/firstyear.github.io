@@ -151,29 +151,25 @@ you can access the heimdal kerberos functions. Fedora's samba 4 ships
 ADDC support now, but lacks some features like RODC that you may want.
 In the future I expect this will change though.</p>
 <p>These documents will help guide you:</p>
-<p><a href="https://wiki.samba.org/index.php/Package_Dependencies_Required_to_Build_Samba#Fedora_26">requirements</a></p>
-<p><a href="https://wiki.samba.org/index.php/Build_Samba_from_Source#Introduction">build
+<p><a rel="external" href="https://wiki.samba.org/index.php/Package_Dependencies_Required_to_Build_Samba#Fedora_26">requirements</a></p>
+<p><a rel="external" href="https://wiki.samba.org/index.php/Build_Samba_from_Source#Introduction">build
 steps</a></p>
-<p><a href="https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller">install a
+<p><a rel="external" href="https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller">install a
 domain</a></p>
 <p>I strongly advise you use options similar to:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/local/samba/bin/samba-tool domain provision --server-role=dc --use-rfc2307 --dns-backend=SAMBA_INTERNAL --realm=SAMDOM.EXAMPLE.COM --domain=SAMDOM --adminpass=Passw0rd
-</span></code></pre>
-<h2 id="allow-anonymous-binds-and-searches">Allow anonymous binds and searches</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/local/samba/bin/samba-tool domain provision --server-role=dc --use-rfc2307 --dns-backend=SAMBA_INTERNAL --realm=SAMDOM.EXAMPLE.COM --domain=SAMDOM --adminpass=Passw0rd</span></span></code></pre><h2 id="allow-anonymous-binds-and-searches">Allow anonymous binds and searches</h2>
 <p>Now that you have a working domain controller, we should test you have
 working ldap:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/local/samba/bin/samba-tool forest directory_service dsheuristics 0000002 -H ldaps://localhost --simple-bind-dn=&#39;administrator@samdom.example.com&#39;
-</span><span>
-</span><span>ldapsearch -b DC=samdom,DC=example,DC=com -H ldaps://localhost -x
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/local/samba/bin/samba-tool forest directory_service dsheuristics 0000002 -H ldaps://localhost --simple-bind-dn=&#39;administrator@samdom.example.com&#39;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>ldapsearch -b DC=samdom,DC=example,DC=com -H ldaps://localhost -x</span></span></code></pre>
 <p>You can see the domain object but nothing else. Many other blogs and
 sites recommend a blanket "anonymous read all" access control, but I
 think that's too broad. A better approach is to add the anonymous read
 to only the few containers that require it.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/local/samba/bin/samba-tool dsacl set --objectdn=DC=samdom,DC=example,DC=com --sddl=&#39;(A;;RPLCLORC;;;AN)&#39; --simple-bind-dn=&quot;administrator@samdom.example.com&quot; --password=Passw0rd
-</span><span>/usr/local/samba/bin/samba-tool dsacl set --objectdn=CN=Users,DC=samdom,DC=example,DC=com --sddl=&#39;(A;CI;RPLCLORC;;;AN)&#39; --simple-bind-dn=&quot;administrator@samdom.example.com&quot; --password=Passw0rd
-</span><span>/usr/local/samba/bin/samba-tool dsacl set --objectdn=CN=Builtin,DC=samdom,DC=example,DC=com --sddl=&#39;(A;CI;RPLCLORC;;;AN)&#39; --simple-bind-dn=&quot;administrator@samdom.example.com&quot; --password=Passw0rd
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/local/samba/bin/samba-tool dsacl set --objectdn=DC=samdom,DC=example,DC=com --sddl=&#39;(A;;RPLCLORC;;;AN)&#39; --simple-bind-dn=&quot;administrator@samdom.example.com&quot; --password=Passw0rd</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool dsacl set --objectdn=CN=Users,DC=samdom,DC=example,DC=com --sddl=&#39;(A;CI;RPLCLORC;;;AN)&#39; --simple-bind-dn=&quot;administrator@samdom.example.com&quot; --password=Passw0rd</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool dsacl set --objectdn=CN=Builtin,DC=samdom,DC=example,DC=com --sddl=&#39;(A;CI;RPLCLORC;;;AN)&#39; --simple-bind-dn=&quot;administrator@samdom.example.com&quot; --password=Passw0rd</span></span></code></pre>
 <p>In AD groups and users are found in cn=users, and some groups are in
 cn=builtin. So we allow read to the root domain object, then we set a
 read on cn=users and cn=builtin that inherits to it's child objects.
@@ -191,146 +187,133 @@ your files and restart.</p>
 <p>To allow adding schema to samba 4 you need to reconfigure the dsdb
 config on the schema master. To show the current schema master you can
 use:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/local/samba/bin/samba-tool fsmo show -H ldaps://localhost --simple-bind-dn=&#39;administrator@adt.blackhats.net.au&#39; --password=Password1
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/local/samba/bin/samba-tool fsmo show -H ldaps://localhost --simple-bind-dn=&#39;administrator@adt.blackhats.net.au&#39; --password=Password1</span></span></code></pre>
 <p>Look for the value:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>SchemaMasterRole owner: CN=NTDS Settings,CN=LDAPKDC,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>SchemaMasterRole owner: CN=NTDS Settings,CN=LDAPKDC,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span></code></pre>
 <p>And note the CN=ldapkdc = that's the hostname of the current schema
 master.</p>
 <p>On the schema master we need to adjust the smb.conf. The change you need
 to make is:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[global]
-</span><span>    dsdb:schema update allowed = yes
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[global]</span></span>
+<span class="giallo-l"><span>    dsdb:schema update allowed = yes</span></span></code></pre>
 <p>Now restart the instance and we can update the schema. The following
 LDIF should work if you replace ${DOMAINDN} with your namingContext.
 You can apply it with ldapmodify</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: CN=sshPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>changetype: add
-</span><span>objectClass: top
-</span><span>objectClass: attributeSchema
-</span><span>attributeID: 1.3.6.1.4.1.24552.500.1.1.1.13
-</span><span>cn: sshPublicKey
-</span><span>name: sshPublicKey
-</span><span>lDAPDisplayName: sshPublicKey
-</span><span>description: MANDATORY: OpenSSH Public key
-</span><span>attributeSyntax: 2.5.5.10
-</span><span>oMSyntax: 4
-</span><span>isSingleValued: FALSE
-</span><span>searchFlags: 8
-</span><span>
-</span><span>dn: CN=ldapPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>changetype: add
-</span><span>objectClass: top
-</span><span>objectClass: classSchema
-</span><span>governsID: 1.3.6.1.4.1.24552.500.1.1.2.0
-</span><span>cn: ldapPublicKey
-</span><span>name: ldapPublicKey
-</span><span>description: MANDATORY: OpenSSH LPK objectclass
-</span><span>lDAPDisplayName: ldapPublicKey
-</span><span>subClassOf: top
-</span><span>objectClassCategory: 3
-</span><span>defaultObjectCategory: CN=ldapPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>mayContain: sshPublicKey
-</span><span>
-</span><span>dn: CN=User,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>changetype: modify
-</span><span>replace: auxiliaryClass
-</span><span>auxiliaryClass: ldapPublicKey
-</span><span>auxiliaryClass: posixAccount
-</span><span>auxiliaryClass: shadowAccount
-</span><span>-
-</span><span>
-</span><span>sudo ldapmodify -f sshpubkey.ldif -D &#39;administrator@adt.blackhats.net.au&#39; -w Password1 -H ldaps://localhost 
-</span><span>adding new entry &quot;CN=sshPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au&quot;
-</span><span>
-</span><span>adding new entry &quot;CN=ldapPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au&quot;
-</span><span>
-</span><span>modifying entry &quot;CN=User,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: CN=sshPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>changetype: add</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: attributeSchema</span></span>
+<span class="giallo-l"><span>attributeID: 1.3.6.1.4.1.24552.500.1.1.1.13</span></span>
+<span class="giallo-l"><span>cn: sshPublicKey</span></span>
+<span class="giallo-l"><span>name: sshPublicKey</span></span>
+<span class="giallo-l"><span>lDAPDisplayName: sshPublicKey</span></span>
+<span class="giallo-l"><span>description: MANDATORY: OpenSSH Public key</span></span>
+<span class="giallo-l"><span>attributeSyntax: 2.5.5.10</span></span>
+<span class="giallo-l"><span>oMSyntax: 4</span></span>
+<span class="giallo-l"><span>isSingleValued: FALSE</span></span>
+<span class="giallo-l"><span>searchFlags: 8</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: CN=ldapPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>changetype: add</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: classSchema</span></span>
+<span class="giallo-l"><span>governsID: 1.3.6.1.4.1.24552.500.1.1.2.0</span></span>
+<span class="giallo-l"><span>cn: ldapPublicKey</span></span>
+<span class="giallo-l"><span>name: ldapPublicKey</span></span>
+<span class="giallo-l"><span>description: MANDATORY: OpenSSH LPK objectclass</span></span>
+<span class="giallo-l"><span>lDAPDisplayName: ldapPublicKey</span></span>
+<span class="giallo-l"><span>subClassOf: top</span></span>
+<span class="giallo-l"><span>objectClassCategory: 3</span></span>
+<span class="giallo-l"><span>defaultObjectCategory: CN=ldapPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>mayContain: sshPublicKey</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: CN=User,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>replace: auxiliaryClass</span></span>
+<span class="giallo-l"><span>auxiliaryClass: ldapPublicKey</span></span>
+<span class="giallo-l"><span>auxiliaryClass: posixAccount</span></span>
+<span class="giallo-l"><span>auxiliaryClass: shadowAccount</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>sudo ldapmodify -f sshpubkey.ldif -D &#39;administrator@adt.blackhats.net.au&#39; -w Password1 -H ldaps://localhost </span></span>
+<span class="giallo-l"><span>adding new entry &quot;CN=sshPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>adding new entry &quot;CN=ldapPublicKey,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>modifying entry &quot;CN=User,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au&quot;</span></span></code></pre>
 <p>To my surprise, userCertificate already exists! The reason I missed it
 is a subtle ad schema behaviour I missed. The <em>ldap attribute</em> name is
 stored in the lDAPDisplayName and may not be the same as the CN of the
 schema element. As a result, you can find this with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ldapsearch -H ldaps://localhost -b CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au -x -D &#39;administrator@adt.blackhats.net.au&#39; -W &#39;(attributeId=2.5.4.36)&#39;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ldapsearch -H ldaps://localhost -b CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au -x -D &#39;administrator@adt.blackhats.net.au&#39; -W &#39;(attributeId=2.5.4.36)&#39;</span></span></code></pre>
 <p>This doesn't solve my issues: Because I am a long time user of 389-ds,
 that means I need some ns compat attributes. Here I add the nsUniqueId
 value so that I can keep some compatability.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: CN=nsUniqueId,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>changetype: add
-</span><span>objectClass: top
-</span><span>objectClass: attributeSchema
-</span><span>attributeID: 2.16.840.1.113730.3.1.542
-</span><span>cn: nsUniqueId
-</span><span>name: nsUniqueId
-</span><span>lDAPDisplayName: nsUniqueId
-</span><span>description: MANDATORY: nsUniqueId compatability
-</span><span>attributeSyntax: 2.5.5.10
-</span><span>oMSyntax: 4
-</span><span>isSingleValued: TRUE
-</span><span>searchFlags: 9
-</span><span>
-</span><span>dn: CN=nsOrgPerson,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>changetype: add
-</span><span>objectClass: top
-</span><span>objectClass: classSchema
-</span><span>governsID: 2.16.840.1.113730.3.2.334
-</span><span>cn: nsOrgPerson
-</span><span>name: nsOrgPerson
-</span><span>description: MANDATORY: Netscape DS compat person
-</span><span>lDAPDisplayName: nsOrgPerson
-</span><span>subClassOf: top
-</span><span>objectClassCategory: 3
-</span><span>defaultObjectCategory: CN=nsOrgPerson,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>mayContain: nsUniqueId
-</span><span>
-</span><span>dn: CN=User,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au
-</span><span>changetype: modify
-</span><span>replace: auxiliaryClass
-</span><span>auxiliaryClass: ldapPublicKey
-</span><span>auxiliaryClass: posixAccount
-</span><span>auxiliaryClass: shadowAccount
-</span><span>auxiliaryClass: nsOrgPerson
-</span><span>-
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: CN=nsUniqueId,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>changetype: add</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: attributeSchema</span></span>
+<span class="giallo-l"><span>attributeID: 2.16.840.1.113730.3.1.542</span></span>
+<span class="giallo-l"><span>cn: nsUniqueId</span></span>
+<span class="giallo-l"><span>name: nsUniqueId</span></span>
+<span class="giallo-l"><span>lDAPDisplayName: nsUniqueId</span></span>
+<span class="giallo-l"><span>description: MANDATORY: nsUniqueId compatability</span></span>
+<span class="giallo-l"><span>attributeSyntax: 2.5.5.10</span></span>
+<span class="giallo-l"><span>oMSyntax: 4</span></span>
+<span class="giallo-l"><span>isSingleValued: TRUE</span></span>
+<span class="giallo-l"><span>searchFlags: 9</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: CN=nsOrgPerson,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>changetype: add</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: classSchema</span></span>
+<span class="giallo-l"><span>governsID: 2.16.840.1.113730.3.2.334</span></span>
+<span class="giallo-l"><span>cn: nsOrgPerson</span></span>
+<span class="giallo-l"><span>name: nsOrgPerson</span></span>
+<span class="giallo-l"><span>description: MANDATORY: Netscape DS compat person</span></span>
+<span class="giallo-l"><span>lDAPDisplayName: nsOrgPerson</span></span>
+<span class="giallo-l"><span>subClassOf: top</span></span>
+<span class="giallo-l"><span>objectClassCategory: 3</span></span>
+<span class="giallo-l"><span>defaultObjectCategory: CN=nsOrgPerson,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>mayContain: nsUniqueId</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: CN=User,CN=Schema,CN=Configuration,DC=adt,DC=blackhats,DC=net,DC=au</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>replace: auxiliaryClass</span></span>
+<span class="giallo-l"><span>auxiliaryClass: ldapPublicKey</span></span>
+<span class="giallo-l"><span>auxiliaryClass: posixAccount</span></span>
+<span class="giallo-l"><span>auxiliaryClass: shadowAccount</span></span>
+<span class="giallo-l"><span>auxiliaryClass: nsOrgPerson</span></span>
+<span class="giallo-l"><span>-</span></span></code></pre>
 <p>Now with this you can extend your users with the required data for SSH,
 certificates and maybe 389-ds compatability.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/local/samba/bin/samba-tool user edit william  -H ldaps://localhost --simple-bind-dn=&#39;administrator@adt.blackhats.net.au&#39;
-</span></code></pre>
-<h2 id="performance">Performance</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/local/samba/bin/samba-tool user edit william  -H ldaps://localhost --simple-bind-dn=&#39;administrator@adt.blackhats.net.au&#39;</span></span></code></pre><h2 id="performance">Performance</h2>
 <p>Out of the box a number of the unix attributes are not indexed by Active
 Directory. To fix this you need to update the search flags in the
 schema.</p>
 <p>Again, temporarily allow changes:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[global]
-</span><span>    dsdb:schema update allowed = yes
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[global]</span></span>
+<span class="giallo-l"><span>    dsdb:schema update allowed = yes</span></span></code></pre>
 <p>Now we need to add some indexes for common types. Note that in the
 nsUniqueId schema I already added the search flags. We also want to set
 that these values should be preserved if they become tombstones so we
 can recove them.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/local/samba/bin/samba-tool schema attribute modify uid --searchflags=9
-</span><span>/usr/local/samba/bin/samba-tool schema attribute modify nsUniqueId --searchflags=9
-</span><span>/usr/local/samba/bin/samba-tool schema attribute modify uidnumber --searchflags=9
-</span><span>/usr/local/samba/bin/samba-tool schema attribute modify gidnumber --searchflags=9
-</span><span># Preserve on tombstone but don&#39;t index
-</span><span>/usr/local/samba/bin/samba-tool schema attribute modify x509-cert --searchflags=8
-</span><span>/usr/local/samba/bin/samba-tool schema attribute modify sshPublicKey --searchflags=8
-</span><span>/usr/local/samba/bin/samba-tool schema attribute modify gecos --searchflags=8
-</span><span>/usr/local/samba/bin/samba-tool schema attribute modify loginShell --searchflags=8
-</span><span>/usr/local/samba/bin/samba-tool schema attribute modify home-directory --searchflags=24
-</span></code></pre>
-<h2 id="ad-hardening">AD Hardening</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify uid --searchflags=9</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify nsUniqueId --searchflags=9</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify uidnumber --searchflags=9</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify gidnumber --searchflags=9</span></span>
+<span class="giallo-l"><span># Preserve on tombstone but don&#39;t index</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify x509-cert --searchflags=8</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify sshPublicKey --searchflags=8</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify gecos --searchflags=8</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify loginShell --searchflags=8</span></span>
+<span class="giallo-l"><span>/usr/local/samba/bin/samba-tool schema attribute modify home-directory --searchflags=24</span></span></code></pre><h2 id="ad-hardening">AD Hardening</h2>
 <p>We want to harden a few default settings that could be considered
 insecure. First, let's stop "any user from being able to domain join
 machines".</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/local/samba/bin/samba-tool domain settings account_machine_join_quota 0 -H ldaps://localhost --simple-bind-dn=&#39;administrator@adt.blackhats.net.au&#39;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/local/samba/bin/samba-tool domain settings account_machine_join_quota 0 -H ldaps://localhost --simple-bind-dn=&#39;administrator@adt.blackhats.net.au&#39;</span></span></code></pre>
 <p>Now let's disable the Guest account</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/usr/local/samba/bin/samba-tool user disable Guest -H ldaps://localhost --simple-bind-dn=&#39;administrator@adt.blackhats.net.au&#39;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/usr/local/samba/bin/samba-tool user disable Guest -H ldaps://localhost --simple-bind-dn=&#39;administrator@adt.blackhats.net.au&#39;</span></span></code></pre>
 <p>I plan to write a more complete samba-tool extension for auditing these
 and more options, so stay tuned!</p>
 <h2 id="sssd-configuration">SSSD configuration</h2>
@@ -342,75 +325,73 @@ In the future I want to explore sudo rules in LDAP with AD, and maybe
 even HBAC rules rather than GPO.</p>
 <p>Please refer to my other blog posts on configuration of the
 userCertificates and sshKey distribution.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[domain/blackhats.net.au]
-</span><span>ignore_group_members = False
-</span><span>
-</span><span>debug_level=3
-</span><span># There is a bug in SSSD where this actually means &quot;ipv6 only&quot;.
-</span><span># lookup_family_order=ipv6_first
-</span><span>cache_credentials = True
-</span><span>id_provider = ldap
-</span><span>auth_provider = ldap
-</span><span>access_provider = ldap
-</span><span>chpass_provider = ldap
-</span><span>ldap_search_base = dc=blackhats,dc=net,dc=au
-</span><span>
-</span><span># This prevents an infinite referral loop.
-</span><span>ldap_referrals = False
-</span><span>ldap_id_mapping = True
-</span><span>ldap_schema = ad
-</span><span># Rather that being in domain users group, create a user private group
-</span><span># automatically on login.
-</span><span># This is very important as a security setting on unix!!!
-</span><span># See this bug if it doesn&#39;t work correctly.
-</span><span># https://pagure.io/SSSD/sssd/issue/3723
-</span><span>auto_private_groups = true
-</span><span>
-</span><span>ldap_uri = ldaps://ad.blackhats.net.au
-</span><span>ldap_tls_reqcert = demand
-</span><span>ldap_tls_cacert = /etc/pki/tls/certs/bh_ldap.crt
-</span><span>
-</span><span># Workstation access
-</span><span>ldap_access_filter = (memberOf=CN=Workstation Operators,CN=Users,DC=blackhats,DC=net,DC=au)
-</span><span>
-</span><span>ldap_user_member_of = memberof
-</span><span>ldap_user_gecos = cn
-</span><span>ldap_user_uuid = objectGUID
-</span><span>ldap_group_uuid = objectGUID
-</span><span># This is really important as it allows SSSD to respect nsAccountLock
-</span><span>ldap_account_expire_policy = ad
-</span><span>ldap_access_order = filter, expire
-</span><span># Setup for ssh keys
-</span><span>ldap_user_ssh_public_key = sshPublicKey
-</span><span># This does not require ;binary tag with AD.
-</span><span>ldap_user_certificate = userCertificate
-</span><span># This is required for the homeDirectory to be looked up in the sssd schema
-</span><span>ldap_user_home_directory = homeDirectory
-</span><span>
-</span><span>
-</span><span>[sssd]
-</span><span>services = nss, pam, ssh, sudo
-</span><span>config_file_version = 2
-</span><span>certificate_verification = no_verification
-</span><span>
-</span><span>domains = blackhats.net.au
-</span><span>[nss]
-</span><span>homedir_substring = /home
-</span><span>
-</span><span>[pam]
-</span><span>pam_cert_auth = True
-</span><span>
-</span><span>[sudo]
-</span><span>
-</span><span>[autofs]
-</span><span>
-</span><span>[ssh]
-</span><span>
-</span><span>[pac]
-</span><span>
-</span><span>[ifp]
-</span></code></pre>
-<h2 id="conclusion">Conclusion</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[domain/blackhats.net.au]</span></span>
+<span class="giallo-l"><span>ignore_group_members = False</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>debug_level=3</span></span>
+<span class="giallo-l"><span># There is a bug in SSSD where this actually means &quot;ipv6 only&quot;.</span></span>
+<span class="giallo-l"><span># lookup_family_order=ipv6_first</span></span>
+<span class="giallo-l"><span>cache_credentials = True</span></span>
+<span class="giallo-l"><span>id_provider = ldap</span></span>
+<span class="giallo-l"><span>auth_provider = ldap</span></span>
+<span class="giallo-l"><span>access_provider = ldap</span></span>
+<span class="giallo-l"><span>chpass_provider = ldap</span></span>
+<span class="giallo-l"><span>ldap_search_base = dc=blackhats,dc=net,dc=au</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># This prevents an infinite referral loop.</span></span>
+<span class="giallo-l"><span>ldap_referrals = False</span></span>
+<span class="giallo-l"><span>ldap_id_mapping = True</span></span>
+<span class="giallo-l"><span>ldap_schema = ad</span></span>
+<span class="giallo-l"><span># Rather that being in domain users group, create a user private group</span></span>
+<span class="giallo-l"><span># automatically on login.</span></span>
+<span class="giallo-l"><span># This is very important as a security setting on unix!!!</span></span>
+<span class="giallo-l"><span># See this bug if it doesn&#39;t work correctly.</span></span>
+<span class="giallo-l"><span># https://pagure.io/SSSD/sssd/issue/3723</span></span>
+<span class="giallo-l"><span>auto_private_groups = true</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>ldap_uri = ldaps://ad.blackhats.net.au</span></span>
+<span class="giallo-l"><span>ldap_tls_reqcert = demand</span></span>
+<span class="giallo-l"><span>ldap_tls_cacert = /etc/pki/tls/certs/bh_ldap.crt</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Workstation access</span></span>
+<span class="giallo-l"><span>ldap_access_filter = (memberOf=CN=Workstation Operators,CN=Users,DC=blackhats,DC=net,DC=au)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>ldap_user_member_of = memberof</span></span>
+<span class="giallo-l"><span>ldap_user_gecos = cn</span></span>
+<span class="giallo-l"><span>ldap_user_uuid = objectGUID</span></span>
+<span class="giallo-l"><span>ldap_group_uuid = objectGUID</span></span>
+<span class="giallo-l"><span># This is really important as it allows SSSD to respect nsAccountLock</span></span>
+<span class="giallo-l"><span>ldap_account_expire_policy = ad</span></span>
+<span class="giallo-l"><span>ldap_access_order = filter, expire</span></span>
+<span class="giallo-l"><span># Setup for ssh keys</span></span>
+<span class="giallo-l"><span>ldap_user_ssh_public_key = sshPublicKey</span></span>
+<span class="giallo-l"><span># This does not require ;binary tag with AD.</span></span>
+<span class="giallo-l"><span>ldap_user_certificate = userCertificate</span></span>
+<span class="giallo-l"><span># This is required for the homeDirectory to be looked up in the sssd schema</span></span>
+<span class="giallo-l"><span>ldap_user_home_directory = homeDirectory</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[sssd]</span></span>
+<span class="giallo-l"><span>services = nss, pam, ssh, sudo</span></span>
+<span class="giallo-l"><span>config_file_version = 2</span></span>
+<span class="giallo-l"><span>certificate_verification = no_verification</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>domains = blackhats.net.au</span></span>
+<span class="giallo-l"><span>[nss]</span></span>
+<span class="giallo-l"><span>homedir_substring = /home</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[pam]</span></span>
+<span class="giallo-l"><span>pam_cert_auth = True</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[sudo]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[autofs]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[ssh]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[pac]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[ifp]</span></span></code></pre><h2 id="conclusion">Conclusion</h2>
 <p>With these simple changes we can easily make samba 4 able to perform the
 roles of other unix focused LDAP servers. This allows stateless clients,
 secure ssh key authentication, certificate authentication and more.</p>

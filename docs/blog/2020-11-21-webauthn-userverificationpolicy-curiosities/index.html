@@ -83,9 +83,9 @@
     <div itemprop="articleBody">
         <h1 id="webauthn-userverificationpolicy-curiosities">Webauthn UserVerificationPolicy Curiosities</h1>
 <p>Recently I received a
-<a href="https://github.com/kanidm/webauthn-rs/issues/32">pair</a>
-<a href="https://github.com/kanidm/webauthn-rs/issues/34">of</a> interesting bugs
-in <a href="https://github.com/kanidm/webauthn-rs/">Webauthn RS</a> where certain
+<a rel="external" href="https://github.com/kanidm/webauthn-rs/issues/32">pair</a>
+<a rel="external" href="https://github.com/kanidm/webauthn-rs/issues/34">of</a> interesting bugs
+in <a rel="external" href="https://github.com/kanidm/webauthn-rs/">Webauthn RS</a> where certain
 types of authenticators would not work in Firefox, but did work in
 Chromium. This confused me, and I couldn't reproduce the behaviour. So
 like any obsessed person I ordered myself one of the affected devices
@@ -99,7 +99,7 @@ kept working on Edge with a pin - and confusingly <em>without</em> a pin on
 Firefox.</p>
 <h2 id="some-background-on-webauthn">Some background on Webauthn</h2>
 <p>Before we dive into the issue, we need to understand some details about
-Webauthn. <a href="https://www.w3.org/TR/webauthn/">Webauthn</a> is a standard that
+Webauthn. <a rel="external" href="https://www.w3.org/TR/webauthn/">Webauthn</a> is a standard that
 allows a client (commonly a web browser) to cryptographically
 authenticate to a server (commonly a web site). Webauthn defines how
 different types of hardware cryptographic authenticators may communicate
@@ -108,7 +108,7 @@ between the client and the server.</p>
 (yubikeys), TouchID (Apple Mac, iPhone, iPad), Trusted Platform Modules
 (Windows Hello) and many more. Webauthn has to account for differences
 in these hardware classes and how they communicate, but in the end each
-device performs a set of <a href="https://en.wikipedia.org/wiki/Public-key_cryptography">asymmetric
+device performs a set of <a rel="external" href="https://en.wikipedia.org/wiki/Public-key_cryptography">asymmetric
 cryptographic</a>
 (public/private key) operations.</p>
 <p>Webauthn defines the structures of how a client and server communicate
@@ -117,53 +117,50 @@ those authenticators.</p>
 <p>For the first step of registration, the server provides a registration
 challenge to the client. The structure of this (which is important for
 later) looks like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dictionary PublicKeyCredentialCreationOptions {
-</span><span>    required PublicKeyCredentialRpEntity         rp;
-</span><span>    required PublicKeyCredentialUserEntity       user;
-</span><span>
-</span><span>    required BufferSource                             challenge;
-</span><span>    required sequence&lt;PublicKeyCredentialParameters&gt;  pubKeyCredParams;
-</span><span>
-</span><span>    unsigned long                                timeout;
-</span><span>    sequence&lt;PublicKeyCredentialDescriptor&gt;      excludeCredentials = [];
-</span><span>    AuthenticatorSelectionCriteria               authenticatorSelection = {
-</span><span>        AuthenticatorAttachment      authenticatorAttachment;
-</span><span>        boolean                      requireResidentKey = false;
-</span><span>        UserVerificationRequirement  userVerification = &quot;preferred&quot;;
-</span><span>    };
-</span><span>    AttestationConveyancePreference              attestation = &quot;none&quot;;
-</span><span>    AuthenticationExtensionsClientInputs         extensions;
-</span><span>};
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dictionary PublicKeyCredentialCreationOptions {</span></span>
+<span class="giallo-l"><span>    required PublicKeyCredentialRpEntity         rp;</span></span>
+<span class="giallo-l"><span>    required PublicKeyCredentialUserEntity       user;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    required BufferSource                             challenge;</span></span>
+<span class="giallo-l"><span>    required sequence&lt;PublicKeyCredentialParameters&gt;  pubKeyCredParams;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    unsigned long                                timeout;</span></span>
+<span class="giallo-l"><span>    sequence&lt;PublicKeyCredentialDescriptor&gt;      excludeCredentials = [];</span></span>
+<span class="giallo-l"><span>    AuthenticatorSelectionCriteria               authenticatorSelection = {</span></span>
+<span class="giallo-l"><span>        AuthenticatorAttachment      authenticatorAttachment;</span></span>
+<span class="giallo-l"><span>        boolean                      requireResidentKey = false;</span></span>
+<span class="giallo-l"><span>        UserVerificationRequirement  userVerification = &quot;preferred&quot;;</span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>    AttestationConveyancePreference              attestation = &quot;none&quot;;</span></span>
+<span class="giallo-l"><span>    AuthenticationExtensionsClientInputs         extensions;</span></span>
+<span class="giallo-l"><span>};</span></span></code></pre>
 <p>The client then takes this structure, and creates a number of hashes
 from it which the authenticator then signs. This signed data and options
 are returned to the server as a
-<a href="https://w3c.github.io/webauthn/#iface-pkcredential">PublicKeyCredential</a>
-containing an <a href="https://www.w3.org/TR/webauthn/#iface-authenticatorattestationresponse">Authenticator Attestation
+<a rel="external" href="https://w3c.github.io/webauthn/#iface-pkcredential">PublicKeyCredential</a>
+containing an <a rel="external" href="https://www.w3.org/TR/webauthn/#iface-authenticatorattestationresponse">Authenticator Attestation
 Response</a>.</p>
 <p>Next is authentication. The server sends a challenge to the client which
 has the structure:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dictionary PublicKeyCredentialRequestOptions {
-</span><span>    required BufferSource                challenge;
-</span><span>    unsigned long                        timeout;
-</span><span>    USVString                            rpId;
-</span><span>    sequence&lt;PublicKeyCredentialDescriptor&gt; allowCredentials = [];
-</span><span>    UserVerificationRequirement          userVerification = &quot;preferred&quot;;
-</span><span>    AuthenticationExtensionsClientInputs extensions;
-</span><span>};
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dictionary PublicKeyCredentialRequestOptions {</span></span>
+<span class="giallo-l"><span>    required BufferSource                challenge;</span></span>
+<span class="giallo-l"><span>    unsigned long                        timeout;</span></span>
+<span class="giallo-l"><span>    USVString                            rpId;</span></span>
+<span class="giallo-l"><span>    sequence&lt;PublicKeyCredentialDescriptor&gt; allowCredentials = [];</span></span>
+<span class="giallo-l"><span>    UserVerificationRequirement          userVerification = &quot;preferred&quot;;</span></span>
+<span class="giallo-l"><span>    AuthenticationExtensionsClientInputs extensions;</span></span>
+<span class="giallo-l"><span>};</span></span></code></pre>
 <p>Again, the client takes this structure, takes a number of hashes and the
 authenticator signs this to prove it is the holder of the private key.
 The signed response is sent to the server as a PublicKeyCredential
-containing an <a href="https://www.w3.org/TR/webauthn/#iface-authenticatorassertionresponse">Authenticator Assertion
+containing an <a rel="external" href="https://www.w3.org/TR/webauthn/#iface-authenticatorassertionresponse">Authenticator Assertion
 Response</a>.</p>
 <p>Key to this discussion is the following field:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>UserVerificationRequirement          userVerification = &quot;preferred&quot;;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>UserVerificationRequirement          userVerification = &quot;preferred&quot;;</span></span></code></pre>
 <p>This is present in both PublicKeyCredentialRequestOptions and
 PublicKeyCredentialCreationOptions. This informs what level of
 interaction assurance should be provided during the signing process.
-These are discussed in <a href="https://pages.nist.gov/800-63-3/sp800-63b.html">NIST SP800-64b (5.1.7,
+These are discussed in <a rel="external" href="https://pages.nist.gov/800-63-3/sp800-63b.html">NIST SP800-64b (5.1.7,
 5.1.9)</a> (which is just
 an excellent document anyway, so read it).</p>
 <p>One aspect of these authenticators is that they must provide tamper
@@ -199,12 +196,12 @@ Single-Factor devices.</li>
 <p>When I initially saw these reports - of devices that did not work in
 Firefox but did in Chromium, and of devices asking for PINs on some
 browsers but not others -I was really confused. The breakthrough came as
-I was developing <a href="https://github.com/kanidm/webauthn-authenticator-rs">Webauthn Authenticator
+I was developing <a rel="external" href="https://github.com/kanidm/webauthn-authenticator-rs">Webauthn Authenticator
 RS</a>. This is the
 client half of Webauthn, so that I could have the
-<a href="https://github.com/kanidm/kanidm">Kanidm</a> CLI tools use Webauthn for
+<a rel="external" href="https://github.com/kanidm/kanidm">Kanidm</a> CLI tools use Webauthn for
 multi-factor authentication (MFA). In the process, I have been using the
-<a href="https://crates.io/crates/authenticator">authenticator</a> crate made by
+<a rel="external" href="https://crates.io/crates/authenticator">authenticator</a> crate made by
 Mozilla and used by Firefox.</p>
 <p>The authenticator crate is what communicates to authenticators by NFC,
 Bluetooth, or USB. Due to the different types of devices, there are
@@ -358,7 +355,7 @@ factors if needed.</li>
 expressed in line with NIST SP800-63b, so users can have a mix of
 Single and Multi Factor devices associated with a single account.</li>
 </ul>
-<p>I have since opened <a href="https://github.com/w3c/webauthn/issues/1510">this
+<p>I have since opened <a rel="external" href="https://github.com/w3c/webauthn/issues/1510">this
 issue</a> with the webauthn
 specification about this, but early comments seem to be highly focused
 on the current expression of the standard rather than the issues around

@@ -112,26 +112,24 @@ and after.</li>
 <h2 id="long-version-let-s-begin">Long Version ... let's begin ...</h2>
 <p>So why do we have memory and operation orderings at all? Let's look at
 some code to explain:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>let mut x = 0;
-</span><span>let mut y = 0;
-</span><span>x = x + 3;
-</span><span>y = y + 7;
-</span><span>x = x + 4;
-</span><span>x = y + x;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>let mut x = 0;</span></span>
+<span class="giallo-l"><span>let mut y = 0;</span></span>
+<span class="giallo-l"><span>x = x + 3;</span></span>
+<span class="giallo-l"><span>y = y + 7;</span></span>
+<span class="giallo-l"><span>x = x + 4;</span></span>
+<span class="giallo-l"><span>x = y + x;</span></span></code></pre>
 <p>Really trivial example - now to us as a human, we read this and see a
 set of operations that are linear by time. That means, they execute from
 top to bottom, in order.</p>
 <p>However, this is not how computers work. First, compilers will optimise
 your code, and optimisation means re-ordering of the operations to
 achieve better results. A compiler may optimise this to:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>let mut x = 0;
-</span><span>let mut y = 0;
-</span><span>// Note removal of the x + 3 and x + 4, folded to a single operation.
-</span><span>x = x + 7
-</span><span>y = y + 7;
-</span><span>x = y + x;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>let mut x = 0;</span></span>
+<span class="giallo-l"><span>let mut y = 0;</span></span>
+<span class="giallo-l"><span>// Note removal of the x + 3 and x + 4, folded to a single operation.</span></span>
+<span class="giallo-l"><span>x = x + 7</span></span>
+<span class="giallo-l"><span>y = y + 7;</span></span>
+<span class="giallo-l"><span>x = y + x;</span></span></code></pre>
 <p>Now there is a second element. Your CPU presents the illusion of running
 as a linear system, but it's actually an asynchronous, out-of-order
 task execution engine. That means a CPU will reorder your instructions,
@@ -169,14 +167,12 @@ will we retrieve the values from RAM.</p>
 <p>(Aside: in almost all cases more CPU cache, not frequency will make your
 system perform better, because a cache miss will mean your task stalls
 waiting on RAM. Ohh no!)</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>CPU -&gt; Cache -&gt; RAM
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>CPU -&gt; Cache -&gt; RAM</span></span></code></pre>
 <p>When you have multiple CPU's, each CPU has it's own L1 cache:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>CPU1 -&gt; L1 Cache -&gt; |              |
-</span><span>CPU2 -&gt; L1 Cache -&gt; | Shared L2/L3 | -&gt; RAM
-</span><span>CPU3 -&gt; L1 Cache -&gt; |              |
-</span><span>CPU4 -&gt; L1 Cache -&gt; |              |
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>CPU1 -&gt; L1 Cache -&gt; |              |</span></span>
+<span class="giallo-l"><span>CPU2 -&gt; L1 Cache -&gt; | Shared L2/L3 | -&gt; RAM</span></span>
+<span class="giallo-l"><span>CPU3 -&gt; L1 Cache -&gt; |              |</span></span>
+<span class="giallo-l"><span>CPU4 -&gt; L1 Cache -&gt; |              |</span></span></code></pre>
 <p>Ahhh! Suddenly we can see where problems can occur - each CPU has an L1
 cache, which is transparent to memory but <em>unique</em> to the CPU. This
 means that each CPU can make a change to the same piece of memory in
@@ -185,15 +181,14 @@ show a demo.</p>
 <h2 id="cpu-just-trash-my-variables">CPU just trash my variables</h2>
 <p>We'll assume we now have two threads - my code is in rust again, and
 there is a good reason for the unsafes - this code really is unsafe!</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>// assume global x: usize = 0; y: usize = 0;
-</span><span>
-</span><span>THREAD 1                        THREAD 2
-</span><span>
-</span><span>if unsafe { *x == 1 } {          unsafe {
-</span><span>    unsafe { *y += 1 }              *y = 10;
-</span><span>}                                   *x = 1;
-</span><span>                                }
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>// assume global x: usize = 0; y: usize = 0;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>THREAD 1                        THREAD 2</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>if unsafe { *x == 1 } {          unsafe {</span></span>
+<span class="giallo-l"><span>    unsafe { *y += 1 }              *y = 10;</span></span>
+<span class="giallo-l"><span>}                                   *x = 1;</span></span>
+<span class="giallo-l"><span>                                }</span></span></code></pre>
 <p>At the end of execution, what state will X and Y be in? The answer is
 "it depends":</p>
 <ul>
@@ -226,7 +221,7 @@ values made available to each cpu ...). Then thread 1 executes y (0) +=
 <p>If you want to know more about this and many other horrors of CPU
 execution, Paul McKenny is an expert in this field and has many talks at
 LCA and others on the topic. He can be found on
-<a href="https://twitter.com/paulmckrcu">twitter</a> and is super helpful if you
+<a rel="external" href="https://twitter.com/paulmckrcu">twitter</a> and is super helpful if you
 have questions.</p>
 <h2 id="so-how-does-a-cpu-work-at-all">So how does a CPU work at all?</h2>
 <p>Obviously your system (likely a multicore system) works today - so it
@@ -270,46 +265,44 @@ that are beyond this discussion.</li>
 <h2 id="understand-a-mutex">Understand a Mutex</h2>
 <p>With this knowledge in place, we are finally in a position to understand
 the operations of a Mutex</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>// Assume mutex: Mutex&lt;usize&gt; = Mutex::new(0);
-</span><span>
-</span><span>THREAD 1                            THREAD 2
-</span><span>
-</span><span>{                                   {
-</span><span>    let guard = mutex.lock()            let guard = mutex.lock()
-</span><span>    *guard += 1;                        println!(*guard)
-</span><span>}                                   }
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>// Assume mutex: Mutex&lt;usize&gt; = Mutex::new(0);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>THREAD 1                            THREAD 2</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>{                                   {</span></span>
+<span class="giallo-l"><span>    let guard = mutex.lock()            let guard = mutex.lock()</span></span>
+<span class="giallo-l"><span>    *guard += 1;                        println!(*guard)</span></span>
+<span class="giallo-l"><span>}                                   }</span></span></code></pre>
 <p>We know very clearly that this will print 1 or 0 - it's safe, no weird
 behaviours. Let's explain this case though:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>THREAD 1
-</span><span>
-</span><span>{
-</span><span>    let guard = mutex.lock()
-</span><span>    // Acquire here!
-</span><span>    // All invalidation handled, guard is 0.
-</span><span>    // Compiler is told &quot;all following code must stay after .lock()&quot;.
-</span><span>    *guard += 1;
-</span><span>    // content of usize is changed, invalid req is queue
-</span><span>}
-</span><span>// Release here!
-</span><span>// Guard goes out of scope, invalidation reqs sent to all CPU&#39;s
-</span><span>// Compiler told all proceeding code must stay above this point.
-</span><span>
-</span><span>            THREAD 2
-</span><span>
-</span><span>            {
-</span><span>                let guard = mutex.lock()
-</span><span>                // Acquire here!
-</span><span>                // All invalidations handled - previous cache of usize discarded
-</span><span>                // and read from THREAD 1 cache into S state.
-</span><span>                // Compiler is told &quot;all following code must stay after .lock()&quot;.
-</span><span>                println(*guard);
-</span><span>            }
-</span><span>            // Release here!
-</span><span>            // Guard goes out of scope, no invalidations sent due to
-</span><span>            // no modifications.
-</span><span>            // Compiler told all proceeding code must stay above this point.
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>THREAD 1</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    let guard = mutex.lock()</span></span>
+<span class="giallo-l"><span>    // Acquire here!</span></span>
+<span class="giallo-l"><span>    // All invalidation handled, guard is 0.</span></span>
+<span class="giallo-l"><span>    // Compiler is told &quot;all following code must stay after .lock()&quot;.</span></span>
+<span class="giallo-l"><span>    *guard += 1;</span></span>
+<span class="giallo-l"><span>    // content of usize is changed, invalid req is queue</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"><span>// Release here!</span></span>
+<span class="giallo-l"><span>// Guard goes out of scope, invalidation reqs sent to all CPU&#39;s</span></span>
+<span class="giallo-l"><span>// Compiler told all proceeding code must stay above this point.</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            THREAD 2</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            {</span></span>
+<span class="giallo-l"><span>                let guard = mutex.lock()</span></span>
+<span class="giallo-l"><span>                // Acquire here!</span></span>
+<span class="giallo-l"><span>                // All invalidations handled - previous cache of usize discarded</span></span>
+<span class="giallo-l"><span>                // and read from THREAD 1 cache into S state.</span></span>
+<span class="giallo-l"><span>                // Compiler is told &quot;all following code must stay after .lock()&quot;.</span></span>
+<span class="giallo-l"><span>                println(*guard);</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>            // Release here!</span></span>
+<span class="giallo-l"><span>            // Guard goes out of scope, no invalidations sent due to</span></span>
+<span class="giallo-l"><span>            // no modifications.</span></span>
+<span class="giallo-l"><span>            // Compiler told all proceeding code must stay above this point.</span></span></code></pre>
 <p>And there we have it! How barriers allow us to define an ordering in
 code and a CPU, to ensure our caches and compiler outputs are correct
 and consistent.</p>
@@ -335,14 +328,14 @@ performance.</p>
 me!</a></p>
 <h2 id="shameless-plug">Shameless Plug</h2>
 <p>I'm the author and maintainer of Conc Read - a concurrently readable
-datastructure library for Rust. <a href="https://crates.io/crates/concread">Check it out on
+datastructure library for Rust. <a rel="external" href="https://crates.io/crates/concread">Check it out on
 crates.io!</a></p>
 <h2 id="references">References</h2>
-<p><a href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf">What every programmer should know about memory
+<p><a rel="external" href="https://people.freebsd.org/~lstewart/articles/cpumemory.pdf">What every programmer should know about memory
 (pdf)</a></p>
-<p><a href="https://doc.rust-lang.org/nomicon/atomics.html">Rust-nomicon - memory
+<p><a rel="external" href="https://doc.rust-lang.org/nomicon/atomics.html">Rust-nomicon - memory
 ordering</a></p>
-<p><a href="https://gamozolabs.github.io/metrology/2019/08/19/sushi_roll.html">Microarchitectural inspection with Sushi
+<p><a rel="external" href="https://gamozolabs.github.io/metrology/2019/08/19/sushi_roll.html">Microarchitectural inspection with Sushi
 Roll</a></p>
 
     </div>

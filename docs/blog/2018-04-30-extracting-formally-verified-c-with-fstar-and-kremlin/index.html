@@ -100,38 +100,36 @@ projects.</p>
 <p>Today there are a number of undocumented gotchas with opam - the OCaml
 package manager. Most of these are silent errors. I used the following
 steps to get to a working environment.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># It&#39;s important to have bzip2 here else opam silently fails!
-</span><span>dnf install -y rsync git patch opam bzip2 which gmp gmp-devel m4 \
-</span><span>        hg unzip pkgconfig redhat-rpm-config
-</span><span>
-</span><span>opam init
-</span><span># You need 4.02.3 else wasm will not compile.
-</span><span>opam switch create 4.02.3
-</span><span>opam switch 4.02.3
-</span><span>echo &quot;. /home/Work/.opam/opam-init/init.sh &gt; /dev/null 2&gt; /dev/null || true&quot; &gt;&gt; .bashrc
-</span><span>opam install batteries fileutils yojson ppx_deriving_yojson zarith fix pprint menhir process stdint ulex wasm
-</span><span>
-</span><span>PATH &quot;~/z3/bin:~/FStar/bin:~/kremlin:$PATH&quot;
-</span><span># You can get the &quot;correct&quot; z3 version from https://github.com/FStarLang/binaries/raw/master/z3-tested/z3-4.5.1.1f29cebd4df6-x64-ubuntu-14.04.zip
-</span><span>unzip z3-4.5.1.1f29cebd4df6-x64-ubuntu-14.04.zip
-</span><span>mv z3-4.5.1.1f29cebd4df6-x64-ubuntu-14.04 z3
-</span><span>
-</span><span># You will need a &quot;stable&quot; release of FStar https://github.com/FStarLang/FStar/archive/stable.zip
-</span><span>unzip stable.zip
-</span><span>mv FStar-stable Fstar
-</span><span>cd ~/FStar
-</span><span>opam config exec -- make -C src/ocaml-output -j
-</span><span>opam config exec -- make -C ulib/ml
-</span><span>
-</span><span># You need a master branch of kremlin https://github.com/FStarLang/kremlin/archive/master.zip
-</span><span>cd ~
-</span><span>unzip master.zip
-</span><span>mv kremlin-master kremlin
-</span><span>cd kremlin
-</span><span>opam config exec -- make
-</span><span>opam config exec -- make test
-</span></code></pre>
-<h2 id="your-first-fstar-extraction">Your first FStar extraction</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># It&#39;s important to have bzip2 here else opam silently fails!</span></span>
+<span class="giallo-l"><span>dnf install -y rsync git patch opam bzip2 which gmp gmp-devel m4 \</span></span>
+<span class="giallo-l"><span>        hg unzip pkgconfig redhat-rpm-config</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>opam init</span></span>
+<span class="giallo-l"><span># You need 4.02.3 else wasm will not compile.</span></span>
+<span class="giallo-l"><span>opam switch create 4.02.3</span></span>
+<span class="giallo-l"><span>opam switch 4.02.3</span></span>
+<span class="giallo-l"><span>echo &quot;. /home/Work/.opam/opam-init/init.sh &gt; /dev/null 2&gt; /dev/null || true&quot; &gt;&gt; .bashrc</span></span>
+<span class="giallo-l"><span>opam install batteries fileutils yojson ppx_deriving_yojson zarith fix pprint menhir process stdint ulex wasm</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>PATH &quot;~/z3/bin:~/FStar/bin:~/kremlin:$PATH&quot;</span></span>
+<span class="giallo-l"><span># You can get the &quot;correct&quot; z3 version from https://github.com/FStarLang/binaries/raw/master/z3-tested/z3-4.5.1.1f29cebd4df6-x64-ubuntu-14.04.zip</span></span>
+<span class="giallo-l"><span>unzip z3-4.5.1.1f29cebd4df6-x64-ubuntu-14.04.zip</span></span>
+<span class="giallo-l"><span>mv z3-4.5.1.1f29cebd4df6-x64-ubuntu-14.04 z3</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># You will need a &quot;stable&quot; release of FStar https://github.com/FStarLang/FStar/archive/stable.zip</span></span>
+<span class="giallo-l"><span>unzip stable.zip</span></span>
+<span class="giallo-l"><span>mv FStar-stable Fstar</span></span>
+<span class="giallo-l"><span>cd ~/FStar</span></span>
+<span class="giallo-l"><span>opam config exec -- make -C src/ocaml-output -j</span></span>
+<span class="giallo-l"><span>opam config exec -- make -C ulib/ml</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># You need a master branch of kremlin https://github.com/FStarLang/kremlin/archive/master.zip</span></span>
+<span class="giallo-l"><span>cd ~</span></span>
+<span class="giallo-l"><span>unzip master.zip</span></span>
+<span class="giallo-l"><span>mv kremlin-master kremlin</span></span>
+<span class="giallo-l"><span>cd kremlin</span></span>
+<span class="giallo-l"><span>opam config exec -- make</span></span>
+<span class="giallo-l"><span>opam config exec -- make test</span></span></code></pre><h2 id="your-first-fstar-extraction">Your first FStar extraction</h2>
 
     </div>
 </article>

@@ -86,13 +86,11 @@
 here!</a></p>
 <p>By default IPA has some weak security around TLS and anonymous binds.</p>
 <p>We can improve this by changing the following options.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nsslapd-minssf-exclude-rootdse: on
-</span><span>nsslapd-minssf: 56
-</span><span>nsslapd-require-secure-binds: on
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>nsslapd-minssf-exclude-rootdse: on</span></span>
+<span class="giallo-l"><span>nsslapd-minssf: 56</span></span>
+<span class="giallo-l"><span>nsslapd-require-secure-binds: on</span></span></code></pre>
 <p>The last one you may want to change is:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nsslapd-allow-anonymous-access: on
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>nsslapd-allow-anonymous-access: on</span></span></code></pre>
 <p>I think this is important to have on, as it allows non-domain members to
 use ipa, but there are arguments to disabling anon reads too.</p>
 

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="description" content="Firstyear&#x27;s blog">
+        
+
+        <title>
+        
+        
+          Standards as Intended vs Standards as Used
+        
+        
+        </title>
+
+        
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="https://fy.blackhats.net.au/rss.xml">
+        
+
+        
+            <link rel="stylesheet" href="https://fy.blackhats.net.au/theme.css">
+        
+        
+    </head>
+    <body>
+        <div class="content">
+        
+        
+            <header>
+                <div class="header-left">
+                    <a href="https:&#x2F;&#x2F;fy.blackhats.net.au" class="logo">Firstyear&#x27;s blog-a-log</a>
+                </div>
+                <div class="header-right">
+                    <nav itemscope itemtype="http://schema.org/SiteNavigationElement">
+                      <ul>
+                        
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/blog/">
+                                    <span itemprop="name">Blog</span>
+                                </a>
+                            </li>
+                        
+                            
+                            <li class="nav">
+                                <a itemprop="url" href="https://fy.blackhats.net.au/pages/">
+                                    <span itemprop="name">Pages</span>
+                                </a>
+                            </li>
+                        
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="https://github.com/firstyear">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/icons/github.svg" alt="Github">
+                            </a>
+                        </li>
+                        
+                        <li class="nav">
+                            <a itemprop="url" href="/rss.xml">
+                                <img class="icon" src="https:&#x2F;&#x2F;fy.blackhats.net.au/rss-logo.png" alt="rss">
+                            </a>
+                        </li>
+                      </ul>
+                    </nav>
+                </div>
+            </header>
+        
+        
+        <main>
+            
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <div itemprop="headline">
+        <h1>Standards as Intended vs Standards as Used</h1>
+        <div class="border"></div>
+        <time datetime="2026-06-12" class="date" itemprop="datePublished">
+            12 Jun 2026
+        </time>
+    </div>
+    <div itemprop="articleBody">
+        <p>Part of my role as a software engineer (and formerly a sysadmin) is that I need to read - and
+understand standards. As <a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.youtube.com/c/BenEater)">Ben Eater</a> said once in his channel "standards trade clarity for
+specificity". This has many consequences - some of which we know as people implementing
+the standard incorrectly due to the lack of clarity (I've made this mistake plenty!). But I
+think this strive for accuracy ends up creating some unintended social outcomes.</p>
+<p>See over time I've noticed that there is often a disconnect between the standard and how it's
+used. Maybe a law already exists for this, but I always say there is a divide between "the standard
+as intended" and "the standard as used".</p>
+<p>LDAP is a great example of this, especially as something I've worked on for so long.</p>
+<p><a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.rfc-editor.org/info/rfc4511/)">RFC 4511</a> defines the capabilities of LDAP, itself being a derivative of <a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://en.wikipedia.org/wiki/X.500)">X500 DAP</a>. LDAP defines
+many operations - searches, updates, binding (authentication), extended operations, even the ability
+to return referrals so that a query can be redirected. Extended operations allow the protocol to be
+customised. Controls allow extra information to be returned in parallel to other operations. Searches
+can request different sort and match orderings - you want to look up alphabetically with case sensitivity
+or not? Even things like tagged attributes so you can have a <code>name</code> in multiple languages.</p>
+<p>So what was the <em>intent</em>? The standard tells us what the operations are but not what the vision for
+them was.</p>
+<p>The goal was a global, federated/trusted directory allowing multiple organisations to interoperate
+and even authenticate users across organisational boundaries. Consider logging into your workplace
+computer with a hardware security token that your government issued that identified you. That same
+token then lets you login to your email hosted by "I can't believe it's not google". One identity
+and method to authenticate you, all shared and trusted.</p>
+<p>All of the parts presented become a part of this. But that intent isn't clear from the standard.</p>
+<p>So despite all of the capability that <a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.rfc-editor.org/info/rfc4511/)">RFC 4511</a> provides, what is actually used?</p>
+<p><code>search</code> and <code>bind</code>. In some edge cases you may see <code>modify</code>/<code>create</code> but not often. Certainly you
+don't see LDAP being a global catalog of identities. Every organisation ends up running their own
+small LDAP silo in isolation to everyone else, and most authentication today doesn't even go via
+LDAP, opting for things like OAuth2 (another example of a misused standard).</p>
+<p>That's the crux of this - despite the intent of the standard authors, the way that the standard is
+used is always <em>different</em>. Maybe it's a subset. Maybe it's completely orthogonal to the intent. Maybe
+things are added that betray the intent of the standard. But it is this disconnect that often
+leads to confusion and friction between standards authors, implementors, and users.</p>
+<p>When viewed through this lens, so many challenges of modern technology start to fall into place.</p>
+<p><a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.w3.org/TR/webauthn/)">Webauthn</a> originally was designed to support security tokens (yubikeys) but was "used" to allow
+software password managers that violated the assumptions that existed. The standard provides
+tools to allow helping users find what credentials they could enrol, but when used by implementors
+ends up locking people out or denying them consent and choice of how they authenticate. Even within
+all the capabilities of Webauthn, there are only a few narrow paths within the standard that create
+good user experiences today.</p>
+<p><a href="https://fy.blackhats.net.au/blog/2026-06-12-standards/(https://www.rfc-editor.org/info/rfc6749/)">OAuth2</a> exists to allow a service (client) to authorise a token that can be used on behalf of a user to
+access something (resource server). But more often than not, what the user is authorising to is the
+service itself, and the token never goes anywhere. OAuth2 is often (mis)used for "authentication"
+to linux machines despite the user experience being so horrible.</p>
+<p>Honestly I could keep going - but all around us are the standards as (mis)used, despite their intent.</p>
+<p>I guess if all you have is unclear standards, everything looks like a nail.</p>
+
+    </div>
+</article>
+
+        </main>
+        
+        <footer>
+            
+            <div class="border"></div>
+            <div class="footer">
+                <small class="footer-left">
+                    Copyright &copy; William Brown
+                </small>
+                <small class="footer-right">
+                    Powered by <a href="https://www.getzola.org">Zola</a> | Theme <a href="https://github.com/barlog-m/oceanic-zen">Oceanic Zen</a>
+                </small>
+            </div>
+        
+        </footer>
+    
+        </div>
+    </body>
+</html>

@@ -89,9 +89,8 @@ works and the features it offers.</p>
 <h2 id="as-a-consumer">As A Consumer</h2>
 <p>The best part of OBS is that it's trivial on OpenSUSE to consume
 content from it. Zypper can add projects with the command:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper ar obs://&lt;project name&gt; &lt;repo nickname&gt;
-</span><span>zypper ar obs://network:ldap network:ldap
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>zypper ar obs://&lt;project name&gt; &lt;repo nickname&gt;</span></span>
+<span class="giallo-l"><span>zypper ar obs://network:ldap network:ldap</span></span></code></pre>
 <p>I like to give the repo nickname (your choice) to be the same as the
 project name so I know what I have enabled. Once you run this you can
 easily consume content from OBS.</p>
@@ -100,92 +99,76 @@ easily consume content from OBS.</p>
 I've been slowly learning how this work flow works. OBS similar to
 GitHub/Lab allows a branching and request model.</p>
 <p>On OpenSUSE you will want to use the osc tool for your workflow:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper in osc
-</span><span># If you plan to use the &quot;service&quot; command
-</span><span>zypper in obs-service-tar obs-service-obs_scm obs-service-recompress obs-service-set_version obs-service-download_files python-xml obs-service-format_spec_file
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>zypper in osc</span></span>
+<span class="giallo-l"><span># If you plan to use the &quot;service&quot; command</span></span>
+<span class="giallo-l"><span>zypper in obs-service-tar obs-service-obs_scm obs-service-recompress obs-service-set_version obs-service-download_files python-xml obs-service-format_spec_file</span></span></code></pre>
 <p>You can branch from an existing project to make changes with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc branch &lt;project&gt; &lt;package&gt;
-</span><span>osc branch network:ldap 389-ds
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc branch &lt;project&gt; &lt;package&gt;</span></span>
+<span class="giallo-l"><span>osc branch network:ldap 389-ds</span></span></code></pre>
 <p>This will branch the project to my home namespace. For me this will land
 in "home:firstyear:branches:network:ldap". Now I can checkout the
 content on to my machine to work on it.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc co &lt;project&gt;
-</span><span>osc co home:firstyear:branches:network:ldap
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc co &lt;project&gt;</span></span>
+<span class="giallo-l"><span>osc co home:firstyear:branches:network:ldap</span></span></code></pre>
 <p>This will create the folder "home:...:ldap" in the current working
 directory.</p>
 <p>From here you can now work on the project. Some useful commands are:</p>
 <p>Add new files to the project (patches, new source tarballs etc).</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc add &lt;path to file&gt;
-</span><span>osc add feature.patch
-</span><span>osc add new-source.tar.xz
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc add &lt;path to file&gt;</span></span>
+<span class="giallo-l"><span>osc add feature.patch</span></span>
+<span class="giallo-l"><span>osc add new-source.tar.xz</span></span></code></pre>
 <p>Edit the change log of the project (I think this is used in release
 notes?)</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc vc
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc vc</span></span></code></pre>
 <p>To ammend your changes, use:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc vc -e
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc vc -e</span></span></code></pre>
 <p>Build your changes locally matching the system you are on. Packages
 normally build on all/most OpenSUSE versions and architectures, this
 will build just for your local system and arch.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc build
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc build</span></span></code></pre>
 <p>Make sure you clean up files you aren't using any more with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc rm &lt;filename&gt;
-</span><span># This commands removes anything untracked by osc.
-</span><span>osc clean
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc rm &lt;filename&gt;</span></span>
+<span class="giallo-l"><span># This commands removes anything untracked by osc.</span></span>
+<span class="giallo-l"><span>osc clean</span></span></code></pre>
 <p>Commit your changes to the OBS server, where a complete build will be
 triggered:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc commit
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc commit</span></span></code></pre>
 <p>View the results of the last commit:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc results
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc results</span></span></code></pre>
 <p>Enable people to use your branch/project as a repository. You edit the
 project metadata and enable repo publishing:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc meta prj -e &lt;name of project&gt;
-</span><span>osc meta prj -e home:firstyear:branches:network:ldap
-</span><span>
-</span><span># When your editor opens, change this section to enabled (disabled by default):
-</span><span>&lt;publish&gt;
-</span><span>  &lt;enabled /&gt;
-</span><span>&lt;/publish&gt;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc meta prj -e &lt;name of project&gt;</span></span>
+<span class="giallo-l"><span>osc meta prj -e home:firstyear:branches:network:ldap</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># When your editor opens, change this section to enabled (disabled by default):</span></span>
+<span class="giallo-l"><span>&lt;publish&gt;</span></span>
+<span class="giallo-l"><span>  &lt;enabled /&gt;</span></span>
+<span class="giallo-l"><span>&lt;/publish&gt;</span></span></code></pre>
 <p>NOTE: In some cases if you have the package already installed, and you
 add the repo/update it won't install from your repo. This is because in
 SUSE packages have a notion of "vendoring". They continue to update
 from the same repo as they were originally installed from. So if you
 want to change this you use:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper [d]up --from &lt;repo name&gt;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>zypper [d]up --from &lt;repo name&gt;</span></span></code></pre>
 <p>You can then create a "request" to merge your branch changes back to
 the project origin. This is:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc sr
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc sr</span></span></code></pre>
 <p>A helpful maintainer will then review your changes. You can see this
 with.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc rq show &lt;your request id&gt;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc rq show &lt;your request id&gt;</span></span></code></pre>
 <p>If you change your request, to submit again, use:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc sr
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc sr</span></span></code></pre>
 <p>And it will ask if you want to replace (supercede) the previous request.</p>
 <p>I was also helped by a friend to provie a "service" configuration that
 allows generation of tar balls from git. It's not always appropriate to
 use this, but if the repo has a "_service" file, you can regenerate
 the tar with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc service ra
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc service ra</span></span></code></pre>
 <p>So far this is as far as I have gotten with OBS, but I already
 appreciate how great this work flow is for package maintainers,
 reviewers and consumers. It's a pleasure to work with software this
 well built.</p>
-<p>As an additional piece of information, it's a good idea to read the <a href="https://en.opensuse.org/openSUSE:Packaging_Patches_guidelines">OBS Packaging Guidelines</a></p>
+<p>As an additional piece of information, it's a good idea to read the <a rel="external" href="https://en.opensuse.org/openSUSE:Packaging_Patches_guidelines">OBS Packaging Guidelines</a></p>
 <p>:   to be sure that you are doing the right thing!</p>
 <p># Acts as tail</p>
 <p>:   osc bl osc r -v</p>

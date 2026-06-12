@@ -83,7 +83,7 @@
     <div itemprop="articleBody">
         <h1 id="windows-hello-in-webauthn-rs">Windows Hello in Webauthn-rs</h1>
 <p>Recently I've been working again on
-<a href="https://crates.io/crates/webauthn-rs">webauthn-rs</a>, as a member of the
+<a rel="external" href="https://crates.io/crates/webauthn-rs">webauthn-rs</a>, as a member of the
 community wants to start using it in production for a service. So far
 the development of the library has been limited to the test devices that
 I own, but now this pushes me toward implementing true fido compliance.</p>
@@ -130,7 +130,7 @@ operations. As Microsoft is attempting to move to a passwordless future
 (which honestly, I'm on board for and want to support in Kanidm), this
 means they want to support Webauthn on as many of their devices as
 possible. Microsoft even defines in their hardware requirements for
-Windows 10 Home, Pro, Education and Enterprise that <a href="https://docs.microsoft.com/en-us/windows-hardware/design/minimum/minimum-hardware-requirements-overview">as of July 28,
+Windows 10 Home, Pro, Education and Enterprise that <a rel="external" href="https://docs.microsoft.com/en-us/windows-hardware/design/minimum/minimum-hardware-requirements-overview">as of July 28,
 2016, all new device models, lines or series ... a component which
 implements the TPM 2.0 must be present and enabled by default from this
 effective
@@ -138,7 +138,7 @@ date.</a>.
 This is pretty major as this means that slowly MS have been ensuring
 that <em>all</em> consumer and enterprise devices are steadily moving to a
 point where passwordless is a viable future. Microsoft state that they
-use TPMv2 for many reasons, but a defining one is: <a href="https://docs.microsoft.com/en-us/windows/security/information-protection/tpm/tpm-recommendations">The TPM 1.2 spec
+use TPMv2 for many reasons, but a defining one is: <a rel="external" href="https://docs.microsoft.com/en-us/windows/security/information-protection/tpm/tpm-recommendations">The TPM 1.2 spec
 only allows for the use of RSA and the SHA-1 hashing
 algorithm</a>
 which is now considered broken.</p>
@@ -146,7 +146,7 @@ which is now considered broken.</p>
 Webauthn supports a TPM attestation path, and that means I have to
 implement it.</p>
 <h2 id="once-more-into-the-abyss">Once more into the abyss</h2>
-<p>Reading the <a href="https://www.w3.org/TR/webauthn/#tpm-attestation">Webauthn spec for TPM
+<p>Reading the <a rel="external" href="https://www.w3.org/TR/webauthn/#tpm-attestation">Webauthn spec for TPM
 attestation</a> it pointed
 me to the TPMv2.0 specification part1, part2 and part3. I will spare you
 from this as there is a sum total of 861 pages between these documents,
@@ -166,7 +166,7 @@ Some stand out parts of this section were as follows.</p>
 <p>Broken Crypto</p>
 <p><code>TPM_ALG_SHA1 0x0004 // The SHA1 Algorithm</code></p>
 <p>Being the boomer equivalent of
-<a href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/">JWT</a></p>
+<a rel="external" href="https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/">JWT</a></p>
 <p><code>TPM_ALG_NULL 0x0010 // The NULL Algorithm</code></p>
 <p>And supporting the latest in modern cipher suites</p>
 <p><code>TPM_ALG_XOR 0x000A // TCG TPM 2.0 library specification - the XOR encryption algorithm.</code></p>
@@ -183,18 +183,16 @@ accidentally a TPM_ALG_ID causing a parser to overflow.</p>
 requiring TPMv2.0 to move away from RSA and SHA-1, that when I checked
 the attestation signatures for a Windows Hello device I had to implement
 the following:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>COSEContentType::INSECURE_RS1 =&gt; {
-</span><span>    hash::hash(hash::MessageDigest::sha1(), input)
-</span><span>        .map(|dbytes| Vec::from(dbytes.as_ref()))
-</span><span>        .map_err(|e| WebauthnError::OpenSSLError(e))
-</span><span>}
-</span></code></pre>
-<h2 id="conclusion">Conclusion</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>COSEContentType::INSECURE_RS1 =&gt; {</span></span>
+<span class="giallo-l"><span>    hash::hash(hash::MessageDigest::sha1(), input)</span></span>
+<span class="giallo-l"><span>        .map(|dbytes| Vec::from(dbytes.as_ref()))</span></span>
+<span class="giallo-l"><span>        .map_err(|e| WebauthnError::OpenSSLError(e))</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h2 id="conclusion">Conclusion</h2>
 <p>Saying this, I'm happy that Windows Hello is now in Webauthn-rs. The
 actual Webauthn authentication flows DO use secure algorithms (RSA2048 +
 SHA256 and better), it is only in the attestation path that some
 components are signed by SHA1. So please use
-<a href="https://crates.io/crates/webauthn-rs">webauthn-rs</a>, and do use Windows
+<a rel="external" href="https://crates.io/crates/webauthn-rs">webauthn-rs</a>, and do use Windows
 Hello with it!</p>
 
     </div>

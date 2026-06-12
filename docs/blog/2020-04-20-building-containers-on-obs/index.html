@@ -91,61 +91,55 @@ make the repository setup a little easier.</p>
 <p>When you edit the project metadata, if the project doesn't already
 exist, a new one is created. So we can start by filling out the template
 from the command:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc meta prj -e home:firstyear:containers
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc meta prj -e home:firstyear:containers</span></span></code></pre>
 <p>This will give you a template: We need to add some repository lines:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&lt;project name=&quot;home:firstyear:apps&quot;&gt;
-</span><span>  &lt;title&gt;Containers Demo&lt;/title&gt;
-</span><span>  &lt;description&gt;Containers Demo&lt;/description&gt;
-</span><span>  &lt;person userid=&quot;firstyear&quot; role=&quot;bugowner&quot;/&gt;
-</span><span>  &lt;person userid=&quot;firstyear&quot; role=&quot;maintainer&quot;/&gt;
-</span><span>  &lt;build&gt;
-</span><span>    &lt;enable/&gt;
-</span><span>  &lt;/build&gt;
-</span><span>  &lt;publish&gt;
-</span><span>    &lt;enable/&gt;
-</span><span>  &lt;/publish&gt;
-</span><span>  &lt;debuginfo&gt;
-</span><span>    &lt;enable/&gt;
-</span><span>  &lt;/debuginfo&gt;
-</span><span>  &lt;!-- this repository --&gt;
-</span><span>  &lt;repository name=&quot;containers&quot;&gt;
-</span><span>    &lt;path project=&quot;openSUSE:Templates:Images:Tumbleweed&quot; repository=&quot;containers&quot;/&gt;
-</span><span>    &lt;arch&gt;x86_64&lt;/arch&gt;
-</span><span>  &lt;/repository&gt;
-</span><span>&lt;/project&gt;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&lt;project name=&quot;home:firstyear:apps&quot;&gt;</span></span>
+<span class="giallo-l"><span>  &lt;title&gt;Containers Demo&lt;/title&gt;</span></span>
+<span class="giallo-l"><span>  &lt;description&gt;Containers Demo&lt;/description&gt;</span></span>
+<span class="giallo-l"><span>  &lt;person userid=&quot;firstyear&quot; role=&quot;bugowner&quot;/&gt;</span></span>
+<span class="giallo-l"><span>  &lt;person userid=&quot;firstyear&quot; role=&quot;maintainer&quot;/&gt;</span></span>
+<span class="giallo-l"><span>  &lt;build&gt;</span></span>
+<span class="giallo-l"><span>    &lt;enable/&gt;</span></span>
+<span class="giallo-l"><span>  &lt;/build&gt;</span></span>
+<span class="giallo-l"><span>  &lt;publish&gt;</span></span>
+<span class="giallo-l"><span>    &lt;enable/&gt;</span></span>
+<span class="giallo-l"><span>  &lt;/publish&gt;</span></span>
+<span class="giallo-l"><span>  &lt;debuginfo&gt;</span></span>
+<span class="giallo-l"><span>    &lt;enable/&gt;</span></span>
+<span class="giallo-l"><span>  &lt;/debuginfo&gt;</span></span>
+<span class="giallo-l"><span>  &lt;!-- this repository --&gt;</span></span>
+<span class="giallo-l"><span>  &lt;repository name=&quot;containers&quot;&gt;</span></span>
+<span class="giallo-l"><span>    &lt;path project=&quot;openSUSE:Templates:Images:Tumbleweed&quot; repository=&quot;containers&quot;/&gt;</span></span>
+<span class="giallo-l"><span>    &lt;arch&gt;x86_64&lt;/arch&gt;</span></span>
+<span class="giallo-l"><span>  &lt;/repository&gt;</span></span>
+<span class="giallo-l"><span>&lt;/project&gt;</span></span></code></pre>
 <p>Remember, to set the publist to "enable" if you want the docker images
 you build to be pushed to the registry!</p>
 <p>Now that that's done, we can check out the project, and create a new
 container package within.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc co home:firstyear:containers
-</span><span>cd home:firstyear:containers
-</span><span>osc mkpac mycontainer
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc co home:firstyear:containers</span></span>
+<span class="giallo-l"><span>cd home:firstyear:containers</span></span>
+<span class="giallo-l"><span>osc mkpac mycontainer</span></span></code></pre>
 <p>Now in the mycontainer folder you can start to build a container. Add
 your dockerfile:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>#!BuildTag: mycontainer
-</span><span>#
-</span><span># docker pull registry.opensuse.org/home/firstyear/apps/containers/mycontainer:latest
-</span><span>#                                   ^projectname        ^repos     ^ build tag
-</span><span>FROM opensuse/tumbleweed:latest
-</span><span>
-</span><span>#
-</span><span># only one zypper ar command per line. only repositories inside the OBS are allowed
-</span><span>#
-</span><span>RUN zypper ar http://download.opensuse.org/repositories/home:firstyear:apps/openSUSE_Tumbleweed/ &quot;home:firstyear:apps&quot;
-</span><span>RUN zypper mr -p 97 &quot;home:firstyear:apps&quot;
-</span><span>RUN zypper --gpg-auto-import-keys ref
-</span><span>RUN zypper install -y vim-data vim python3-ipython shadow python3-praw
-</span><span># Then the rest of your container as per usual ...
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>#!BuildTag: mycontainer</span></span>
+<span class="giallo-l"><span>#</span></span>
+<span class="giallo-l"><span># docker pull registry.opensuse.org/home/firstyear/apps/containers/mycontainer:latest</span></span>
+<span class="giallo-l"><span>#                                   ^projectname        ^repos     ^ build tag</span></span>
+<span class="giallo-l"><span>FROM opensuse/tumbleweed:latest</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#</span></span>
+<span class="giallo-l"><span># only one zypper ar command per line. only repositories inside the OBS are allowed</span></span>
+<span class="giallo-l"><span>#</span></span>
+<span class="giallo-l"><span>RUN zypper ar http://download.opensuse.org/repositories/home:firstyear:apps/openSUSE_Tumbleweed/ &quot;home:firstyear:apps&quot;</span></span>
+<span class="giallo-l"><span>RUN zypper mr -p 97 &quot;home:firstyear:apps&quot;</span></span>
+<span class="giallo-l"><span>RUN zypper --gpg-auto-import-keys ref</span></span>
+<span class="giallo-l"><span>RUN zypper install -y vim-data vim python3-ipython shadow python3-praw</span></span>
+<span class="giallo-l"><span># Then the rest of your container as per usual ...</span></span></code></pre>
 <p>Then to finish up, you can commit this:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>osc add Dockerfile
-</span><span>osc ci
-</span><span>osc results
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>osc add Dockerfile</span></span>
+<span class="giallo-l"><span>osc ci</span></span>
+<span class="giallo-l"><span>osc results</span></span></code></pre>
     </div>
 </article>
 

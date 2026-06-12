@@ -83,11 +83,11 @@
     <div itemprop="articleBody">
         <h1 id="lock-free-database">lock free database</h1>
 <p>While discussing some ideas with the owner of
-<a href="http://liblfds.org/">liblfds</a> I was thinking about some of the issues
+<a rel="external" href="http://liblfds.org/">liblfds</a> I was thinking about some of the issues
 in the database of Directory Server, and other ldap products. What slows
 us down?</p>
 <h2 id="why-are-locks-slow">Why are locks slow?</h2>
-<p>It's a good idea to read <a href="http://liblfds.org/mediawiki/index.php?title=Article:Memory_Barriers">this
+<p>It's a good idea to read <a rel="external" href="http://liblfds.org/mediawiki/index.php?title=Article:Memory_Barriers">this
 article</a>
 to understand Memory Barriers in a cpu.</p>
 <p>When you think about the way a mutex has to work, it takes advantage of
@@ -157,7 +157,7 @@ all locking mechanisms, and still have a guarantee that the view of the
 data is correct.</p>
 <p>Every thread of our application would then be "pinned" to a NUMA
 region and core, to ensure that they don't move.</p>
-<p>We would then use the <a href="http://liblfds.org/mediawiki/index.php?title=r7.1.0:Queue_%28bounded,_single_producer,_single_consumer%29">single producer, single consumer bounded
+<p>We would then use the <a rel="external" href="http://liblfds.org/mediawiki/index.php?title=r7.1.0:Queue_%28bounded,_single_producer,_single_consumer%29">single producer, single consumer bounded
 queue</a>
 from this article. Each NUMA region would establish one of these queues
 to the database thread. The bounding size is the number of working
@@ -176,7 +176,7 @@ allocations.</p>
 <p>Why would this be better?</p>
 <ul>
 <li>We have dispensed completely with ALL mutexes and locks. The queue
-in liblfds is fast. Amazingly fast. Seriously, look at <a href="http://liblfds.org/mediawiki/index.php?title=r7.1.0:Queue_%28unbounded,_many_producer,_many_consumer%29#Benchmark_Results_and_Analysis">these
+in liblfds is fast. Amazingly fast. Seriously, look at <a rel="external" href="http://liblfds.org/mediawiki/index.php?title=r7.1.0:Queue_%28unbounded,_many_producer,_many_consumer%29#Benchmark_Results_and_Analysis">these
 benchmarks</a>.
 And that's on the many many queue, which is theoretically slower
 than the single single bounded queue.</li>
@@ -199,29 +199,27 @@ advanced, the entry still within our NUMA region is valid. This
 prevents more moving between NUMA regions, again yielding a benefit.
 It would basically be:</li>
 </ul>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>    Thread A                              Thread DB
-</span><span>    Queue a read transaction with
-</span><span>    thread ID X               --&gt;
-</span><span>                              &lt;--  Open the transaction, and stash
-</span><span>
-</span><span>    Queue a search for set of IDs --&gt;
-</span><span>                                    Dequeue search request
-</span><span>                                    Build ID set
-</span><span>                                    With each ID, pair to the &quot;db version&quot; of the entry. IE USN style.
-</span><span>                              &lt;--   Return ID set to queue
-</span><span>    Examine the local cache.
-</span><span>    if ID not in local cache || 
-</span><span>    not USN matches entry in cache
-</span><span>        Add Id to &quot;retrieve set&quot;
-</span><span>    Queue a retrieve request      --&gt;
-</span><span>                                    Dequeue the retrieve request
-</span><span>                                    Copy the requested IDs / entries to Thread A
-</span><span>                              &lt;--   Return
-</span><span>
-</span><span>    Queue a transaction complete  --&gt;
-</span><span>                              &lt;--   Done
-</span></code></pre>
-<h2 id="acknowledgement">Acknowledgement</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>    Thread A                              Thread DB</span></span>
+<span class="giallo-l"><span>    Queue a read transaction with</span></span>
+<span class="giallo-l"><span>    thread ID X               --&gt;</span></span>
+<span class="giallo-l"><span>                              &lt;--  Open the transaction, and stash</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Queue a search for set of IDs --&gt;</span></span>
+<span class="giallo-l"><span>                                    Dequeue search request</span></span>
+<span class="giallo-l"><span>                                    Build ID set</span></span>
+<span class="giallo-l"><span>                                    With each ID, pair to the &quot;db version&quot; of the entry. IE USN style.</span></span>
+<span class="giallo-l"><span>                              &lt;--   Return ID set to queue</span></span>
+<span class="giallo-l"><span>    Examine the local cache.</span></span>
+<span class="giallo-l"><span>    if ID not in local cache || </span></span>
+<span class="giallo-l"><span>    not USN matches entry in cache</span></span>
+<span class="giallo-l"><span>        Add Id to &quot;retrieve set&quot;</span></span>
+<span class="giallo-l"><span>    Queue a retrieve request      --&gt;</span></span>
+<span class="giallo-l"><span>                                    Dequeue the retrieve request</span></span>
+<span class="giallo-l"><span>                                    Copy the requested IDs / entries to Thread A</span></span>
+<span class="giallo-l"><span>                              &lt;--   Return</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Queue a transaction complete  --&gt;</span></span>
+<span class="giallo-l"><span>                              &lt;--   Done</span></span></code></pre><h2 id="acknowledgement">Acknowledgement</h2>
 <p>Huge thank you to Winterflaw, the author of LibLFDS for discussing these
 ideas, his future review of this idea, and for teaching me many of these
 concepts.</p>

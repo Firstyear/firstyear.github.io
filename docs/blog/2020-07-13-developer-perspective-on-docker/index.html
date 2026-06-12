@@ -82,7 +82,7 @@
     </div>
     <div itemprop="articleBody">
         <h1 id="developer-perspective-on-docker">Developer Perspective on Docker</h1>
-<p>A good mate of mine <a href="https://ronamosa.io/">Ron Amosa</a> put a question up
+<p>A good mate of mine <a rel="external" href="https://ronamosa.io/">Ron Amosa</a> put a question up
 on twitter about what do developers think Docker brings to the table.
 I'm really keen to see what he has to say (his knowledge of CI/CD and
 Kubernetes is amazing by the way!), but I thought I'd answer his
@@ -166,10 +166,9 @@ process. For example, a very complex topic like CPU or memory limit's
 on Linux, becomes quite simple in docker which exposes CPU and memory
 tunables. Docker allows sysctls per container. You assign and manage
 storage.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>docker run -v db:/data/db -v config:/data/config --network private_net \
-</span><span>    --memory 1024M --shm-size 128M -P 80:8080 --user isolated \
-</span><span>    my/application:version
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>docker run -v db:/data/db -v config:/data/config --network private_net \</span></span>
+<span class="giallo-l"><span>    --memory 1024M --shm-size 128M -P 80:8080 --user isolated \</span></span>
+<span class="giallo-l"><span>    my/application:version</span></span></code></pre>
 <p>From this command we can see what resources are involved. We know that
 we mount two storage locations. We can see that we confine the network
 to a private network, and that we want to limit memory to 1024M. We also

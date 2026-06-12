@@ -93,36 +93,33 @@ target. To make this work really smoothly there are a few setup steps.</p>
 <p>By default timemachine operates as a low priority process. You can set a
 sysctl to improve the performance of this (especially helpful for a
 first backup!)</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sysctl -w debug.lowpri_throttle_enabled=0
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>sysctl -w debug.lowpri_throttle_enabled=0</span></span></code></pre>
 <p>You will need a launchd script to make this setting survive a reboot.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># /etc/sudoers.d/sysctl
-</span><span>YOUR_USERNAME_HERE    ALL=(ALL) NOPASSWD: /usr/sbin/sysctl
-</span><span>
-</span><span># ~/Library/LaunchAgents/au.id.firstyear.sysctl-tm.plist
-</span><span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-</span><span>&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
-</span><span>&lt;plist version=&quot;1.0&quot;&gt;
-</span><span>    &lt;dict&gt;
-</span><span>        &lt;key&gt;Label&lt;/key&gt;
-</span><span>        &lt;string&gt;au.id.firstyear.sysctl-tm&lt;/string&gt;
-</span><span>        &lt;key&gt;ProgramArguments&lt;/key&gt;
-</span><span>        &lt;array&gt;
-</span><span>          &lt;string&gt;/usr/bin/sudo&lt;/string&gt;
-</span><span>          &lt;string&gt;/usr/sbin/sysctl&lt;/string&gt;
-</span><span>          &lt;string&gt;-w&lt;/string&gt;
-</span><span>          &lt;string&gt;debug.lowpri_throttle_enabled=0&lt;/string&gt;
-</span><span>        &lt;/array&gt;
-</span><span>        &lt;key&gt;StandardErrorPath&lt;/key&gt;
-</span><span>        &lt;string&gt;/tmp/au.id.firstyear.sysctl-tm.err&lt;/string&gt;
-</span><span>        &lt;key&gt;StandardOutPath&lt;/key&gt;
-</span><span>        &lt;string&gt;/tmp/au.id.firstyear.sysctl-tm.out&lt;/string&gt;
-</span><span>        &lt;key&gt;RunAtLoad&lt;/key&gt;
-</span><span>        &lt;true/&gt;
-</span><span>    &lt;/dict&gt;
-</span><span>&lt;/plist&gt;
-</span></code></pre>
-<h2 id="zfs">ZFS</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># /etc/sudoers.d/sysctl</span></span>
+<span class="giallo-l"><span>YOUR_USERNAME_HERE    ALL=(ALL) NOPASSWD: /usr/sbin/sysctl</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># ~/Library/LaunchAgents/au.id.firstyear.sysctl-tm.plist</span></span>
+<span class="giallo-l"><span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span>
+<span class="giallo-l"><span>&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;</span></span>
+<span class="giallo-l"><span>&lt;plist version=&quot;1.0&quot;&gt;</span></span>
+<span class="giallo-l"><span>    &lt;dict&gt;</span></span>
+<span class="giallo-l"><span>        &lt;key&gt;Label&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>        &lt;string&gt;au.id.firstyear.sysctl-tm&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>        &lt;key&gt;ProgramArguments&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>        &lt;array&gt;</span></span>
+<span class="giallo-l"><span>          &lt;string&gt;/usr/bin/sudo&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>          &lt;string&gt;/usr/sbin/sysctl&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>          &lt;string&gt;-w&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>          &lt;string&gt;debug.lowpri_throttle_enabled=0&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>        &lt;/array&gt;</span></span>
+<span class="giallo-l"><span>        &lt;key&gt;StandardErrorPath&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>        &lt;string&gt;/tmp/au.id.firstyear.sysctl-tm.err&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>        &lt;key&gt;StandardOutPath&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>        &lt;string&gt;/tmp/au.id.firstyear.sysctl-tm.out&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>        &lt;key&gt;RunAtLoad&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>        &lt;true/&gt;</span></span>
+<span class="giallo-l"><span>    &lt;/dict&gt;</span></span>
+<span class="giallo-l"><span>&lt;/plist&gt;</span></span></code></pre><h2 id="zfs">ZFS</h2>
 <p>I'm using ZFS on my server, which is probably the best filesystem
 available. To make Time Machine work well on ZFS there are a number of
 tuning options that can help. As these backups write and read many small
@@ -133,20 +130,19 @@ files. Generally time machine is very "IO demanding".</p>
 <p>For the ZFS properties on the filesystem I created it with the following
 options to [zfs create]{.title-ref}. Each once is set with [-o
 attribute=value]{.title-ref}</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>atime: off
-</span><span>dnodesize: auto
-</span><span>xattr: sa
-</span><span>logbias: throughput
-</span><span>recordsize: 1M
-</span><span>compression: zstd-10 | zle
-</span><span>refquota: 3T
-</span><span># optional - greatly improves write performance
-</span><span>sync: disabled
-</span><span># security
-</span><span>setuid: off
-</span><span>exec: off
-</span><span>devices: off
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>atime: off</span></span>
+<span class="giallo-l"><span>dnodesize: auto</span></span>
+<span class="giallo-l"><span>xattr: sa</span></span>
+<span class="giallo-l"><span>logbias: throughput</span></span>
+<span class="giallo-l"><span>recordsize: 1M</span></span>
+<span class="giallo-l"><span>compression: zstd-10 | zle</span></span>
+<span class="giallo-l"><span>refquota: 3T</span></span>
+<span class="giallo-l"><span># optional - greatly improves write performance</span></span>
+<span class="giallo-l"><span>sync: disabled</span></span>
+<span class="giallo-l"><span># security</span></span>
+<span class="giallo-l"><span>setuid: off</span></span>
+<span class="giallo-l"><span>exec: off</span></span>
+<span class="giallo-l"><span>devices: off</span></span></code></pre>
 <p>The important ones here are the compression setting. If you choose zle,
 you gain much faster write performance, but you dont get much in the way
 of compression. zstd-10 gives me about 1.3x compression, but at the loss
@@ -162,57 +158,53 @@ cause low performance with many small files. To mitigate the data loss
 risk here, I snapshot the backups filesystem hourly.</p>
 <p>If you want to encrypt at the ZFS level instead of through time machine
 you need to enable this as you create the filesystem.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># create a key file to unlock the zfs filesystem
-</span><span>openssl rand -hex -out /root/key 32
-</span><span>
-</span><span># Add the following settings during zfs create:
-</span><span>-o encryption=aes-128-gcm -o keyformat=hex -o keylocation=file:///root/key
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># create a key file to unlock the zfs filesystem</span></span>
+<span class="giallo-l"><span>openssl rand -hex -out /root/key 32</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Add the following settings during zfs create:</span></span>
+<span class="giallo-l"><span>-o encryption=aes-128-gcm -o keyformat=hex -o keylocation=file:///root/key</span></span></code></pre>
 <p>If you add any subvolumes, you need to repeat the same encryption steps
 during the create of these subvolumes.</p>
 <p>For example a create may look like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zfs create \
-</span><span>    -o encryption=aes-128-gcm -o keyformat=hex -o keylocation=file:///root/key \
-</span><span>    -o atime=off -o dnodesize=auto -o xattr=sa -o logbias=throughput \
-</span><span>    -o recordsize=1M -o compression=zle -o refquota=3T -o sync=disabled \
-</span><span>    -o setuid=off -o exec=off -o devices=off tank/backups
-</span></code></pre>
-<h2 id="smb-conf">smb.conf</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>zfs create \</span></span>
+<span class="giallo-l"><span>    -o encryption=aes-128-gcm -o keyformat=hex -o keylocation=file:///root/key \</span></span>
+<span class="giallo-l"><span>    -o atime=off -o dnodesize=auto -o xattr=sa -o logbias=throughput \</span></span>
+<span class="giallo-l"><span>    -o recordsize=1M -o compression=zle -o refquota=3T -o sync=disabled \</span></span>
+<span class="giallo-l"><span>    -o setuid=off -o exec=off -o devices=off tank/backups</span></span></code></pre><h2 id="smb-conf">smb.conf</h2>
 <p>In smb.conf you define the share that exposes the timemachine backup
 location. You need to set additional metadata on this so that macos will
 recognise it correctly.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[global]
-</span><span>min protocol = SMB2
-</span><span>ea support = yes
-</span><span>
-</span><span># This needs to be global else time machine ops can fail.
-</span><span>vfs objects = fruit streams_xattr
-</span><span>fruit:aapl = yes
-</span><span>fruit:metadata = stream
-</span><span>fruit:model = MacSamba
-</span><span>fruit:posix_rename = yes
-</span><span>fruit:veto_appledouble = no
-</span><span>fruit:nfs_aces = no
-</span><span>fruit:wipe_intentionally_left_blank_rfork = yes
-</span><span>fruit:delete_empty_adfiles = yes
-</span><span>spotlight = no
-</span><span>
-</span><span>[timemachine_a]
-</span><span>comment = Time Machine
-</span><span>fruit:time machine = yes
-</span><span>fruit:time machine max size = 1050G
-</span><span>path = /var/data/backup/timemachine_a
-</span><span>browseable = yes
-</span><span>write list = timemachine
-</span><span>create mask = 0600
-</span><span>directory mask = 0700
-</span><span># NOTE: Changing these will require a new initial backup cycle if you already have an existing
-</span><span># timemachine share.
-</span><span>case sensitive = true
-</span><span>default case = lower
-</span><span>preserve case = no
-</span><span>short preserve case = no
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[global]</span></span>
+<span class="giallo-l"><span>min protocol = SMB2</span></span>
+<span class="giallo-l"><span>ea support = yes</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># This needs to be global else time machine ops can fail.</span></span>
+<span class="giallo-l"><span>vfs objects = fruit streams_xattr</span></span>
+<span class="giallo-l"><span>fruit:aapl = yes</span></span>
+<span class="giallo-l"><span>fruit:metadata = stream</span></span>
+<span class="giallo-l"><span>fruit:model = MacSamba</span></span>
+<span class="giallo-l"><span>fruit:posix_rename = yes</span></span>
+<span class="giallo-l"><span>fruit:veto_appledouble = no</span></span>
+<span class="giallo-l"><span>fruit:nfs_aces = no</span></span>
+<span class="giallo-l"><span>fruit:wipe_intentionally_left_blank_rfork = yes</span></span>
+<span class="giallo-l"><span>fruit:delete_empty_adfiles = yes</span></span>
+<span class="giallo-l"><span>spotlight = no</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[timemachine_a]</span></span>
+<span class="giallo-l"><span>comment = Time Machine</span></span>
+<span class="giallo-l"><span>fruit:time machine = yes</span></span>
+<span class="giallo-l"><span>fruit:time machine max size = 1050G</span></span>
+<span class="giallo-l"><span>path = /var/data/backup/timemachine_a</span></span>
+<span class="giallo-l"><span>browseable = yes</span></span>
+<span class="giallo-l"><span>write list = timemachine</span></span>
+<span class="giallo-l"><span>create mask = 0600</span></span>
+<span class="giallo-l"><span>directory mask = 0700</span></span>
+<span class="giallo-l"><span># NOTE: Changing these will require a new initial backup cycle if you already have an existing</span></span>
+<span class="giallo-l"><span># timemachine share.</span></span>
+<span class="giallo-l"><span>case sensitive = true</span></span>
+<span class="giallo-l"><span>default case = lower</span></span>
+<span class="giallo-l"><span>preserve case = no</span></span>
+<span class="giallo-l"><span>short preserve case = no</span></span></code></pre>
 <p>The fruit settings are required to help Time Machine understand that
 this share is usable for it. I have also added a custom timemachine user
 to smbpasswd, and created a matching posix account who should own these
@@ -225,28 +217,21 @@ machine backup. For system preferences to "see" the samba share you
 may need to mount it manually via finder as the time machine user.</p>
 <p>If you are using ZFS encryption, you can add the time machine backup
 from the command line instead.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tmutil setdestination smb://timemachine:password@hostname/timemachine_a
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>tmutil setdestination smb://timemachine:password@hostname/timemachine_a</span></span></code></pre>
 <p>If you intend to have multiple time machine targets, MacOS is capable of
 mirroring between multilple stripes alternately. You can append the
 second stripe with (note the -a). You could do this with other shares
 (offsite for example) or with a HDD on your desk.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tmutil setdestination -a smb://timemachine:password@hostname/timemachine_b
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>tmutil setdestination -a smb://timemachine:password@hostname/timemachine_b</span></span></code></pre>
 <p>Time machine with ZFS may have some odd issues with quota not applying properly, so
 you may want to set a quote client side</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tmutil destinationinfo
-</span><span># tmutil setquota &lt;UUID OF LOCATION&gt; &lt;QUOTA IN GB&gt;
-</span><span>tmutil setquota 58A5BADF-FB61-4BDD-A053-9344366423A5 800
-</span></code></pre>
-<h3 id="stuck-backups">Stuck Backups</h3>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>tmutil destinationinfo</span></span>
+<span class="giallo-l"><span># tmutil setquota &lt;UUID OF LOCATION&gt; &lt;QUOTA IN GB&gt;</span></span>
+<span class="giallo-l"><span>tmutil setquota 58A5BADF-FB61-4BDD-A053-9344366423A5 800</span></span></code></pre><h3 id="stuck-backups">Stuck Backups</h3>
 <p>Sometimes tm can get "stuck" unable to complete the first backup.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>log show --info --style compact --predicate &#39;(subsystem == &quot;com.apple.TimeMachine&quot;) &amp;&amp; (eventMessage like[cd] &quot;Failed * acquire device lock assertion*&quot;)&#39; --last 24h
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>log show --info --style compact --predicate &#39;(subsystem == &quot;com.apple.TimeMachine&quot;) &amp;&amp; (eventMessage like[cd] &quot;Failed * acquire device lock assertion*&quot;)&#39; --last 24h</span></span></code></pre>
 <p>Add affected paths to the exclusion list</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sudo tmutil addexclusion -p ~/Library/Metadata
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>sudo tmutil addexclusion -p ~/Library/Metadata</span></span></code></pre>
     </div>
 </article>
 

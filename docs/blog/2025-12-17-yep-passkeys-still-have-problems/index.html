@@ -94,7 +94,7 @@ before, and a few new ones I've learnt! Let's round up the year together then.</
 <li>DO use a Credential Manager you control and can backup. I recommend Bitwarden or Vaultwarden which allow backups to be taken easily.</li>
 <li><em>AVOID</em> using a platform (Apple, Google, Microsoft) Credential Manager as your only Passkey repository - these can't easily backed up and you CAN be locked out permanently.
 <ul>
-<li>IF you use a platform Passkey manager, frequently sync it with <a href="https://fidoalliance.org/specifications-credential-exchange-specifications/">FIDO Credential Exchange</a> to an external Credential Manager you can backup/control.</li>
+<li>IF you use a platform Passkey manager, frequently sync it with <a rel="external" href="https://fidoalliance.org/specifications-credential-exchange-specifications/">FIDO Credential Exchange</a> to an external Credential Manager you can backup/control.</li>
 <li>OR use both the platform Passkey manager <em>AND</em> a Credential Manager you control in parallel.</li>
 </ul>
 </li>
@@ -108,7 +108,7 @@ before, and a few new ones I've learnt! Let's round up the year together then.</
 </ul>
 <h2 id="so-what-has-changed">So what has changed?</h2>
 <p>The major change in the last 12 months has been the introduction of the
-<a href="https://fidoalliance.org/specifications-credential-exchange-specifications/">FIDO Credential Exchange Specification</a>.</p>
+<a rel="external" href="https://fidoalliance.org/specifications-credential-exchange-specifications/">FIDO Credential Exchange Specification</a>.</p>
 <p>Most people within the tech community who have dismissed my claim that "Passkeys are a form of vendor
 lockin" are now pointing at this specification as proof that this claim is now wrong.</p>
 <blockquote>
@@ -187,7 +187,7 @@ password and TOTP and it <em>just works</em>. And that leads to ...</p>
 <p>In economics, vendor lock-in, [...] makes a customer dependent on a vendor for products, unable to
 use another vendor without substantial switching costs.</p>
 </blockquote>
-<p><a href="https://en.wikipedia.org/wiki/Vendor_lock-in">citation - wikipedia</a></p>
+<p><a rel="external" href="https://en.wikipedia.org/wiki/Vendor_lock-in">citation - wikipedia</a></p>
 <p>See, the big issue that the thought leaders seem to get wrong is that they believe that if you can
 use FIDO Credential Exchange, then you aren't locked in because you can move between Passkey providers.</p>
 <p>The issue is when you try to go against the platform manager, it's the continual friction at each stage of the users
@@ -201,7 +201,7 @@ intended paths.</p>
 </blockquote>
 <p>The majority of this modal is dedicated to "you should make a Passkey in your Apple Keychain". If you
 want to use your Android phone or a Security Key, where would I click? Oh yes, <code>Other Options</code>.</p>
-<p>Per <a href="https://developer.apple.com/design/human-interface-guidelines/buttons#Best-practices">Apple's Human Interface Guidelines</a>:</p>
+<p>Per <a rel="external" href="https://developer.apple.com/design/human-interface-guidelines/buttons#Best-practices">Apple's Human Interface Guidelines</a>:</p>
 <blockquote>
 <p>Make buttons easy for people to use. It’s essential to include enough space around a button so that people can visually distinguish it from surrounding components and content. Giving a button enough space is also critical for helping people select or activate it, regardless of the method of input they use.</p>
 </blockquote>
@@ -227,7 +227,7 @@ into settling into their vendor ecosystem. That's vendor lock-in.</p>
 <h3 id="cloud-keychains-are-still-blowing-up-data">Cloud Keychains Are Still Blowing Up Data</h3>
 <p>We still get reports of people losing Passkeys from Apple Keychain. We similarly get reports of Android
 phones that one day just stop creating new Passkeys, or stop being able to use existing ones. One
-<a href="https://infosec.exchange/@tychotithonus/115341947864402280">exceptional story</a> we saw recently was of
+<a rel="external" href="https://infosec.exchange/@tychotithonus/115341947864402280">exceptional story</a> we saw recently was of
 an Android device that stopped using it's onboard Passkeys and also stopped accepting NFC key. USB
 CTAP would still function, and all the historical fixes we've seen (such as full device resets) would
 not work. So now what? I'm not sure of the outcome of this story, but my assumption is there was not
@@ -235,7 +235,7 @@ a happy ending.</p>
 <p>If someone ends up locked out of their accounts because their Passkeys got nuked silently, what are
 we meant to do to help them? How will they ever trust Passkeys again?</p>
 <h3 id="vendors-can-lock-you-out">Vendors Can Lock You Out</h3>
-<p><a href="https://hey.paris/posts/appleid/">Dr Paris Buttfield-Addison was locked out of their Apple account</a>.</p>
+<p><a rel="external" href="https://hey.paris/posts/appleid/">Dr Paris Buttfield-Addison was locked out of their Apple account</a>.</p>
 <p>I recommend you read the post, but the side effect - every Passkey they had in an Apple keychain is now unrecoverable.</p>
 <p>There is just as much evidence about the same account practices with Google and Microsoft.</p>
 <p>I honestly don't think I have to say much else, this is terrifying that every account you own could be destroyed by a single action where you have no recourse.</p>

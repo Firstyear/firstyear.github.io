@@ -91,22 +91,20 @@ instance.</p>
 <p>It can also be useful to call db2ldif before you run the backup so that
 you have a human readable copy of the data on hand as well.</p>
 <p>I've found the best pattern is:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>def tearDown(self):
-</span><span>    if self.instance.exists():
-</span><span>        self.instance.db2ldif(bename=&#39;userRoot&#39;, suffixes=[DEFAULT_SUFFIX], excludeSuffixes=[], encrypt=False, \
-</span><span>            repl_data=False, outputfile=&#39;%s/ldif/%s.ldif&#39; % (self.instance.dbdir,INSTANCE_SERVERID ))
-</span><span>        self.instance.clearBackupFS()
-</span><span>        self.instance.backupFS()
-</span><span>        self.instance.delete()
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>def tearDown(self):</span></span>
+<span class="giallo-l"><span>    if self.instance.exists():</span></span>
+<span class="giallo-l"><span>        self.instance.db2ldif(bename=&#39;userRoot&#39;, suffixes=[DEFAULT_SUFFIX], excludeSuffixes=[], encrypt=False, \</span></span>
+<span class="giallo-l"><span>            repl_data=False, outputfile=&#39;%s/ldif/%s.ldif&#39; % (self.instance.dbdir,INSTANCE_SERVERID ))</span></span>
+<span class="giallo-l"><span>        self.instance.clearBackupFS()</span></span>
+<span class="giallo-l"><span>        self.instance.backupFS()</span></span>
+<span class="giallo-l"><span>        self.instance.delete()</span></span></code></pre>
 <p>This puts an ldif dump of the DB into the backup path, we then clear old
 backups for our test instance (else it won't over-write them), finally,
 we actually do the backup. You should see:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>snip ...
-</span><span>DEBUG:lib389:backupFS add = /var/lib/dirsrv/slapd-effectiverightsds/ldif/effectiverightsds.ldif (/)
-</span><span>snip ...
-</span><span>INFO:lib389:backupFS: archive done : /tmp/slapd-effectiverightsds.bck/backup_08032015_092510.tar.gz
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>snip ...</span></span>
+<span class="giallo-l"><span>DEBUG:lib389:backupFS add = /var/lib/dirsrv/slapd-effectiverightsds/ldif/effectiverightsds.ldif (/)</span></span>
+<span class="giallo-l"><span>snip ...</span></span>
+<span class="giallo-l"><span>INFO:lib389:backupFS: archive done : /tmp/slapd-effectiverightsds.bck/backup_08032015_092510.tar.gz</span></span></code></pre>
 <p>Then you can extract this in /tmp/slapd-instance, and examine your logs
 and the ldif of what was really in your ldap server at the time.</p>
 

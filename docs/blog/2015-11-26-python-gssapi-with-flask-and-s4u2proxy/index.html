@@ -104,76 +104,74 @@ by the client</li>
 </ul>
 <p>Now, a thing to remember is that here, if your kdc support it, you will
 be using s4u2proxy automatically. If you want to know more, and you are
-using freeipa, you can look into <a href="http://www.freeipa.org/page/V4/Service_Constraint_Delegation">constrained
+using freeipa, you can look into <a rel="external" href="http://www.freeipa.org/page/V4/Service_Constraint_Delegation">constrained
 delegation</a>.</p>
 <p>Here is how I implemented the negotiate handler in flask.</p>
 <p>:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>def _negotiate_start(req):
-</span><span>    # This assumes a realm. You can leave this unset to use the default ream from krb5.conf iirc.
-</span><span>    svc_princ = gssnames.Name(&#39;HTTP/%s@EXAMPLE.COM&#39;% (socket.gethostname()))
-</span><span>    server_creds = gsscreds.Credentials(usage=&#39;accept&#39;, name=svc_princ)
-</span><span>    context = gssctx.SecurityContext(creds=server_creds)
-</span><span>    # Yay! Undocumented gssapi magic. No indication that you need to b64 decode.
-</span><span>    context.step(base64.b64decode(req))
-</span><span>    deleg_creds = context.delegated_creds
-</span><span>    CCACHE = &#39;MEMORY:ccache_rest389_%s&#39; % deleg_creds.name
-</span><span>    store = {&#39;ccache&#39;: CCACHE}
-</span><span>    deleg_creds.store(store, overwrite=True)
-</span><span>    os.environ[&#39;KRB5CCNAME&#39;] = CCACHE
-</span><span>    # Return the context, so we can free it later.
-</span><span>    return context
-</span><span>
-</span><span>
-</span><span>def _negotiate_end(context):
-</span><span>
-</span><span>    # tell python-gssapi to free gss_cred_id_t
-</span><span>    deleg_creds = context.delegated_creds
-</span><span>    del(deleg_creds)
-</span><span>
-</span><span>
-</span><span>def _connection(f, *args, **kwargs):
-</span><span>    retval = None
-</span><span>    negotiate = False
-</span><span>    headers = Headers()  # Allows a multivalue header response.
-</span><span>    # Request comes from **kwargs
-</span><span>    authorization = request.headers.get(&quot;Authorization&quot;, None)
-</span><span>    try:
-</span><span>        if authorization is not None:
-</span><span>            values = authorization.split()
-</span><span>            if values[0] == &#39;Negotiate&#39;:
-</span><span>                # If this is valid, it sets KRB5CCNAME
-</span><span>                negotiate = _negotiate_start(values[1])
-</span><span>        # This is set by mod_auth_gssapi if you are using that instead.
-</span><span>        if request.headers.get(&quot;Krb5Ccname&quot;, &#39;(null)&#39;) != &#39;(null)&#39;:
-</span><span>            os.environ[&#39;KRB5CCNAME&#39;] = request.headers.get(&quot;Krb5Ccname&quot;, None)
-</span><span>        if os.environ.get(&#39;KRB5CCNAME&#39;, &#39;&#39;) != &#39;&#39;:
-</span><span>            pass
-</span><span>            # Do something with the krb creds here, db connection etc.
-</span><span>            retval = f(dir_srv_conn, *args, **kwargs)
-</span><span>        else:
-</span><span>            headers.add(&#39;WWW-Authenticate&#39;, &#39;Negotiate&#39;)
-</span><span>            retval = Response(&quot;Unauthorized&quot;, 401, headers)
-</span><span>    finally:
-</span><span>        if negotiate is not False:
-</span><span>            _negotiate_end(negotiate)
-</span><span>        if os.environ.get(&#39;KRB5CCNAME&#39;, None) is not None:
-</span><span>            os.environ[&#39;KRB5CCNAME&#39;] = &#39;&#39;
-</span><span>    return retval
-</span><span>
-</span><span>
-</span><span>def authenticateConnection(f):
-</span><span>    @wraps(f)
-</span><span>    def decorator(*args, **kwargs):
-</span><span>        return _connection(f, *args, **kwargs)
-</span><span>    return decorator
-</span><span>
-</span><span>
-</span><span>@app.route(&#39;/&#39;, methods[&#39;GET&#39;])
-</span><span>@authenticateConnection
-</span><span>def index():
-</span><span>    pass
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>def _negotiate_start(req):</span></span>
+<span class="giallo-l"><span>    # This assumes a realm. You can leave this unset to use the default ream from krb5.conf iirc.</span></span>
+<span class="giallo-l"><span>    svc_princ = gssnames.Name(&#39;HTTP/%s@EXAMPLE.COM&#39;% (socket.gethostname()))</span></span>
+<span class="giallo-l"><span>    server_creds = gsscreds.Credentials(usage=&#39;accept&#39;, name=svc_princ)</span></span>
+<span class="giallo-l"><span>    context = gssctx.SecurityContext(creds=server_creds)</span></span>
+<span class="giallo-l"><span>    # Yay! Undocumented gssapi magic. No indication that you need to b64 decode.</span></span>
+<span class="giallo-l"><span>    context.step(base64.b64decode(req))</span></span>
+<span class="giallo-l"><span>    deleg_creds = context.delegated_creds</span></span>
+<span class="giallo-l"><span>    CCACHE = &#39;MEMORY:ccache_rest389_%s&#39; % deleg_creds.name</span></span>
+<span class="giallo-l"><span>    store = {&#39;ccache&#39;: CCACHE}</span></span>
+<span class="giallo-l"><span>    deleg_creds.store(store, overwrite=True)</span></span>
+<span class="giallo-l"><span>    os.environ[&#39;KRB5CCNAME&#39;] = CCACHE</span></span>
+<span class="giallo-l"><span>    # Return the context, so we can free it later.</span></span>
+<span class="giallo-l"><span>    return context</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>def _negotiate_end(context):</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    # tell python-gssapi to free gss_cred_id_t</span></span>
+<span class="giallo-l"><span>    deleg_creds = context.delegated_creds</span></span>
+<span class="giallo-l"><span>    del(deleg_creds)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>def _connection(f, *args, **kwargs):</span></span>
+<span class="giallo-l"><span>    retval = None</span></span>
+<span class="giallo-l"><span>    negotiate = False</span></span>
+<span class="giallo-l"><span>    headers = Headers()  # Allows a multivalue header response.</span></span>
+<span class="giallo-l"><span>    # Request comes from **kwargs</span></span>
+<span class="giallo-l"><span>    authorization = request.headers.get(&quot;Authorization&quot;, None)</span></span>
+<span class="giallo-l"><span>    try:</span></span>
+<span class="giallo-l"><span>        if authorization is not None:</span></span>
+<span class="giallo-l"><span>            values = authorization.split()</span></span>
+<span class="giallo-l"><span>            if values[0] == &#39;Negotiate&#39;:</span></span>
+<span class="giallo-l"><span>                # If this is valid, it sets KRB5CCNAME</span></span>
+<span class="giallo-l"><span>                negotiate = _negotiate_start(values[1])</span></span>
+<span class="giallo-l"><span>        # This is set by mod_auth_gssapi if you are using that instead.</span></span>
+<span class="giallo-l"><span>        if request.headers.get(&quot;Krb5Ccname&quot;, &#39;(null)&#39;) != &#39;(null)&#39;:</span></span>
+<span class="giallo-l"><span>            os.environ[&#39;KRB5CCNAME&#39;] = request.headers.get(&quot;Krb5Ccname&quot;, None)</span></span>
+<span class="giallo-l"><span>        if os.environ.get(&#39;KRB5CCNAME&#39;, &#39;&#39;) != &#39;&#39;:</span></span>
+<span class="giallo-l"><span>            pass</span></span>
+<span class="giallo-l"><span>            # Do something with the krb creds here, db connection etc.</span></span>
+<span class="giallo-l"><span>            retval = f(dir_srv_conn, *args, **kwargs)</span></span>
+<span class="giallo-l"><span>        else:</span></span>
+<span class="giallo-l"><span>            headers.add(&#39;WWW-Authenticate&#39;, &#39;Negotiate&#39;)</span></span>
+<span class="giallo-l"><span>            retval = Response(&quot;Unauthorized&quot;, 401, headers)</span></span>
+<span class="giallo-l"><span>    finally:</span></span>
+<span class="giallo-l"><span>        if negotiate is not False:</span></span>
+<span class="giallo-l"><span>            _negotiate_end(negotiate)</span></span>
+<span class="giallo-l"><span>        if os.environ.get(&#39;KRB5CCNAME&#39;, None) is not None:</span></span>
+<span class="giallo-l"><span>            os.environ[&#39;KRB5CCNAME&#39;] = &#39;&#39;</span></span>
+<span class="giallo-l"><span>    return retval</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>def authenticateConnection(f):</span></span>
+<span class="giallo-l"><span>    @wraps(f)</span></span>
+<span class="giallo-l"><span>    def decorator(*args, **kwargs):</span></span>
+<span class="giallo-l"><span>        return _connection(f, *args, **kwargs)</span></span>
+<span class="giallo-l"><span>    return decorator</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>@app.route(&#39;/&#39;, methods[&#39;GET&#39;])</span></span>
+<span class="giallo-l"><span>@authenticateConnection</span></span>
+<span class="giallo-l"><span>def index():</span></span>
+<span class="giallo-l"><span>    pass</span></span></code></pre>
     </div>
 </article>
 

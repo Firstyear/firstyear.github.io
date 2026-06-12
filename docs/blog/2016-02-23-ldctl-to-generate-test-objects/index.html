@@ -85,31 +85,29 @@
 <p>I was told by some coworkers today at Red Hat that I can infact use
 ldctl to generate my databases for load testing with 389-ds.</p>
 <p>First, create a template.ldif</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>objectClass: top
-</span><span>objectclass: person
-</span><span>objectClass: organizationalPerson
-</span><span>objectClass: inetorgperson
-</span><span>objectClass: posixAccount
-</span><span>objectClass: shadowAccount
-</span><span>sn: testnew[A]
-</span><span>cn: testnew[A]
-</span><span>uid: testnew[A]
-</span><span>givenName: testnew[A]
-</span><span>description: description[A]
-</span><span>userPassword: testnew[A]
-</span><span>mail: testnew[A]@redhat.com
-</span><span>uidNumber: 3[A]
-</span><span>gidNumber: 4[A]
-</span><span>shadowMin: 0
-</span><span>shadowMax: 99999
-</span><span>shadowInactive: 30
-</span><span>shadowWarning: 7
-</span><span>homeDirectory: /home/uid[A]
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectclass: person</span></span>
+<span class="giallo-l"><span>objectClass: organizationalPerson</span></span>
+<span class="giallo-l"><span>objectClass: inetorgperson</span></span>
+<span class="giallo-l"><span>objectClass: posixAccount</span></span>
+<span class="giallo-l"><span>objectClass: shadowAccount</span></span>
+<span class="giallo-l"><span>sn: testnew[A]</span></span>
+<span class="giallo-l"><span>cn: testnew[A]</span></span>
+<span class="giallo-l"><span>uid: testnew[A]</span></span>
+<span class="giallo-l"><span>givenName: testnew[A]</span></span>
+<span class="giallo-l"><span>description: description[A]</span></span>
+<span class="giallo-l"><span>userPassword: testnew[A]</span></span>
+<span class="giallo-l"><span>mail: testnew[A]@redhat.com</span></span>
+<span class="giallo-l"><span>uidNumber: 3[A]</span></span>
+<span class="giallo-l"><span>gidNumber: 4[A]</span></span>
+<span class="giallo-l"><span>shadowMin: 0</span></span>
+<span class="giallo-l"><span>shadowMax: 99999</span></span>
+<span class="giallo-l"><span>shadowInactive: 30</span></span>
+<span class="giallo-l"><span>shadowWarning: 7</span></span>
+<span class="giallo-l"><span>homeDirectory: /home/uid[A]</span></span></code></pre>
 <p>Now you can use ldctl to actually load in the data:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ldclt -h localhost -p 389 -D &quot;cn=Directory Manager&quot; -w password -b &quot;ou=people,dc=example,dc=com&quot; \
-</span><span>-I 68 -e add,commoncounter -e &quot;object=/tmp/template.ldif,rdn=uid:[A=INCRNNOLOOP(0;3999;5)]&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ldclt -h localhost -p 389 -D &quot;cn=Directory Manager&quot; -w password -b &quot;ou=people,dc=example,dc=com&quot; \</span></span>
+<span class="giallo-l"><span>-I 68 -e add,commoncounter -e &quot;object=/tmp/template.ldif,rdn=uid:[A=INCRNNOLOOP(0;3999;5)]&quot;</span></span></code></pre>
 <p>Thanks to vashirov and spichugi for their advice and this example!</p>
 
     </div>

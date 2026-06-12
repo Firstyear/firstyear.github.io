@@ -84,16 +84,14 @@
         <h1 id="upgrading-opensuse-15-0-to-15-1">Upgrading OpenSUSE 15.0 to 15.1</h1>
 <p>It's a little bit un-obvious how to do this. You have to edit the repo
 files to change the release version, then refresh + update.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sed -ri &#39;s/15\.0/15.1/&#39; /etc/zypp/repos.d/*.repo
-</span><span>zypper ref
-</span><span>zypper dup
-</span><span>reboot
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>sed -ri &#39;s/15\.0/15.1/&#39; /etc/zypp/repos.d/*.repo</span></span>
+<span class="giallo-l"><span>zypper ref</span></span>
+<span class="giallo-l"><span>zypper dup</span></span>
+<span class="giallo-l"><span>reboot</span></span></code></pre>
 <p>Note this works on a transactional host too:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sed -ri &#39;s/15\.0/15.1/&#39; /etc/zypp/repos.d/*.repo
-</span><span>transactional-update dup
-</span><span>reboot
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>sed -ri &#39;s/15\.0/15.1/&#39; /etc/zypp/repos.d/*.repo</span></span>
+<span class="giallo-l"><span>transactional-update dup</span></span>
+<span class="giallo-l"><span>reboot</span></span></code></pre>
 <p>It would be nice if these was an upgrade tool that would attempt the
 upgrade and revert the repo files, or use temporary repo files for the
 upgrade though. It would be a bit nicer as a user experience than sed of

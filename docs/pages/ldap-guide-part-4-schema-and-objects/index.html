@@ -92,16 +92,14 @@ object-oriented programming.</p>
 <p>Sadly, schema is a bit difficult to parse due to it's representation as
 a single object. You can show all the objectClasses and attributeTypes
 definitions with the following search.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ldapsearch -H ldap://exampleldap.blackhats.net.au:3389 -x -b &#39;cn=schema&#39; &#39;(objectClass=*)&#39; +
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ldapsearch -H ldap://exampleldap.blackhats.net.au:3389 -x -b &#39;cn=schema&#39; &#39;(objectClass=*)&#39; +</span></span></code></pre>
 <p><em>note</em>: We have a tool in development that makes searching for these
 details easier, but we haven't released it yet.</p>
 <p>You'll notice two important types here. The first is an attributeType:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>attributeTypes: ( 2.5.4.4 NAME ( &#39;sn&#39; &#39;surName&#39; )  SUP name
-</span><span> EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch
-</span><span> SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN &#39;RFC 4519&#39;
-</span><span> X-DEPRECATED &#39;surName&#39; )
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>attributeTypes: ( 2.5.4.4 NAME ( &#39;sn&#39; &#39;surName&#39; )  SUP name</span></span>
+<span class="giallo-l"><span> EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch</span></span>
+<span class="giallo-l"><span> SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN &#39;RFC 4519&#39;</span></span>
+<span class="giallo-l"><span> X-DEPRECATED &#39;surName&#39; )</span></span></code></pre>
 <p>This is the definition of how an attribute is named and represented. We
 can see this attribute can be named "sn" or "surName" (but surName
 is deprecated), it uses a case-insensitive match for checks (ie Brown
@@ -110,63 +108,56 @@ hold: in this case a utf8 string.</p>
 <p>For the most part you won't need to play with attributeTypes unless you
 have an odd data edge case you are trying to represent.</p>
 <p>The second important type is the objectClass definition:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>objectClasses: ( 2.5.6.6 NAME &#39;person&#39; SUP top STRUCTURAL MUST ( sn $ cn )
-</span><span> MAY ( userPassword $ telephoneNumber $ seeAlso $ description )
-</span><span> X-ORIGIN &#39;RFC 4519&#39; )
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>objectClasses: ( 2.5.6.6 NAME &#39;person&#39; SUP top STRUCTURAL MUST ( sn $ cn )</span></span>
+<span class="giallo-l"><span> MAY ( userPassword $ telephoneNumber $ seeAlso $ description )</span></span>
+<span class="giallo-l"><span> X-ORIGIN &#39;RFC 4519&#39; )</span></span></code></pre>
 <p>This defines an objectClass called "person". It's parent is the
 "top" objectClass, and for this to exist on an object the object MUST
 have sn and cn attributes present. You may optionally include the MAY
 attributes on the object also.</p>
 <h2 id="example">Example</h2>
 <p>So using our person objectclass we can create a simple object:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cn=user,dc=...
-</span><span>objectClass: top
-</span><span>objectClass: person
-</span><span>cn: user
-</span><span>sn: user
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cn=user,dc=...</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: person</span></span>
+<span class="giallo-l"><span>cn: user</span></span>
+<span class="giallo-l"><span>sn: user</span></span></code></pre>
 <p>Let's go through a few things. First, note that the rdn (cn=user), is a
 valid attribute on the object (cn: user). If we omitted this or changed
 it, it would not be valid. This for example is invalid:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cn=user,dc=...
-</span><span>objectClass: top
-</span><span>objectClass: person
-</span><span>cn: somethingelse
-</span><span>sn: user
-</span><span>description: invalid!
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cn=user,dc=...</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: person</span></span>
+<span class="giallo-l"><span>cn: somethingelse</span></span>
+<span class="giallo-l"><span>sn: user</span></span>
+<span class="giallo-l"><span>description: invalid!</span></span></code></pre>
 <p>If we don't satisfy the schema's "MUST" requirements, the object is
 also invalid:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cn=user,dc=...
-</span><span>objectClass: top
-</span><span>objectClass: person
-</span><span>sn: user
-</span><span>description: invalid, missing cn!
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cn=user,dc=...</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: person</span></span>
+<span class="giallo-l"><span>sn: user</span></span>
+<span class="giallo-l"><span>description: invalid, missing cn!</span></span></code></pre>
 <p>It IS valid to add any of the MAY types to an object of course, but they
 can also be absent (as per the examples above):</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cn=user,dc=...
-</span><span>objectClass: top
-</span><span>objectClass: person
-</span><span>cn: user
-</span><span>sn: user
-</span><span>telephoneNumber: 0118999....
-</span><span>description: valid with may attrs.
-</span></code></pre>
-<h2 id="complex-objects">Complex objects</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cn=user,dc=...</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: person</span></span>
+<span class="giallo-l"><span>cn: user</span></span>
+<span class="giallo-l"><span>sn: user</span></span>
+<span class="giallo-l"><span>telephoneNumber: 0118999....</span></span>
+<span class="giallo-l"><span>description: valid with may attrs.</span></span></code></pre><h2 id="complex-objects">Complex objects</h2>
 <p>You are not limited to a single objectClass per object either. You can
 list multiple objectClasses:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>objectClass: account
-</span><span>objectClass: inetOrgPerson
-</span><span>objectClass: inetUser
-</span><span>objectClass: ldapPublicKey
-</span><span>objectClass: ntUser
-</span><span>objectClass: organizationalPerson
-</span><span>objectClass: person
-</span><span>objectClass: posixaccount
-</span><span>objectClass: top
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>objectClass: account</span></span>
+<span class="giallo-l"><span>objectClass: inetOrgPerson</span></span>
+<span class="giallo-l"><span>objectClass: inetUser</span></span>
+<span class="giallo-l"><span>objectClass: ldapPublicKey</span></span>
+<span class="giallo-l"><span>objectClass: ntUser</span></span>
+<span class="giallo-l"><span>objectClass: organizationalPerson</span></span>
+<span class="giallo-l"><span>objectClass: person</span></span>
+<span class="giallo-l"><span>objectClass: posixaccount</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span></code></pre>
 <p>Provided that all the MUST requirements of all objectClasses are
 satisfied, this is valid.</p>
 <p>If an attribute exists in both a MUST and a MAY of an objectClass, then
@@ -174,14 +165,12 @@ the stricter requirement is enforced, IE MUST. Here, both objectClasses
 define cn, but ldapsubentry defines it as "MAY" and person as
 "MUST". Therfore, on an object that contained both of these, CN is a
 must attribute.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>objectClasses: ( 2.16.840.1.113719.2.142.6.1.1 NAME &#39;ldapSubEntry&#39; DESC &#39;LDAP 
-</span><span> Subentry class, version 1&#39; SUP top STRUCTURAL MAY cn X-ORIGIN &#39;LDAP Subentry 
-</span><span> Internet Draft&#39; )
-</span><span>objectClasses: ( 2.5.6.6 NAME &#39;person&#39; SUP top STRUCTURAL MUST ( sn $ cn )
-</span><span> MAY ( userPassword $ telephoneNumber $ seeAlso $ description )
-</span><span> X-ORIGIN &#39;RFC 4519&#39; )
-</span></code></pre>
-<h2 id="building-your-own-objects">Building your own objects</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>objectClasses: ( 2.16.840.1.113719.2.142.6.1.1 NAME &#39;ldapSubEntry&#39; DESC &#39;LDAP </span></span>
+<span class="giallo-l"><span> Subentry class, version 1&#39; SUP top STRUCTURAL MAY cn X-ORIGIN &#39;LDAP Subentry </span></span>
+<span class="giallo-l"><span> Internet Draft&#39; )</span></span>
+<span class="giallo-l"><span>objectClasses: ( 2.5.6.6 NAME &#39;person&#39; SUP top STRUCTURAL MUST ( sn $ cn )</span></span>
+<span class="giallo-l"><span> MAY ( userPassword $ telephoneNumber $ seeAlso $ description )</span></span>
+<span class="giallo-l"><span> X-ORIGIN &#39;RFC 4519&#39; )</span></span></code></pre><h2 id="building-your-own-objects">Building your own objects</h2>
 <p>Knowing this now you can use this to create your own objects. There are
 some common attributes that generally need to be satisfied to allow user
 objects to resolve on unix systems. You'll probably need:</p>
@@ -208,22 +197,19 @@ it.</p>
 objectClass definitions to match. Try this out:</p>
 <h2 id="answers">Answers</h2>
 <p>For the group, this is pretty easy. You should have:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>objectClass: top
-</span><span>objectClass: posixGroup
-</span><span>objectClass: groupOfNames
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: posixGroup</span></span>
+<span class="giallo-l"><span>objectClass: groupOfNames</span></span></code></pre>
 <p>The user is a bit tricker. You should have something similar to:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>objectClass: top
-</span><span>objectClass: account
-</span><span>objectClass: person
-</span><span>objectClass: posixAccount
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: account</span></span>
+<span class="giallo-l"><span>objectClass: person</span></span>
+<span class="giallo-l"><span>objectClass: posixAccount</span></span></code></pre>
 <p>Remember, there is more than one way to put these objects together to
 have valid attributes that you require - just try to make sure you pick
 classes that don't have excess attributes. A bad choice for example is:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>objectClass: top
-</span><span>objectClass: nsValueItem
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>objectClass: nsValueItem</span></span></code></pre>
 <p>nsValueItem gives you a "MUST" cn, but it gives "MAY" of many other
 attributes you will never use or need. So account or person are better
 choices. Generally the clue is in the objectClass name.</p>

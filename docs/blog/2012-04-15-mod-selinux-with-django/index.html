@@ -89,70 +89,63 @@ virtual hosts, or by LocationMatch directives.</p>
 <p>Part of my curiosity wanted to see how this works. So I made up a small
 django application that would tell you the selinux context of an URL.</p>
 <p>Install mod_selinux first</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>yum install mod_selinux mod_wsgi
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>yum install mod_selinux mod_wsgi</span></span></code></pre>
 <p>Now we create a VirtualHost that we can use for the test application</p>
 <p>:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>NameVirtualHost *:80
-</span><span>
-</span><span>&lt;VirtualHost *:80&gt;
-</span><span>    ServerAdmin william@firstyear.id.au
-</span><span>    DocumentRoot /var/empty
-</span><span>    ServerName 172.16.209.150
-</span><span>
-</span><span>    &lt;LocationMatch /selinux/test/c2&gt;
-</span><span>    selinuxDomainVal    *:s0:c2
-</span><span>    &lt;/LocationMatch&gt;
-</span><span>    &lt;LocationMatch /selinux/test/c3&gt;
-</span><span>    selinuxDomainVal    *:s0:c3
-</span><span>    &lt;/LocationMatch&gt;
-</span><span>
-</span><span>    #Alias /robots.txt /usr/local/wsgi/static/robots.txt
-</span><span>    #Alias /favicon.ico /usr/local/wsgi/static/favicon.ico
-</span><span>
-</span><span>    AliasMatch ^/([^/]*\.css) /var/www/django_base/static/styles/$1
-</span><span>
-</span><span>    Alias /media/ /var/www/django_base/media/
-</span><span>    Alias /static/ /var/www/django_base/static/
-</span><span>
-</span><span>    &lt;Directory /var/www/django_base/static&gt;
-</span><span>    Order deny,allow
-</span><span>    Allow from all
-</span><span>    &lt;/Directory&gt;
-</span><span>
-</span><span>    &lt;Directory /var/www/django_base/media&gt;
-</span><span>    Order deny,allow
-</span><span>    Allow from all
-</span><span>    &lt;/Directory&gt;
-</span><span>
-</span><span>    WSGIScriptAlias / /var/www/django_base/django_base/wsgi.py
-</span><span>
-</span><span>    &lt;Directory /var/www/django_base/scripts&gt;
-</span><span>    Order allow,deny
-</span><span>    Allow from all
-</span><span>    &lt;/Directory&gt;
-</span><span>&lt;/VirtualHost&gt;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>NameVirtualHost *:80</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>&lt;VirtualHost *:80&gt;</span></span>
+<span class="giallo-l"><span>    ServerAdmin william@firstyear.id.au</span></span>
+<span class="giallo-l"><span>    DocumentRoot /var/empty</span></span>
+<span class="giallo-l"><span>    ServerName 172.16.209.150</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    &lt;LocationMatch /selinux/test/c2&gt;</span></span>
+<span class="giallo-l"><span>    selinuxDomainVal    *:s0:c2</span></span>
+<span class="giallo-l"><span>    &lt;/LocationMatch&gt;</span></span>
+<span class="giallo-l"><span>    &lt;LocationMatch /selinux/test/c3&gt;</span></span>
+<span class="giallo-l"><span>    selinuxDomainVal    *:s0:c3</span></span>
+<span class="giallo-l"><span>    &lt;/LocationMatch&gt;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    #Alias /robots.txt /usr/local/wsgi/static/robots.txt</span></span>
+<span class="giallo-l"><span>    #Alias /favicon.ico /usr/local/wsgi/static/favicon.ico</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    AliasMatch ^/([^/]*\.css) /var/www/django_base/static/styles/$1</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Alias /media/ /var/www/django_base/media/</span></span>
+<span class="giallo-l"><span>    Alias /static/ /var/www/django_base/static/</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    &lt;Directory /var/www/django_base/static&gt;</span></span>
+<span class="giallo-l"><span>    Order deny,allow</span></span>
+<span class="giallo-l"><span>    Allow from all</span></span>
+<span class="giallo-l"><span>    &lt;/Directory&gt;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    &lt;Directory /var/www/django_base/media&gt;</span></span>
+<span class="giallo-l"><span>    Order deny,allow</span></span>
+<span class="giallo-l"><span>    Allow from all</span></span>
+<span class="giallo-l"><span>    &lt;/Directory&gt;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    WSGIScriptAlias / /var/www/django_base/django_base/wsgi.py</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    &lt;Directory /var/www/django_base/scripts&gt;</span></span>
+<span class="giallo-l"><span>    Order allow,deny</span></span>
+<span class="giallo-l"><span>    Allow from all</span></span>
+<span class="giallo-l"><span>    &lt;/Directory&gt;</span></span>
+<span class="giallo-l"><span>&lt;/VirtualHost&gt;</span></span></code></pre>
 <p>We also need to alter /etc/httpd/conf.d/mod_selinux.conf to have MCS
 labels.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>selinuxServerDomain     *:s0:c0.c100
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>selinuxServerDomain     *:s0:c0.c100</span></span></code></pre>
 <p>And finally, download the (now sadly lost) tar ball, and unpack it to
 /var/www</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cd /var/www
-</span><span>tar -xvzf django_selinux_test.tar.gz
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cd /var/www</span></span>
+<span class="giallo-l"><span>tar -xvzf django_selinux_test.tar.gz</span></span></code></pre>
 <p>Now, navigating to the right URL will show you the different SELinux
 contexts</p>
-<p><a href="http://localhost/selinux/test/test">http://localhost/selinux/test/test</a> :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Hello. Your processes context is [0, &#39;system_u:system_r:httpd_t:s0:c0.c100&#39;]
-</span></code></pre>
-<p><a href="http://localhost/selinux/test/c2">http://localhost/selinux/test/c2</a> :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Hello. Your processes context is [0, &#39;system_u:system_r:httpd_t:s0:c2&#39;]
-</span></code></pre>
-<p><a href="http://localhost/selinux/test/c3">http://localhost/selinux/test/c3</a> :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Hello. Your processes context is [0, &#39;system_u:system_r:httpd_t:s0:c3&#39;]
-</span></code></pre>
+<p><a rel="external" href="http://localhost/selinux/test/test">http://localhost/selinux/test/test</a> :</p>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>Hello. Your processes context is [0, &#39;system_u:system_r:httpd_t:s0:c0.c100&#39;]</span></span></code></pre>
+<p><a rel="external" href="http://localhost/selinux/test/c2">http://localhost/selinux/test/c2</a> :</p>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>Hello. Your processes context is [0, &#39;system_u:system_r:httpd_t:s0:c2&#39;]</span></span></code></pre>
+<p><a rel="external" href="http://localhost/selinux/test/c3">http://localhost/selinux/test/c3</a> :</p>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>Hello. Your processes context is [0, &#39;system_u:system_r:httpd_t:s0:c3&#39;]</span></span></code></pre>
 <p>The best part about this is that this context is passed via the local
 unix socket to sepgsql - meaning that specific locations in your Django
 application can have different SELinux MCS labels, allowing mandatory

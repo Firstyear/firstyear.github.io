@@ -85,41 +85,38 @@
 <p>I have now compiled and testing mod_selinux on el7. I'm trying to get
 this into EPEL now.</p>
 <p>To test this once you have done a build.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>#!/usr/bin/env python
-</span><span>import cgi
-</span><span>import cgitb; cgitb.enable()  # for troubleshooting
-</span><span>import selinux
-</span><span>
-</span><span>print &quot;Content-type: text/html&quot;
-</span><span>print
-</span><span>print &quot;&quot;&quot;
-</span><span>&lt;html&gt;
-</span><span>&lt;head&gt;&lt;title&gt;Selinux CGI context&lt;/title&gt;&lt;/head&gt;
-</span><span>&lt;body&gt;
-</span><span>  &lt;p&gt;Current context is %s&lt;/p&gt;
-</span><span>&lt;/body&gt;
-</span><span>&lt;/html&gt;
-</span><span>&quot;&quot;&quot; % cgi.escape(str(selinux.getcon()))
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>#!/usr/bin/env python</span></span>
+<span class="giallo-l"><span>import cgi</span></span>
+<span class="giallo-l"><span>import cgitb; cgitb.enable()  # for troubleshooting</span></span>
+<span class="giallo-l"><span>import selinux</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>print &quot;Content-type: text/html&quot;</span></span>
+<span class="giallo-l"><span>print</span></span>
+<span class="giallo-l"><span>print &quot;&quot;&quot;</span></span>
+<span class="giallo-l"><span>&lt;html&gt;</span></span>
+<span class="giallo-l"><span>&lt;head&gt;&lt;title&gt;Selinux CGI context&lt;/title&gt;&lt;/head&gt;</span></span>
+<span class="giallo-l"><span>&lt;body&gt;</span></span>
+<span class="giallo-l"><span>  &lt;p&gt;Current context is %s&lt;/p&gt;</span></span>
+<span class="giallo-l"><span>&lt;/body&gt;</span></span>
+<span class="giallo-l"><span>&lt;/html&gt;</span></span>
+<span class="giallo-l"><span>&quot;&quot;&quot; % cgi.escape(str(selinux.getcon()))</span></span></code></pre>
 <p>Put this cgi into:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/var/www/cgi-bin/selinux-c1.cgi
-</span><span>/var/www/cgi-bin/selinux-c2.cgi
-</span><span>/var/www/cgi-bin/selinux-c3.cgi
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/var/www/cgi-bin/selinux-c1.cgi</span></span>
+<span class="giallo-l"><span>/var/www/cgi-bin/selinux-c2.cgi</span></span>
+<span class="giallo-l"><span>/var/www/cgi-bin/selinux-c3.cgi</span></span></code></pre>
 <p>Now, install and configure httpd.</p>
 <p>/etc/httpd/conf.d/mod_selinux.conf</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&lt;VirtualHost *:80&gt;
-</span><span> DocumentRoot          /var/www/html
-</span><span>
-</span><span>    &lt;LocationMatch /cgi-bin/selinux-c2.cgi&gt;
-</span><span>    selinuxDomainVal    *:s0:c2
-</span><span>    &lt;/LocationMatch&gt;
-</span><span>    &lt;LocationMatch /cgi-bin/selinux-c3.cgi&gt;
-</span><span>    selinuxDomainVal    *:s0:c3
-</span><span>    &lt;/LocationMatch&gt;
-</span><span>
-</span><span>&lt;/VirtualHost&gt;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&lt;VirtualHost *:80&gt;</span></span>
+<span class="giallo-l"><span> DocumentRoot          /var/www/html</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    &lt;LocationMatch /cgi-bin/selinux-c2.cgi&gt;</span></span>
+<span class="giallo-l"><span>    selinuxDomainVal    *:s0:c2</span></span>
+<span class="giallo-l"><span>    &lt;/LocationMatch&gt;</span></span>
+<span class="giallo-l"><span>    &lt;LocationMatch /cgi-bin/selinux-c3.cgi&gt;</span></span>
+<span class="giallo-l"><span>    selinuxDomainVal    *:s0:c3</span></span>
+<span class="giallo-l"><span>    &lt;/LocationMatch&gt;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>&lt;/VirtualHost&gt;</span></span></code></pre>
 <p>Now when you load each page you should see different contexts such as:
 "Current context is [0,
 'system_u:system_r:httpd_sys_script_t:s0:c3']"</p>

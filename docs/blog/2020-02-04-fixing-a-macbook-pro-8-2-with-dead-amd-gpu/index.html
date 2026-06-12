@@ -122,42 +122,38 @@ like what we have here!</p>
 <h2 id="to-fix-this">To fix this ...</h2>
 <p>Okay, so this is fixable. First, we need to tell EFI to boot primarily
 from the intel card. Boot to single user mode and then run.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>nvram fa4ce28d-b62f-4c99-9cc3-6815686e30f9:gpu-power-prefs=%01%00%00%00
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>nvram fa4ce28d-b62f-4c99-9cc3-6815686e30f9:gpu-power-prefs=%01%00%00%00</span></span></code></pre>
 <p>Now we need to prevent loading of the AMD drivers so that during the
 boot MacOS doesn't attempt to swap from Intel to the Radeon. We can do
 this by hiding the drivers. System integrity protection will stop you,
 so you need to do this as part of recovery. Boot with cmd + r, which now
 works thanks to the EFI changes, then open terminal</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cd /Volumes/Macintosh HD
-</span><span>sudo mkdir amdkext
-</span><span>sudo mv System/Library/Extensions/AMDRadeonX3000.kext amdkext/
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cd /Volumes/Macintosh HD</span></span>
+<span class="giallo-l"><span>sudo mkdir amdkext</span></span>
+<span class="giallo-l"><span>sudo mv System/Library/Extensions/AMDRadeonX3000.kext amdkext/</span></span></code></pre>
 <p>Then reboot. You'll notice the fans go crazy because the Radeon card
 can't be disabled without the driver. We can post-boot load the driver
 to stop the fans to fix this up.</p>
 <p>To achieve this we make a helper script:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># cat /usr/local/libexec/amd_kext_load.sh
-</span><span>#!/bin/sh
-</span><span>/sbin/kextload /amdkext/AMDRadeonX3000.kext
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># cat /usr/local/libexec/amd_kext_load.sh</span></span>
+<span class="giallo-l"><span>#!/bin/sh</span></span>
+<span class="giallo-l"><span>/sbin/kextload /amdkext/AMDRadeonX3000.kext</span></span></code></pre>
 <p>And a launchctl daemon</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># cat /Library/LaunchDaemons/au.net.blackhats.fy.amdkext.plist
-</span><span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-</span><span>&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;
-</span><span>&lt;plist version=&quot;1.0&quot;&gt;
-</span><span>        &lt;dict&gt;
-</span><span>                &lt;key&gt;Label&lt;/key&gt;
-</span><span>                &lt;string&gt;au.net.blackhats.fy.amdkext&lt;/string&gt;
-</span><span>                &lt;key&gt;Program&lt;/key&gt;
-</span><span>                &lt;string&gt;/usr/local/libexec/amd_kext_load.sh&lt;/string&gt;
-</span><span>                &lt;key&gt;RunAtLoad&lt;/key&gt;
-</span><span>                &lt;true/&gt;
-</span><span>                &lt;key&gt;StandardOutPath&lt;/key&gt;
-</span><span>                &lt;string&gt;/var/log/amd_kext_load.log&lt;/string&gt;
-</span><span>        &lt;/dict&gt;
-</span><span>&lt;/plist&gt;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># cat /Library/LaunchDaemons/au.net.blackhats.fy.amdkext.plist</span></span>
+<span class="giallo-l"><span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span>
+<span class="giallo-l"><span>&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;</span></span>
+<span class="giallo-l"><span>&lt;plist version=&quot;1.0&quot;&gt;</span></span>
+<span class="giallo-l"><span>        &lt;dict&gt;</span></span>
+<span class="giallo-l"><span>                &lt;key&gt;Label&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>                &lt;string&gt;au.net.blackhats.fy.amdkext&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>                &lt;key&gt;Program&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>                &lt;string&gt;/usr/local/libexec/amd_kext_load.sh&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>                &lt;key&gt;RunAtLoad&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>                &lt;true/&gt;</span></span>
+<span class="giallo-l"><span>                &lt;key&gt;StandardOutPath&lt;/key&gt;</span></span>
+<span class="giallo-l"><span>                &lt;string&gt;/var/log/amd_kext_load.log&lt;/string&gt;</span></span>
+<span class="giallo-l"><span>        &lt;/dict&gt;</span></span>
+<span class="giallo-l"><span>&lt;/plist&gt;</span></span></code></pre>
 <p>Now if you reboot, you'll have a working mac, and the fans will stop
 properly. I've tested this with suspend and resume too and it works!
 The old beast continues to live :)</p>

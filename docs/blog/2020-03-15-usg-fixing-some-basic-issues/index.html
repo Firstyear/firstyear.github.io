@@ -84,13 +84,10 @@
         <h1 id="usg-fixing-avahi">USG fixing avahi</h1>
 <p>Sadly on the USG pro 4 avahi will regularly spiral out of control taking
 up 100% cpu. To fix this, we set an hourly restart:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>sudo -s
-</span><span>crontab -e
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>sudo -s</span></span>
+<span class="giallo-l"><span>crontab -e</span></span></code></pre>
 <p>Then add:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>15 * * * * /usr/sbin/service avahi-daemon restart
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>15 * * * * /usr/sbin/service avahi-daemon restart</span></span></code></pre>
     </div>
 </article>
 

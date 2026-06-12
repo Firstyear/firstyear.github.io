@@ -87,9 +87,8 @@ onto this challenge.</p>
 <p>If we have a replication conflict in 389, we generall have two results.
 A and B. In the case A is the live object and B is the conflict, and we
 want to keep A as live object, it's as easy as:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: idnsname=_kerberos._udp.Default-First-Site-Name._sites.dc._msdcs+nsuniqueid=910d8837-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span><span>changetype: delete
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: idnsname=_kerberos._udp.Default-First-Site-Name._sites.dc._msdcs+nsuniqueid=910d8837-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span>
+<span class="giallo-l"><span>changetype: delete</span></span></code></pre>
 <p>But say we want to swap them over: We want to keep B, but A is live. How
 do we recover this?</p>
 <p>I plan to make a tool to do this, because it's a right pain.</p>
@@ -99,53 +98,49 @@ somewhere that doesn't need the blackmagic that is extensibleObject.
 personally.)</p>
 <p>First, we need to get the object out of being a multivalued rdn object
 so we can manipulate it easier. We give it a cn to match it's uniqueId.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: idnsname=_kerberos._udp.dc._msdcs+nsuniqueid=910d8842-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span><span>changetype: modify
-</span><span>add: cn
-</span><span>cn: 910d8842-4c3c11e5-83eea63b-366c3f94
-</span><span>-
-</span><span>replace: objectClass
-</span><span>objectClass: extensibleObject
-</span><span>objectClass: idnsrecord
-</span><span>objectClass: top
-</span><span>-
-</span><span>
-</span><span>dn: idnsname=_kerberos._udp.dc._msdcs+nsuniqueid=910d8842-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span><span>changetype: modrdn
-</span><span>newrdn: cn=910d8842-4c3c11e5-83eea63b-366c3f94
-</span><span>deleteoldrdn: 0
-</span><span>newsuperior:
-</span><span>idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: idnsname=_kerberos._udp.dc._msdcs+nsuniqueid=910d8842-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>add: cn</span></span>
+<span class="giallo-l"><span>cn: 910d8842-4c3c11e5-83eea63b-366c3f94</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"><span>replace: objectClass</span></span>
+<span class="giallo-l"><span>objectClass: extensibleObject</span></span>
+<span class="giallo-l"><span>objectClass: idnsrecord</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: idnsname=_kerberos._udp.dc._msdcs+nsuniqueid=910d8842-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span>
+<span class="giallo-l"><span>changetype: modrdn</span></span>
+<span class="giallo-l"><span>newrdn: cn=910d8842-4c3c11e5-83eea63b-366c3f94</span></span>
+<span class="giallo-l"><span>deleteoldrdn: 0</span></span>
+<span class="giallo-l"><span>newsuperior:</span></span>
+<span class="giallo-l"><span>idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span></code></pre>
 <p>Now, we can get rid of the repl conflict:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: cn=910d8842-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span><span>changetype: modify
-</span><span>delete: nsds5ReplConflict
-</span><span>nsds5ReplConflict:
-</span><span>namingConflictidnsname=_kerberos._udp.dc._msdcs,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span><span>-
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: cn=910d8842-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>delete: nsds5ReplConflict</span></span>
+<span class="giallo-l"><span>nsds5ReplConflict:</span></span>
+<span class="giallo-l"><span>namingConflictidnsname=_kerberos._udp.dc._msdcs,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span>
+<span class="giallo-l"><span>-</span></span></code></pre>
 <p>We have "B" ready to go. So lets get A out of the way, and drop B in.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: idnsname=_kerberos._udp.Default-First-Site-Name._sites.dc._msdcs+nsuniqueid=910d8837-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span><span>changetype: delete
-</span><span>
-</span><span>dn: cn=910d8842-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span><span>changetype: modrdn
-</span><span>newrdn: idnsName=_kerberos._udp.dc._msdcs
-</span><span>deleteoldrdn: 0
-</span><span>newsuperior: idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: idnsname=_kerberos._udp.Default-First-Site-Name._sites.dc._msdcs+nsuniqueid=910d8837-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span>
+<span class="giallo-l"><span>changetype: delete</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: cn=910d8842-4c3c11e5-83eea63b-366c3f94,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span>
+<span class="giallo-l"><span>changetype: modrdn</span></span>
+<span class="giallo-l"><span>newrdn: idnsName=_kerberos._udp.dc._msdcs</span></span>
+<span class="giallo-l"><span>deleteoldrdn: 0</span></span>
+<span class="giallo-l"><span>newsuperior: idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span></code></pre>
 <p>Finally, we need to fix the objectClass and get rid of the cn.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: idnsName=_kerberos._udp.dc._msdcs,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan
-</span><span>changetype: modify
-</span><span>delete: cn
-</span><span>cn: 910d8842-4c3c11e5-83eea63b-366c3f94
-</span><span>-
-</span><span>replace: objectClass
-</span><span>objectClass: idnsrecord
-</span><span>objectClass: top
-</span><span>-
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: idnsName=_kerberos._udp.dc._msdcs,idnsname=lab.example.lan.,cn=dns,dc=lab,dc=example,dc=lan</span></span>
+<span class="giallo-l"><span>changetype: modify</span></span>
+<span class="giallo-l"><span>delete: cn</span></span>
+<span class="giallo-l"><span>cn: 910d8842-4c3c11e5-83eea63b-366c3f94</span></span>
+<span class="giallo-l"><span>-</span></span>
+<span class="giallo-l"><span>replace: objectClass</span></span>
+<span class="giallo-l"><span>objectClass: idnsrecord</span></span>
+<span class="giallo-l"><span>objectClass: top</span></span>
+<span class="giallo-l"><span>-</span></span></code></pre>
 <p>I think a tool to do this would be really helpful.</p>
 
     </div>

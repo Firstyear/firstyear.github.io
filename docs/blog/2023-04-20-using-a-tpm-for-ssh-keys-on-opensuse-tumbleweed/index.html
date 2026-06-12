@@ -89,8 +89,7 @@ exist online for how to configure this for other distributions, this
 will focus on OpenSUSE Tumbleweed.</p>
 <h2 id="install-packages">Install Packages</h2>
 <p>The following is required to be installed.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>zypper install tpm2-pkcs11 tpm2.0-tools tpm2-0-tss libtpm2_pkcs11-0
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>zypper install tpm2-pkcs11 tpm2.0-tools tpm2-0-tss libtpm2_pkcs11-0</span></span></code></pre>
 <ul>
 <li><code>tpm2-pkcs11</code> - tools to configure keys in a tpm via PKCS11</li>
 <li><code>tpm2.0-tools</code> - tools for TPM introspection</li>
@@ -99,83 +98,64 @@ will focus on OpenSUSE Tumbleweed.</p>
 </ul>
 <h2 id="check-the-tpm-exists">Check the TPM exists</h2>
 <p>You can check the TPM exists and is working with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ls -l /dev/tpm*
-</span><span># crw-rw---- 1 tss root  10,   224 Apr 19 18:39 /dev/tpm0
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ls -l /dev/tpm*</span></span>
+<span class="giallo-l"><span># crw-rw---- 1 tss root  10,   224 Apr 19 18:39 /dev/tpm0</span></span></code></pre>
 <p>To check the supported algorithms on the TPM:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tpm2_getcap algorithms
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>tpm2_getcap algorithms</span></span></code></pre>
 <p>If this command errors, your TPM may be misconfigured or you may not
 have access to the TPM.</p>
 <p><em>HINT</em>: You can add a TPM to a KVM virtual machine with virt-install
 with the line:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>--tpm backend.type=emulator,backend.version=2.0,model=tpm-tis
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>--tpm backend.type=emulator,backend.version=2.0,model=tpm-tis</span></span></code></pre>
 <p>From virt-manager you can add the TPM via "Add Hardware", "TPM".</p>
 <p>Editing the virtual machine xml directly a TPM can be defined with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&lt;domain type=&#39;kvm&#39;&gt;
-</span><span>  &lt;devices&gt;
-</span><span>    &lt;tpm model=&#39;tpm-tis&#39;&gt;
-</span><span>      &lt;backend type=&#39;emulator&#39; version=&#39;2.0&#39;/&gt;
-</span><span>    &lt;/tpm&gt;
-</span><span>  &lt;/devices&gt;
-</span><span>&lt;/domain&gt;
-</span></code></pre>
-<h2 id="allow-user-access">Allow User Access</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&lt;domain type=&#39;kvm&#39;&gt;</span></span>
+<span class="giallo-l"><span>  &lt;devices&gt;</span></span>
+<span class="giallo-l"><span>    &lt;tpm model=&#39;tpm-tis&#39;&gt;</span></span>
+<span class="giallo-l"><span>      &lt;backend type=&#39;emulator&#39; version=&#39;2.0&#39;/&gt;</span></span>
+<span class="giallo-l"><span>    &lt;/tpm&gt;</span></span>
+<span class="giallo-l"><span>  &lt;/devices&gt;</span></span>
+<span class="giallo-l"><span>&lt;/domain&gt;</span></span></code></pre><h2 id="allow-user-access">Allow User Access</h2>
 <p>Add your user to the tss group</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>usermod -a -G tss username
-</span></code></pre>
-<h2 id="execute-fapi-provisioning">Execute FAPI Provisioning</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>usermod -a -G tss username</span></span></code></pre><h2 id="execute-fapi-provisioning">Execute FAPI Provisioning</h2>
 <p>The tpm2 library comes with a feature api (FAPI), which annoyingly needs
 provisioning before we can proceed. If you skip this provisioning step,
 you will be annoyed by a pointless warning message every time you use
 your ssh key.</p>
 <p>If you attempt the provisioning later, you will BREAK YOUR KEYS.</p>
 <p>Edit <code>/etc/tpm2-tss/fapi-config.json</code> and ensure this line is present:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>     &quot;ek_cert_less&quot;: &quot;yes&quot;,
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>     &quot;ek_cert_less&quot;: &quot;yes&quot;,</span></span></code></pre>
 <p>now run:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tss2_provision
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>tss2_provision</span></span></code></pre>
 <blockquote>
 <p>HINT: If you have errors you can get more output with:</p>
 </blockquote>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>TSS2_LOG=fapi+debug tss2_provision
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>TSS2_LOG=fapi+debug tss2_provision</span></span></code></pre>
 <p>If you get an error about "An SRK already exists", you can clear it with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tpm2_evictcontrol -C o -c 0x81000001
-</span></code></pre>
-<h2 id="configure-the-ssh-key">Configure the SSH key</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>tpm2_evictcontrol -C o -c 0x81000001</span></span></code></pre><h2 id="configure-the-ssh-key">Configure the SSH key</h2>
 <p><em>NOTE</em> Be sure to perform these steps as your user - not as root!</p>
 <p>Initialise the tpm PKCS11 store - note the id in the output.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tpm2_ptool init
-</span><span># action: Created
-</span><span># id: 1
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>tpm2_ptool init</span></span>
+<span class="giallo-l"><span># action: Created</span></span>
+<span class="giallo-l"><span># id: 1</span></span></code></pre>
 <p>Using the id from the above output, you can use that to create a new
 token. Note here that the userpin is the pin for using the ssh key. The
 sopin is the recovery password incase you lose the pin and need to reset
 it.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>tpm2_ptool addtoken --pid=1 --label=ssh --userpin=&quot;&quot; --sopin=&quot;&quot;
-</span><span>tpm2_ptool addkey --label=ssh --userpin=&quot;&quot; --algorithm=ecc256
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>tpm2_ptool addtoken --pid=1 --label=ssh --userpin=&quot;&quot; --sopin=&quot;&quot;</span></span>
+<span class="giallo-l"><span>tpm2_ptool addkey --label=ssh --userpin=&quot;&quot; --algorithm=ecc256</span></span></code></pre>
 <p>If you want to use a different key algorithm, other choices are rsa2048,
 rsa3072, rsa4096, ecc256, ecc384, ecc521.</p>
 <p>Now you can view the public key with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -D /usr/lib64/pkcs11/libtpm2_pkcs11.so.0
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh-keygen -D /usr/lib64/pkcs11/libtpm2_pkcs11.so.0</span></span></code></pre>
 <p>It's a good idea to store this into a file for later:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ssh-keygen -D /usr/lib64/pkcs11/libtpm2_pkcs11.so.0 | tee ~/.ssh/id_ecdsa_tpm.pub
-</span></code></pre>
-<h2 id="using-the-ssh-key">Using the SSH Key</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ssh-keygen -D /usr/lib64/pkcs11/libtpm2_pkcs11.so.0 | tee ~/.ssh/id_ecdsa_tpm.pub</span></span></code></pre><h2 id="using-the-ssh-key">Using the SSH Key</h2>
 <p>You can modify your ssh configuration to always use the key. You will be
 prompted for the userpin to access the ssh key as required.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># ~/.ssh/config
-</span><span>
-</span><span>PKCS11Provider /usr/lib64/pkcs11/libtpm2_pkcs11.so.0
-</span><span>PasswordAuthentication no
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># ~/.ssh/config</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>PKCS11Provider /usr/lib64/pkcs11/libtpm2_pkcs11.so.0</span></span>
+<span class="giallo-l"><span>PasswordAuthentication no</span></span></code></pre>
     </div>
 </article>
 

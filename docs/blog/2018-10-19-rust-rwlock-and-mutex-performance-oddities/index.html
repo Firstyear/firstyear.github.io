@@ -95,15 +95,14 @@ be shared between threads is consistent when accessed. This consistency
 is not just logical consistency of the data, but affects hardware
 consistency of the memory in cache. As a simple example, let's examine
 an update to a bank account done by two threads:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>acc = 10
-</span><span>deposit = 3
-</span><span>withdrawl = 5
-</span><span>
-</span><span>[ Thread A ]            [ Thread B ]
-</span><span>acc = load_balance()    acc = load_balance()
-</span><span>acc = acc + deposit     acc = acc - withdrawl
-</span><span>store_balance(acc)      store_balance(acc)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>acc = 10</span></span>
+<span class="giallo-l"><span>deposit = 3</span></span>
+<span class="giallo-l"><span>withdrawl = 5</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[ Thread A ]            [ Thread B ]</span></span>
+<span class="giallo-l"><span>acc = load_balance()    acc = load_balance()</span></span>
+<span class="giallo-l"><span>acc = acc + deposit     acc = acc - withdrawl</span></span>
+<span class="giallo-l"><span>store_balance(acc)      store_balance(acc)</span></span></code></pre>
 <p>What will the account balance be at the end? The answer is "it
 depends". Because threads are working in parallel these operations
 could happen:</p>
@@ -121,17 +120,16 @@ allows only a single thread inside of the mutex at a time so we can
 linearise operations. Mutex comes from the word "Mutual Exclusion"
 after all.</p>
 <p>So our example with a mutex now becomes:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>acc = 10
-</span><span>deposit = 3
-</span><span>withdrawl = 5
-</span><span>
-</span><span>[ Thread A ]            [ Thread B ]
-</span><span>mutex.lock()            mutex.lock()
-</span><span>acc = load_balance()    acc = load_balance()
-</span><span>acc = acc + deposit     acc = acc - withdrawl
-</span><span>store_balance(acc)      store_balance(acc)
-</span><span>mutex.unlock()          mutex.unlock()
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>acc = 10</span></span>
+<span class="giallo-l"><span>deposit = 3</span></span>
+<span class="giallo-l"><span>withdrawl = 5</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>[ Thread A ]            [ Thread B ]</span></span>
+<span class="giallo-l"><span>mutex.lock()            mutex.lock()</span></span>
+<span class="giallo-l"><span>acc = load_balance()    acc = load_balance()</span></span>
+<span class="giallo-l"><span>acc = acc + deposit     acc = acc - withdrawl</span></span>
+<span class="giallo-l"><span>store_balance(acc)      store_balance(acc)</span></span>
+<span class="giallo-l"><span>mutex.unlock()          mutex.unlock()</span></span></code></pre>
 <p>Now only one thread will access our account at a time: The other thread
 will block until the mutex is released.</p>
 <p>A RwLock is a special extension to this pattern. Where a mutex
@@ -140,15 +138,13 @@ guarantees single access to the data in a read and write form, a RwLock
 writer access. Importantly when a writer wants to access the lock, all
 readers must complete their work and "drain". Once the write is
 complete readers can begin again. So you can imagine it as:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Time -&gt;
-</span><span>
-</span><span>T1: -- read --&gt; x
-</span><span>T3:     -- read --&gt; x                x -- read --&gt;
-</span><span>T3:     -- read --&gt; x                x -- read --&gt;
-</span><span>T4:                   | -- write -- |
-</span><span>T5:                                  x -- read --&gt;
-</span></code></pre>
-<h2 id="test-case-for-the-rwlock">Test Case for the RwLock</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>Time -&gt;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>T1: -- read --&gt; x</span></span>
+<span class="giallo-l"><span>T3:     -- read --&gt; x                x -- read --&gt;</span></span>
+<span class="giallo-l"><span>T3:     -- read --&gt; x                x -- read --&gt;</span></span>
+<span class="giallo-l"><span>T4:                   | -- write -- |</span></span>
+<span class="giallo-l"><span>T5:                                  x -- read --&gt;</span></span></code></pre><h2 id="test-case-for-the-rwlock">Test Case for the RwLock</h2>
 <p>My test case is simple. Given a set of 12 threads, we spawn:</p>
 <ul>
 <li>8 readers. Take a read lock, read the value, release the read lock.
@@ -177,7 +173,7 @@ This is a 4000 times difference. (i7-7700 CPU @ 3.60GHz)</p>
 a desktop processor, of a newer generation, and much faster clock speed.
 So why is the RwLock performance so much different on Linux?</p>
 <h2 id="to-the-source-code">To the source code!</h2>
-<p>Examining the <a href="https://github.com/rust-lang/rust/blob/master/src/libstd/sys/unix/rwlock.rs">Rust source
+<p>Examining the <a rel="external" href="https://github.com/rust-lang/rust/blob/master/src/libstd/sys/unix/rwlock.rs">Rust source
 code</a>
 , many OS primitives come from libc. This is because they require OS
 support to function. RwLock is an example of this as is mutex and many
@@ -186,22 +182,19 @@ primitive. This means we need to read man pages to understand the
 details of each.</p>
 <p>OSX uses FreeBSD userland components, so we can assume they follow the
 BSD man pages. In the FreeBSD man page for pthread_rwlock_rdlock we see:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>IMPLEMENTATION NOTES
-</span><span>
-</span><span> To prevent writer starvation, writers are favored over readers.
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>IMPLEMENTATION NOTES</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span> To prevent writer starvation, writers are favored over readers.</span></span></code></pre>
 <p>Linux however, uses different constructs. Looking at the Linux man page:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>PTHREAD_RWLOCK_PREFER_READER_NP
-</span><span>  This is the default.  A thread may hold multiple read locks;
-</span><span>  that is, read locks are recursive.  According to The Single
-</span><span>  Unix Specification, the behavior is unspecified when a reader
-</span><span>  tries to place a lock, and there is no write lock but writers
-</span><span>  are waiting.  Giving preference to the reader, as is set by
-</span><span>  PTHREAD_RWLOCK_PREFER_READER_NP, implies that the reader will
-</span><span>  receive the requested lock, even if a writer is waiting.  As
-</span><span>  long as there are readers, the writer will be starved.
-</span></code></pre>
-<h2 id="reader-vs-writer-preferences">Reader vs Writer Preferences?</h2>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>PTHREAD_RWLOCK_PREFER_READER_NP</span></span>
+<span class="giallo-l"><span>  This is the default.  A thread may hold multiple read locks;</span></span>
+<span class="giallo-l"><span>  that is, read locks are recursive.  According to The Single</span></span>
+<span class="giallo-l"><span>  Unix Specification, the behavior is unspecified when a reader</span></span>
+<span class="giallo-l"><span>  tries to place a lock, and there is no write lock but writers</span></span>
+<span class="giallo-l"><span>  are waiting.  Giving preference to the reader, as is set by</span></span>
+<span class="giallo-l"><span>  PTHREAD_RWLOCK_PREFER_READER_NP, implies that the reader will</span></span>
+<span class="giallo-l"><span>  receive the requested lock, even if a writer is waiting.  As</span></span>
+<span class="giallo-l"><span>  long as there are readers, the writer will be starved.</span></span></code></pre><h2 id="reader-vs-writer-preferences">Reader vs Writer Preferences?</h2>
 <p>Due to the policy of a RwLock having multiple readers OR a single
 writer, a preference is given to one or the other. The preference
 basically boils down to the choice of:</p>

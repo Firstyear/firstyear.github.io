@@ -94,7 +94,7 @@ servers.</p>
 reason for this, which is that the json parts are for the webbrowser,
 and the cbor parts are for ctap and the authenticator device.</p>
 <p>However, I quickly noticed an issue in the Attestation Object, as
-described here <a href="https://w3c.github.io/webauthn/#sctn-attestation">https://w3c.github.io/webauthn/#sctn-attestation</a> . Can
+described here <a rel="external" href="https://w3c.github.io/webauthn/#sctn-attestation">https://w3c.github.io/webauthn/#sctn-attestation</a> . Can
 you see the problem?</p>
 <p>The problem is that the Authenticator Data relies on hand-parsing bytes,
 and has two structures that are concatenated with no length. This means:</p>
@@ -160,7 +160,7 @@ it raises questions about the ability for people to meaningfully
 implement the full specification for all possible devices, let alone
 correctly.</p>
 <p>Some parts even omit details in a cryptographic operation, such as
-<a href="https://w3c.github.io/webauthn/#fido-u2f-attestation">here</a> in
+<a rel="external" href="https://w3c.github.io/webauthn/#fido-u2f-attestation">here</a> in
 verification step 2, it doesn't even list what format the bytes are.
 (Hint: it's DER x509).</p>
 <h2 id="what-would-i-change">What would I change?</h2>

@@ -101,22 +101,17 @@ status area shows as permanently stuck at indexing.</p>
 <p>Anyway, the fix is far simpler but requires some confidence to use a terminal. All of these commands
 must be run as root (aka, prefixed with <code>sudo</code>).</p>
 <p>Disable all spotlight indexes on all volumes.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -ia off
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>mdutil -ia off</span></span></code></pre>
 <p>Erase all indexes</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -Ea
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>mdutil -Ea</span></span></code></pre>
 <p>Reboot your machine. I'm serious, you can't skip this step, you have to reboot here.</p>
 <p>When the machine comes back, wait a few minutes for things to "settle".</p>
 <p>Now remove the spotlight index directories completely.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -Xa
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>mdutil -Xa</span></span></code></pre>
 <p>Finally, re-enable the indexing process</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -ia on
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>mdutil -ia on</span></span></code></pre>
 <p>You can check the status of the reindex with:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>mdutil -sav
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>mdutil -sav</span></span></code></pre>
 <p>Or by opening spotlight search and typeing one letter, which will then show a progress bar of the
 indexing process. In my case it took more than 2 hours to complete, so be patient.</p>
 <h2 id="other-details">Other Details</h2>

@@ -85,8 +85,7 @@
 <p>It would appear we don't have any documentation for the tricky little
 notes field in ns-slapd.</p>
 <p>Sometimes in a search you'll see:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[26/Nov/2015:10:22:00 +1000] conn=5 op=1 SRCH base=&quot;&quot; scope=0 notes=&quot;U&quot; filter=&quot;(cn=foo)&quot; attrs=&quot;cn&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[26/Nov/2015:10:22:00 +1000] conn=5 op=1 SRCH base=&quot;&quot; scope=0 notes=&quot;U&quot; filter=&quot;(cn=foo)&quot; attrs=&quot;cn&quot;</span></span></code></pre>
 <p>See the notes="U"? Well, it turns out it's the DS trying to help you
 out.</p>
 <p>First, the two to look out for are notes=U and notes=A.</p>
@@ -95,13 +94,11 @@ candidate attributes in the filter are unindexed, so we need to make a
 full table scan. This can quickly hit the nsslapd-lookthroughlimit.</p>
 <p>To rectify this, look at the search, and identify the attributes. Look
 them up in cn=schema:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ldapsearch -H ldap://localhost -b &#39;cn=schema&#39; -x &#39;(objectClass=*)&#39; attributeTypes
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ldapsearch -H ldap://localhost -b &#39;cn=schema&#39; -x &#39;(objectClass=*)&#39; attributeTypes</span></span></code></pre>
 <p>And make sure it has an equality syntax:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>attributeTypes: ( 2.5.4.3 NAME ( &#39;cn&#39; &#39;commonName&#39; )  SUP name EQUALITY caseIg
-</span><span> noreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.
-</span><span> 15 X-ORIGIN &#39;RFC 4519&#39; X-DEPRECATED &#39;commonName&#39; )
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>attributeTypes: ( 2.5.4.3 NAME ( &#39;cn&#39; &#39;commonName&#39; )  SUP name EQUALITY caseIg</span></span>
+<span class="giallo-l"><span> noreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.</span></span>
+<span class="giallo-l"><span> 15 X-ORIGIN &#39;RFC 4519&#39; X-DEPRECATED &#39;commonName&#39; )</span></span></code></pre>
 <p>If you don't have an equality syntax, DO NOT ADD AN INDEX. Terrible
 things will happen!</p>
 <p>notes=U means one of two things. It means that a candidate attribute in
@@ -110,8 +107,7 @@ means that the search has hit the idlistscanlimit.</p>
 <p>If you have the query like below, check your nsslapd indexes. cn is
 probably indexed, but then you need to add the index for sn. Follow the
 rules as above, and make sure it has an equality syntax. :</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&quot;(|(cn=foo)(sn=bar))&quot; 
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&quot;(|(cn=foo)(sn=bar))&quot; </span></span></code></pre>
 <p>Second, if that's not the issue, and you think you are hitting
 idlistscanlimit, you can either:</p>
 <ul>
@@ -121,7 +117,7 @@ idlistscanlimit, you can either:</p>
 <p>Doing it on the entry, can cause the query to become sometimes more
 efficient, because you can de-preference certain indexes. There is more
 to read about here in the &lt;a
-href="<a href="http://www.port389.org/docs/389ds/design/fine-grained-id-list-size.html">http://www.port389.org/docs/389ds/design/fine-grained-id-list-size.html</a>"&gt;id
+href="<a rel="external" href="http://www.port389.org/docs/389ds/design/fine-grained-id-list-size.html">http://www.port389.org/docs/389ds/design/fine-grained-id-list-size.html</a>"&gt;id
 scan limit docs&lt;/a&gt;.</p>
 <p>Remember to test offline, in a production replica!</p>
 <p>40</p>

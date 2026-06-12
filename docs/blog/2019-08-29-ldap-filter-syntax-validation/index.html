@@ -96,50 +96,45 @@ of the primary methods of expression in LDAP, and are used in almost
 every aspect of the system - from finding who you are when you login, to
 asserting you are member of a group or have other security attributes.</p>
 <p>For the purposes of this discussion we'll look at this filter:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>&#39;(|(cn=william)(cn=claire))&#39;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>&#39;(|(cn=william)(cn=claire))&#39;</span></span></code></pre>
 <p>In order to execute these queries quickly (LDAP is designed to handle
 thousands of operations per second) we heavily rely on indexing.
 Indexing is often a topic where people believe it to be some kind of
 "magic" but it's reasonably simple: indexes are pre-computed partial
 result sets. So why do we need these?</p>
 <p>We'll imagine we have two entries (invalid, and truncated for brevity).</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: cn=william,...
-</span><span>cn: william
-</span><span>
-</span><span>dn: cn=claire,...
-</span><span>cn: claire
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: cn=william,...</span></span>
+<span class="giallo-l"><span>cn: william</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: cn=claire,...</span></span>
+<span class="giallo-l"><span>cn: claire</span></span></code></pre>
 <p>These entries both have entry-ids - these id's are <em>per-server</em> in a
 replication group and are integers. You can show them by requesting
 entryid as an attribute in 389.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>dn: cn=william,...
-</span><span>entryid: 1
-</span><span>cn: william
-</span><span>
-</span><span>dn: cn=claire,...
-</span><span>entryid: 2
-</span><span>cn: claire
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>dn: cn=william,...</span></span>
+<span class="giallo-l"><span>entryid: 1</span></span>
+<span class="giallo-l"><span>cn: william</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>dn: cn=claire,...</span></span>
+<span class="giallo-l"><span>entryid: 2</span></span>
+<span class="giallo-l"><span>cn: claire</span></span></code></pre>
 <p>Our entries are stored in the main-entry database in
 <em>/var/lib/dirsrv/slapd-standalone1/db/userRoot</em> in the file
 "id2entry.db4". This is a key-value database where the keys are the
 entryid, and the value is the serialised entry itself. Roughly, it's:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[ ID ][ Entry             ]
-</span><span>  1     dn: cn=william,...
-</span><span>        cn: william
-</span><span>
-</span><span>  2     dn: cn=claire,...
-</span><span>        cn: claire
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[ ID ][ Entry             ]</span></span>
+<span class="giallo-l"><span>  1     dn: cn=william,...</span></span>
+<span class="giallo-l"><span>        cn: william</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>  2     dn: cn=claire,...</span></span>
+<span class="giallo-l"><span>        cn: claire</span></span></code></pre>
 <p>Now, if we had NO indexes, to evaluate our filters we have to scan every
 entry of id2entry to determine if the filter matches. This algorithm is:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>candidate_set = []
-</span><span>for id in id-min to id-max:
-</span><span>    entry = load_entry_by_id(id)
-</span><span>    if apply_filter(filter, entry):
-</span><span>        candidate_set.append(entry)
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>candidate_set = []</span></span>
+<span class="giallo-l"><span>for id in id-min to id-max:</span></span>
+<span class="giallo-l"><span>    entry = load_entry_by_id(id)</span></span>
+<span class="giallo-l"><span>    if apply_filter(filter, entry):</span></span>
+<span class="giallo-l"><span>        candidate_set.append(entry)</span></span></code></pre>
 <p>For two entries, this may be fast, but when you have 1000, 10.000, or
 even millions, this is extremely slow. We call these searches <em>full
 table scans</em> or in 389 DS, <em>ALLIDS</em> searches.</p>
@@ -147,38 +142,35 @@ table scans</em> or in 389 DS, <em>ALLIDS</em> searches.</p>
 partial query term to an id list (In 389 we call these IDLs). An IDL is
 a set of integers. Our index for these examples would likely be
 something like:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>cn
-</span><span>=william: [1, ]
-</span><span>=claire: [2, ]
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>cn</span></span>
+<span class="giallo-l"><span>=william: [1, ]</span></span>
+<span class="giallo-l"><span>=claire: [2, ]</span></span></code></pre>
 <p>These indexes are also stored in key-value databases in userRoot - you
 can see this as cn.db4.</p>
 <p>So when we have an indexed term, to evaluate the query, we'll load the
 indexes, then using mathematical set operations, we then produce a
 candidate_id_set, and we can then load the entries that only match.</p>
 <p>For example in psuedo python code:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span># Assume query is: (cn=william)
-</span><span>
-</span><span>attr = filter.get_attr_name()
-</span><span>with open(&#39;%s.db&#39; % attr) as index:
-</span><span>    idl = index.get(&#39;=william&#39;) # from the filter :)
-</span><span>
-</span><span>for id in idl:
-</span><span>    ... # as before.
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span># Assume query is: (cn=william)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>attr = filter.get_attr_name()</span></span>
+<span class="giallo-l"><span>with open(&#39;%s.db&#39; % attr) as index:</span></span>
+<span class="giallo-l"><span>    idl = index.get(&#39;=william&#39;) # from the filter :)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>for id in idl:</span></span>
+<span class="giallo-l"><span>    ... # as before.</span></span></code></pre>
 <p>So we can see now that when we load the idl for cn index, this would
 give us the set [1, ]. Even if the database had 100 million entries,
 as our idl is a single value, we only need to load the one entry that
 matches. Neat!</p>
 <p>When we have a more complex operation such as AND and OR, we can now
 manipulate the idl sets. For example:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>(|(uid=claire)(uid=william))
-</span><span>   uid =claire -&gt; idl [2, ]
-</span><span>   uid =william -&gt; idl [1, ]
-</span><span>
-</span><span>candidate_idl_set = union([2, ], [1, ])
-</span><span># [1, 2]
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>(|(uid=claire)(uid=william))</span></span>
+<span class="giallo-l"><span>   uid =claire -&gt; idl [2, ]</span></span>
+<span class="giallo-l"><span>   uid =william -&gt; idl [1, ]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>candidate_idl_set = union([2, ], [1, ])</span></span>
+<span class="giallo-l"><span># [1, 2]</span></span></code></pre>
 <p>This means again, even with millions of entries, we only need to load
 entry 1 and 2 to uphold the query provided to us.</p>
 <p>So we finally know enough to understand how our example query is
@@ -191,16 +183,14 @@ operate on the idl set, we may insert an idl with the value of ALLIDS
 have various effects.</p>
 <p>If this was an AND query, we can annotate that the filter is <em>partially</em>
 resolved. This means that if we had:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>(&amp;(cn=william)(unindexed=foo))
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>(&amp;(cn=william)(unindexed=foo))</span></span></code></pre>
 <p>Because an AND condition, both filter components must be satisfied, we
 have a partial candidate set from cn=william of [1, ]. We can load
 this partial candidate set, and then apply the filter test as in the
 full table scan case, but as we only apply it to a single entry this is
 really fast.</p>
 <p>The real problem is OR queries. If we had:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>(|(cn=william)(unindexed=foo))
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>(|(cn=william)(unindexed=foo))</span></span></code></pre>
 <p>Because OR means that both filter components <em>could</em> be satisfied, we
 have to turn unindexd into ALLIDS, and the result of the OR as a whole
 is ALLIDS. So even if we have 30 indexed values in the OR, a single
@@ -282,11 +272,9 @@ instead of returning ALLIDS on the failure to find the relevant index
 db.</p>
 <p>We can show the performance impact of this change:</p>
 <p>Before with non-existant attribute</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Average rate:    7.40/thr
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>Average rate:    7.40/thr</span></span></code></pre>
 <p>After with "warn" enabled (map to empty set)</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>Average rate: 4808.70/thr
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>Average rate: 4808.70/thr</span></span></code></pre>
 <p>This is a huge improvement, and certainly shows the risk of DOS and how
 effective the solution was!</p>
 <h2 id="the-social-solution">The Social Solution</h2>
@@ -313,8 +301,7 @@ be discussed and assessed.</p>
 <p>A really important point that was raised by Thierry is how we
 communicated these errors too. Previously we would use the "notes="
 field of the access log. It looks like this:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>conn=1 op=4 RESULT err=0 tag=101 nentries=13 etime=0.0003795424 notes=U
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>conn=1 op=4 RESULT err=0 tag=101 nentries=13 etime=0.0003795424 notes=U</span></span></code></pre>
 <p>The challenge with the notes= field, is that it's easy to overlook, and
 unless you are familar, hard to see what this is indicating. In this
 case, notes=U means partially unindexed query (one filter component but
@@ -324,9 +311,8 @@ scripts like logconv.pl, support tools developed by RH or SUSE, or even
 integrations to platforms like splunk. But clearly we need a way to
 detail what is happening with your filter. So Thierry suggested an
 extension to have details about the provided notes. Now we get:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>conn=1 op=4 RESULT err=0 tag=101 nentries=13 etime=0.0003795424 notes=U details=&quot;Partially Unindexed Filter&quot;
-</span><span>conn=1 op=8 RESULT err=0 tag=101 nentries=0 etime=0.0001886208 notes=F details=&quot;Filter Element Missing From Schema&quot;
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>conn=1 op=4 RESULT err=0 tag=101 nentries=13 etime=0.0003795424 notes=U details=&quot;Partially Unindexed Filter&quot;</span></span>
+<span class="giallo-l"><span>conn=1 op=8 RESULT err=0 tag=101 nentries=0 etime=0.0001886208 notes=F details=&quot;Filter Element Missing From Schema&quot;</span></span></code></pre>
 <p>So we have extended our log message, but without breaking existing
 integrations.</p>
 <p>The final question is what our defaults should be. It's one thing to
@@ -356,7 +342,7 @@ decisions and design process that affects you every day, where we have
 to be responsible and considerate in our actions.</p>
 <p>I hope you enjoyed this exploration of this change!</p>
 <h2 id="references">References</h2>
-<p><a href="https://pagure.io/389-ds-base/pull-request/50379">PR#50379</a></p>
+<p><a rel="external" href="https://pagure.io/389-ds-base/pull-request/50379">PR#50379</a></p>
 
     </div>
 </article>

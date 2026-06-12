@@ -84,34 +84,31 @@
         <h1 id="trick-to-debug-single-files-in-ds">Trick to debug single files in ds</h1>
 <p>I've been debugging thread deadlocks in directory server. When you turn
 on detailed tracing with</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>ns-slapd -d 1
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>ns-slapd -d 1</span></span></code></pre>
 <p>You slow the server down so much that you can barely function.</p>
 <p>A trick is that defines in the local .c file, override from the .h. Copy
 paste this to the file you want to debug. This allows the logs from this
 file to be emitted at -d 0, but without turning it on everywhere, so you
 don't grind the server to a halt.</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>/* Do this so we can get the messages at standard log levels. */
-</span><span>#define SLAPI_LOG_FATAL         0
-</span><span>#define SLAPI_LOG_TRACE         0
-</span><span>#define SLAPI_LOG_PACKETS       0
-</span><span>#define SLAPI_LOG_ARGS          0
-</span><span>#define SLAPI_LOG_CONNS         0
-</span><span>#define SLAPI_LOG_BER           0
-</span><span>#define SLAPI_LOG_FILTER        0
-</span><span>#define SLAPI_LOG_CONFIG        0
-</span><span>#define SLAPI_LOG_ACL           0
-</span><span>#define SLAPI_LOG_SHELL         0
-</span><span>#define SLAPI_LOG_PARSE         0
-</span><span>#define SLAPI_LOG_HOUSE         0
-</span><span>#define SLAPI_LOG_REPL          0
-</span><span>#define SLAPI_LOG_CACHE         0
-</span><span>#define SLAPI_LOG_PLUGIN        0
-</span><span>#define SLAPI_LOG_TIMING        0
-</span><span>#define SLAPI_LOG_BACKLDBM      0
-</span><span>#define SLAPI_LOG_ACLSUMMARY    0
-</span></code></pre>
-
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>/* Do this so we can get the messages at standard log levels. */</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_FATAL         0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_TRACE         0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_PACKETS       0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_ARGS          0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_CONNS         0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_BER           0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_FILTER        0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_CONFIG        0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_ACL           0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_SHELL         0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_PARSE         0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_HOUSE         0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_REPL          0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_CACHE         0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_PLUGIN        0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_TIMING        0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_BACKLDBM      0</span></span>
+<span class="giallo-l"><span>#define SLAPI_LOG_ACLSUMMARY    0</span></span></code></pre>
     </div>
 </article>
 

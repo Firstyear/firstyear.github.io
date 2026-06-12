@@ -94,15 +94,14 @@ So when you change the bus type, it renames the path making the volume
 inaccessible. This causes boot to fail.</p>
 <p>To work around you can remove "resume=/disk/path" from the cli. Then
 to fix it permanently you need:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>transactional-update shell
-</span><span>vim /etc/default/grub
-</span><span># Edit this line to remove &quot;resume&quot;
-</span><span>GRUB_CMDLINE_LINUX_DEFAULT=&quot;console=ttyS0,115200 resume=/dev/disk/by-path/pci-0000:00:07.0-part3 splash=silent quiet showopts&quot;
-</span><span>
-</span><span>vim /etc/default/grub_installdevice
-</span><span># Edit the path to the correct swap location as by ls -al /dev/disk/by-path
-</span><span>/dev/disk/by-path/pci-0000:00:07.0-part3
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>transactional-update shell</span></span>
+<span class="giallo-l"><span>vim /etc/default/grub</span></span>
+<span class="giallo-l"><span># Edit this line to remove &quot;resume&quot;</span></span>
+<span class="giallo-l"><span>GRUB_CMDLINE_LINUX_DEFAULT=&quot;console=ttyS0,115200 resume=/dev/disk/by-path/pci-0000:00:07.0-part3 splash=silent quiet showopts&quot;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>vim /etc/default/grub_installdevice</span></span>
+<span class="giallo-l"><span># Edit the path to the correct swap location as by ls -al /dev/disk/by-path</span></span>
+<span class="giallo-l"><span>/dev/disk/by-path/pci-0000:00:07.0-part3</span></span></code></pre>
 <p>I have reported these issues, and I hope they are resolved.</p>
 
     </div>

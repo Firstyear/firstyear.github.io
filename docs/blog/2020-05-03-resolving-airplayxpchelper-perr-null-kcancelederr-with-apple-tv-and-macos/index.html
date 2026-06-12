@@ -92,8 +92,7 @@ description.</p>
 <h2 id="initial-research">Initial Research</h2>
 <p>The first step was to look in console.app at the local system logs. The
 following item stood out:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>error 09:24:41.459722+1000 AirPlayXPCHelper ### Error: CID 0xACF10006, Peer NULL, -6723/0xFFFFE5BD kCanceledErr
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>error 09:24:41.459722+1000 AirPlayXPCHelper ### Error: CID 0xACF10006, Peer NULL, -6723/0xFFFFE5BD kCanceledErr</span></span></code></pre>
 <p>I only found a single result on a search for this, and they resolved the
 problem by disabling their MacOS firewall - attempting this myself did
 not fix the issue. There are also reports of apple service staff
@@ -104,16 +103,15 @@ USB-C cable to it's service port on the rear of the device, while you
 connect this to a Mac on the other side. Console.app will then show you
 the streamed logs from the device.</p>
 <p>While looking on the Apple TV I noticed the following log item:</p>
-<pre style="background-color:#2b303b;color:#c0c5ce;"><code><span>[AirPlay] ### [0x8F37] Set up session 16845584210140482044 with [&lt;ipv6 address&gt;:3378]:52762 failed: 61/0x3D ECONNREFUSED {
-</span><span>&quot;timingProtocol&quot; : &quot;NTP&quot;,
-</span><span>&quot;osName&quot; : &quot;Mac OS X&quot;,
-</span><span>...
-</span><span>&quot;isScreenMirroringSession&quot; : true,
-</span><span>&quot;osVersion&quot; : &quot;10.15.4&quot;,
-</span><span>&quot;timingPort&quot; : 64880,
-</span><span>...
-</span><span>}
-</span></code></pre>
+<pre class="giallo" style="color: #B392F0; background-color: #1F1F1F;"><code data-lang="plain"><span class="giallo-l"><span>[AirPlay] ### [0x8F37] Set up session 16845584210140482044 with [&lt;ipv6 address&gt;:3378]:52762 failed: 61/0x3D ECONNREFUSED {</span></span>
+<span class="giallo-l"><span>&quot;timingProtocol&quot; : &quot;NTP&quot;,</span></span>
+<span class="giallo-l"><span>&quot;osName&quot; : &quot;Mac OS X&quot;,</span></span>
+<span class="giallo-l"><span>...</span></span>
+<span class="giallo-l"><span>&quot;isScreenMirroringSession&quot; : true,</span></span>
+<span class="giallo-l"><span>&quot;osVersion&quot; : &quot;10.15.4&quot;,</span></span>
+<span class="giallo-l"><span>&quot;timingPort&quot; : 64880,</span></span>
+<span class="giallo-l"><span>...</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
 <p>I have trimmed this log, as most details don't matter. What is
 important is that it looks like the Apple TV is attempting to
 back-connect to the MacBook Pro, which has a connection refused. From
