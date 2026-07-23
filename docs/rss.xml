@@ -7,7 +7,161 @@
       <generator>Zola</generator>
       <language>en</language>
       <atom:link href="https://fy.blackhats.net.au/rss.xml" rel="self" type="application/rss+xml"/>
-      <lastBuildDate>Fri, 12 Jun 2026 00:00:00 +0000</lastBuildDate>
+      <lastBuildDate>Thu, 23 Jul 2026 00:00:00 +0000</lastBuildDate>
+      <item>
+          <title>Passkeys are single factor, and why that&#x27;s (mostly) okay</title>
+          <pubDate>Thu, 23 Jul 2026 00:00:00 +0000</pubDate>
+          <author>Unknown</author>
+          <link>https://fy.blackhats.net.au/blog/2026-07-23-passkeys-are-single-factor/</link>
+          <guid>https://fy.blackhats.net.au/blog/2026-07-23-passkeys-are-single-factor/</guid>
+          <description xml:base="https://fy.blackhats.net.au/blog/2026-07-23-passkeys-are-single-factor/">&lt;p&gt;I have once again awoken and chosen to cause a kerfuffle. Now to save you reading the whole post
+I will give you the conclusion now:&lt;&#x2F;p&gt;
+&lt;p&gt;Passkeys are single factor, except when they are not. And that mostly doesn&#x27;t matter. Until it does.&lt;&#x2F;p&gt;
+&lt;p&gt;You can fight amongst yourselves as to which camp you belong in.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;origin-of-multi-factor-authentication&quot;&gt;Origin of Multi Factor Authentication&lt;&#x2F;h2&gt;
+&lt;p&gt;To understand why Multi Factor Authentication (MFA) is often mandated, we have to remember how we got
+here. In the dark ages, we used to only use passwords as a credential when accessing systems. However
+passwords have a lot of weaknesses, and even if you have the best password in the world then there
+are still plenty of attacks against them.&lt;&#x2F;p&gt;
+&lt;p&gt;The best article to explain this is the excellent &lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;techcommunity.microsoft.com&#x2F;blog&#x2F;microsoft-entra-blog&#x2F;your-paword-doesnt-matter&#x2F;731984&quot;&gt;Your Password Doesn&#x27;t Matter&lt;&#x2F;a&gt;
+which describes attacks on passwords, and why MFA is so important.&lt;&#x2F;p&gt;
+&lt;p&gt;This has led to the rise of time based one-time password (TOTP) and universal second factor (U2F). Mostly
+you will likely have interacted with TOTP more than U2F just due to it&#x27;s lower bar of availability.&lt;&#x2F;p&gt;
+&lt;p&gt;Inevitably plenty of auditors and regulators now mandate the enforcement of MFA for authentication. And
+of course because of this Passkeys have to be MFA to be acceptable for use.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;how-passkeys-implement-mfa&quot;&gt;How Passkeys Implement MFA&lt;&#x2F;h2&gt;
+&lt;p&gt;To understand why Passkeys are single factor we first have to understand how they ... well
+implement MFA.&lt;&#x2F;p&gt;
+&lt;p&gt;During authentication with a Passkey (aka authenticator), the relying party (RP, aka who wants to verify you) sends a
+challenge to your device. This challenge has a number of parameters including a request for
+you the user to &lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;www.w3.org&#x2F;TR&#x2F;webauthn-3&#x2F;#effective-user-verification-requirement-for-assertion&quot;&gt;verify yourself&lt;&#x2F;a&gt;
+to the authenticator. The requirement can be one of:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;discouraged&lt;&#x2F;code&gt; - no verification needed&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;preferred&lt;&#x2F;code&gt; - verify if the authenticator is capable, else continue without verification&lt;&#x2F;li&gt;
+&lt;li&gt;&lt;code&gt;required&lt;&#x2F;code&gt; - verification must be performed&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;So how does this verification work?&lt;&#x2F;p&gt;
+&lt;p&gt;Lets say you have a yubikey and our challenge contains &lt;code&gt;user verification = required&lt;&#x2F;code&gt;. Now
+our yubikey needs us to supply a PIN value which the secure enclave (SE) of the yubikey validates
+in addition to our need to touch the key to prove our physical presence with the device.&lt;&#x2F;p&gt;
+&lt;p&gt;If the PIN is wrong, the key refuses to proceed. If we don&#x27;t touch the key, then the same refusal.&lt;&#x2F;p&gt;
+&lt;p&gt;This has a few neat properties.&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;We can&#x27;t perform a software-only authentication, because we require the user to touch the key physically.&lt;&#x2F;li&gt;
+&lt;li&gt;Physical theft of the key can&#x27;t proceed without the PIN as the attacker doesn&#x27;t know it.&lt;&#x2F;li&gt;
+&lt;li&gt;Since the PIN is verified by the authenticator, it can implement ratelimits and lockouts.&lt;&#x2F;li&gt;
+&lt;li&gt;Disassembling the device to try and retrieve the key and PIN would be an exercise in suffering.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;This is what makes our security key multi-factor. You require not only physical possession and presence of the
+authenticator, but knowledge of the PIN. (Side note - other devices may do this with biometrics like
+a fingerprint reader but it has the same result).&lt;&#x2F;p&gt;
+&lt;p&gt;As you may have noticed though this verification happens inside the authenticator. So how do we tell
+our relying party that this verification happened?&lt;&#x2F;p&gt;
+&lt;p&gt;Well our Passkey is based on public-private key cryptography which allows our authenticator to sign
+the challenge that our RP provided. Then we can send back the signed response (aka assertion) to the RP
+which uses our public key to determine that it must have been our authenticator that was used.&lt;&#x2F;p&gt;
+&lt;p&gt;Now this signed challenge contains quite a bit of data but for our usage here the fields we care about
+are contained in the &lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;www.w3.org&#x2F;TR&#x2F;webauthn-3&#x2F;#sctn-authenticator-data&quot;&gt;authenticator data&lt;&#x2F;a&gt; structure.
+Specifically what we care about are the flags in position bit 1 and 3.&lt;&#x2F;p&gt;
+&lt;p&gt;Bit 1 is user presence. This being set indicates that a physical interaction (such as touch) of the
+authenticator occured.&lt;&#x2F;p&gt;
+&lt;p&gt;Bit 3 is user verification. This being set indicates that the authenticator verified something
+about the user such as a PIN, biometric or something else.&lt;&#x2F;p&gt;
+&lt;p&gt;These fields in the authenticator data structure are signed by the authenticators private key
+so the RP can then check the signature and verify the bits are set as required. Hooray we have
+multifactor authentication that validates the user was present and verified!&lt;&#x2F;p&gt;
+&lt;p&gt;Or do we ...&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;single-factor-variant-one-rp-s-don-t-verify-the-bits&quot;&gt;Single Factor Variant One - RP&#x27;s don&#x27;t verify the bits&lt;&#x2F;h2&gt;
+&lt;p&gt;The first and simplest variant of this is relying parties that either don&#x27;t request the right
+verification options, or simply don&#x27;t verify the bits even if they do.&lt;&#x2F;p&gt;
+&lt;p&gt;For example, if you have an RP that requests &lt;code&gt;preferred&lt;&#x2F;code&gt; user verification, then there is a 99% chance
+that you can modify this client side to &lt;code&gt;discouraged&lt;&#x2F;code&gt; and completely bypass verification. This is
+because if you have &lt;code&gt;preferred&lt;&#x2F;code&gt; you have to be able to fall back to the user verification bit
+as false being a valid response. In this way &lt;code&gt;preferred == discouraged&lt;&#x2F;code&gt; and should never be used. In
+worse cases, you can alter &lt;code&gt;required&lt;&#x2F;code&gt; to &lt;code&gt;discouraged&lt;&#x2F;code&gt; and still bypass user verification.&lt;&#x2F;p&gt;
+&lt;p&gt;And yes I have found large public identity providers that are vulnerable to this, and still are to
+this day (yes I responsibily disclosed to any vendor I have found, no they don&#x27;t care).&lt;&#x2F;p&gt;
+&lt;p&gt;The second variant is RP&#x27;s that simply don&#x27;t give a fuck. For example github when you use a passkey
+in their &quot;sudo&quot; mode to modify your account&#x2F;project settings will send &lt;code&gt;discouraged&lt;&#x2F;code&gt;. This means
+physical theft of the key along with a session cookie is enough to modify anything on the account. Certainly
+not the ... worst user verification crime, but this really should be &lt;code&gt;required&lt;&#x2F;code&gt;.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;single-factor-variant-two-lies-lies-and-more-lies&quot;&gt;Single Factor Variant Two - Lies, Lies, and more Lies.&lt;&#x2F;h2&gt;
+&lt;p&gt;Finally my favourite class. Authenticators that simply &lt;em&gt;lie&lt;&#x2F;em&gt; about user verification. Password managers
+tend to fall into this category, but there are some physical keys so terrible that they can probably be
+exploited to achieve the same.&lt;&#x2F;p&gt;
+&lt;p&gt;What this means is when an RP asks for user verification to be &lt;code&gt;required&lt;&#x2F;code&gt;, the password manager simply
+falsifies the user verification bit, never asks the user for a PIN or other verification, and proceeds
+happily to sign the challenge.&lt;&#x2F;p&gt;
+&lt;p&gt;This means as the RP when you get that authenticator data back and the user verification bit is set,
+you no longer have a way to trust if it really happened.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;this-is-why-passkeys-are-single-factor-and-it-mostly-doesn-t-matter&quot;&gt;This is why Passkeys are Single Factor - and it Mostly Doesn&#x27;t Matter.&lt;&#x2F;h2&gt;
+&lt;p&gt;Between RP&#x27;s that implement Passkeys incorrectly and authenticators that simply lie about user verification
+it becomes a reasonable assumption that when you receive the user verification bit you just don&#x27;t know
+if it can be trusted or not. Or as a user, if the service even checks that correctly.&lt;&#x2F;p&gt;
+&lt;p&gt;But lets say your in the majority of use cases such as public consumer facing websites. Does it matter?&lt;&#x2F;p&gt;
+&lt;p&gt;Lets draw this back to where we started.&lt;&#x2F;p&gt;
+&lt;p&gt;&lt;a rel=&quot;external&quot; href=&quot;https:&#x2F;&#x2F;techcommunity.microsoft.com&#x2F;blog&#x2F;microsoft-entra-blog&#x2F;your-paword-doesnt-matter&#x2F;731984&quot;&gt;Your Password Doesn&#x27;t Matter&lt;&#x2F;a&gt;&lt;&#x2F;p&gt;
+&lt;p&gt;MFA is only a requirement because &lt;em&gt;passwords&lt;&#x2F;em&gt; are terrible.&lt;&#x2F;p&gt;
+&lt;p&gt;The attacks you can pull off against a password don&#x27;t apply to a Passkey, meaning the level of security
+you have even with a password manager that lies about user verification is still better than using
+a password and TOTP ( &lt;a href=&quot;..&#x2F;2025-12-17-yep-passkeys-still-have-problems&quot;&gt;usability issues not withstanding&lt;&#x2F;a&gt; ).&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;You can&#x27;t be phished - the uri origin is signed as part of the challenge and verified .... I hope.&lt;&#x2F;li&gt;
+&lt;li&gt;There are no &#x27;top one hundred most common passkeys&#x27; lists you can spray and pray.&lt;&#x2F;li&gt;
+&lt;li&gt;Database leaks don&#x27;t reveal the private key - only the public key.&lt;&#x2F;li&gt;
+&lt;li&gt;And that public key can&#x27;t be attacked offline like a password hash.&lt;&#x2F;li&gt;
+&lt;li&gt;Annndddd that public key is unique per website.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;So in the end it doesn&#x27;t &lt;em&gt;matter&lt;&#x2F;em&gt; that Passkeys are single factor - the issues that affect passwords
+don&#x27;t affect Passkeys making them better even if user verification wasn&#x27;t performed (or checked).&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;but-what-if-it-does-matter&quot;&gt;But What if it Does Matter?&lt;&#x2F;h2&gt;
+&lt;p&gt;Now, I will say as someone whose password manager &lt;em&gt;is&lt;&#x2F;em&gt; one of these naughty naughty ones that lies
+about user verification, there are some times that this does matter.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;as-an-individual&quot;&gt;As an Individual&lt;&#x2F;h3&gt;
+&lt;p&gt;If you have high value accounts, choose to put them on a yubikey where you &lt;em&gt;know&lt;&#x2F;em&gt; and trust that user verification
+will be performed and enforced. Some easy examples are:&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Email accounts&lt;&#x2F;li&gt;
+&lt;li&gt;Anything which may control the domain name of your email account&lt;&#x2F;li&gt;
+&lt;li&gt;Banking&lt;&#x2F;li&gt;
+&lt;li&gt;Government services (holy shit did you know my.gov.au supports Passkeys!!!)&lt;&#x2F;li&gt;
+&lt;li&gt;Work place authentication&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;For people who like me tend to work in opensource other good examples&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Code repository authentication&lt;&#x2F;li&gt;
+&lt;li&gt;SSH keys&lt;&#x2F;li&gt;
+&lt;li&gt;Package hosting&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;p&gt;Make some informed choices about how much compromise of the service or your password manager would affect
+you personally (or heck, if it would affect others). If it would be life altering, maybe a physical
+key is best (since it can&#x27;t be remotely used or exfiltrated).&lt;&#x2F;p&gt;
+&lt;p&gt;But hey, I keep plenty of passkeys in my deceptive password manager. Remember to always have a strong
+login to your devices, full disk encryption, etc etc. Just make an informed decision about the damage
+potential of the credential if taken from the password manager.&lt;&#x2F;p&gt;
+&lt;h3 id=&quot;as-an-organisation&quot;&gt;As an Organisation&lt;&#x2F;h3&gt;
+&lt;p&gt;Enforce attestation on high-value accounts. This forces cryptographic verification of what Passkeys (authenticators) can be
+registered to your identity provider. This lets you audit the devices first to ensure they behave in
+a trusted manner before you let them be used as an authenticator. This way when you see the user verification
+bit you, you know and trust the authenticator really did set it properly. And more importantly that
+devices you &lt;em&gt;haven&#x27;t&lt;&#x2F;em&gt; audited aren&#x27;t allowed to be used in the first place.&lt;&#x2F;p&gt;
+&lt;p&gt;Second, audit your identity provider and ensure that even when attestation is enabled it doesn&#x27;t allow
+non-attested credentials to register (or even falsified AAGUIDs). Also audit that they send and verify
+the user verification requirements and bits correctly. Lots of vendors get this wrong, so it&#x27;s worth
+verifying these behaviours yourself.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;is-this-a-yubikey-advert&quot;&gt;Is This a Yubikey Advert?&lt;&#x2F;h2&gt;
+&lt;p&gt;No I&#x27;m not paid by yubico, but seriously, just throw yubikeys at people like candy. Nothing
+else comes close today for usability and security.&lt;&#x2F;p&gt;
+&lt;p&gt;I have plenty of other keys I&#x27;ve tried and they all have issues. From firmware updates that wipe all your
+Passkeys away, to defective models that are impossible to trigger the presence on, to the worst that don&#x27;t
+even have secure enclaves to store their private keys and &lt;em&gt;LIE&lt;&#x2F;em&gt; to users claiming they DO use the SE.&lt;&#x2F;p&gt;
+&lt;p&gt;So yeah, just get yubikeys.&lt;&#x2F;p&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;&#x2F;h2&gt;
+&lt;p&gt;As promised:&lt;&#x2F;p&gt;
+&lt;p&gt;Passkeys are single factor, except when they are not. And that mostly doesn&#x27;t matter. Until it does.&lt;&#x2F;p&gt;
+</description>
+      </item>
       <item>
           <title>Standards as Intended vs Standards as Used</title>
           <pubDate>Fri, 12 Jun 2026 00:00:00 +0000</pubDate>
