@@ -180,8 +180,12 @@ a password and TOTP ( <a href="../2025-12-17-yep-passkeys-still-have-problems">u
 <li>And that public key can't be attacked offline like a password hash.</li>
 <li>Annndddd that public key is unique per website.</li>
 </ul>
-<p>So in the end it doesn't <em>matter</em> that Passkeys are single factor - the issues that affect passwords
+<p>So in the end it doesn't <em>matter</em> that Passkeys are (mostly) single factor - the issues that affect passwords
 don't affect Passkeys making them better even if user verification wasn't performed (or checked).</p>
+<p>To also point this out, lots of people store their password and TOTP in the same password manager, so compromise
+of the password manager would have the same consequences on the "single factor" Passkey as the "multi factor"
+password and totp - you're screwed either way. And I bet that your password manager doesn't perform user verification
+when you use that password and totp either.</p>
 <h2 id="but-what-if-it-does-matter">But What if it Does Matter?</h2>
 <p>Now, I will say as someone whose password manager <em>is</em> one of these naughty naughty ones that lies
 about user verification, there are some times that this does matter.</p>

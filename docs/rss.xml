@@ -113,8 +113,12 @@ a password and TOTP ( &lt;a href=&quot;..&#x2F;2025-12-17-yep-passkeys-still-hav
 &lt;li&gt;And that public key can&#x27;t be attacked offline like a password hash.&lt;&#x2F;li&gt;
 &lt;li&gt;Annndddd that public key is unique per website.&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
-&lt;p&gt;So in the end it doesn&#x27;t &lt;em&gt;matter&lt;&#x2F;em&gt; that Passkeys are single factor - the issues that affect passwords
+&lt;p&gt;So in the end it doesn&#x27;t &lt;em&gt;matter&lt;&#x2F;em&gt; that Passkeys are (mostly) single factor - the issues that affect passwords
 don&#x27;t affect Passkeys making them better even if user verification wasn&#x27;t performed (or checked).&lt;&#x2F;p&gt;
+&lt;p&gt;To also point this out, lots of people store their password and TOTP in the same password manager, so compromise
+of the password manager would have the same consequences on the &quot;single factor&quot; Passkey as the &quot;multi factor&quot;
+password and totp - you&#x27;re screwed either way. And I bet that your password manager doesn&#x27;t perform user verification
+when you use that password and totp either.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;but-what-if-it-does-matter&quot;&gt;But What if it Does Matter?&lt;&#x2F;h2&gt;
 &lt;p&gt;Now, I will say as someone whose password manager &lt;em&gt;is&lt;&#x2F;em&gt; one of these naughty naughty ones that lies
 about user verification, there are some times that this does matter.&lt;&#x2F;p&gt;
