@@ -48,7 +48,7 @@ in addition to our need to touch the key to prove our physical presence with the
 &lt;p&gt;If the PIN is wrong, the key refuses to proceed. If we don&#x27;t touch the key, then the same refusal.&lt;&#x2F;p&gt;
 &lt;p&gt;This has a few neat properties.&lt;&#x2F;p&gt;
 &lt;ul&gt;
-&lt;li&gt;We can&#x27;t perform a software-only authentication, because we require the user to touch the key physically.&lt;&#x2F;li&gt;
+&lt;li&gt;We can&#x27;t perform a software-only authentication, because we require the user to physically touch the key.&lt;&#x2F;li&gt;
 &lt;li&gt;Physical theft of the key can&#x27;t proceed without the PIN as the attacker doesn&#x27;t know it.&lt;&#x2F;li&gt;
 &lt;li&gt;Since the PIN is verified by the authenticator, it can implement ratelimits and lockouts.&lt;&#x2F;li&gt;
 &lt;li&gt;Disassembling the device to try and retrieve the key and PIN would be an exercise in suffering.&lt;&#x2F;li&gt;
@@ -94,7 +94,8 @@ exploited to achieve the same.&lt;&#x2F;p&gt;
 falsifies the user verification bit, never asks the user for a PIN or other verification, and proceeds
 happily to sign the challenge.&lt;&#x2F;p&gt;
 &lt;p&gt;This means as the RP when you get that authenticator data back and the user verification bit is set,
-you no longer have a way to trust if it really happened.&lt;&#x2F;p&gt;
+you no longer have a way to trust if it really happened. You only know someone &lt;em&gt;has&lt;&#x2F;em&gt; the private key not that
+they &lt;em&gt;verified&lt;&#x2F;em&gt; to the authenticator since that bit is now untrustworthy.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;this-is-why-passkeys-are-single-factor-and-it-mostly-doesn-t-matter&quot;&gt;This is why Passkeys are Single Factor - and it Mostly Doesn&#x27;t Matter.&lt;&#x2F;h2&gt;
 &lt;p&gt;Between RP&#x27;s that implement Passkeys incorrectly and authenticators that simply lie about user verification
 it becomes a reasonable assumption that when you receive the user verification bit you just don&#x27;t know
@@ -114,11 +115,11 @@ a password and TOTP ( &lt;a href=&quot;..&#x2F;2025-12-17-yep-passkeys-still-hav
 &lt;li&gt;Annndddd that public key is unique per website.&lt;&#x2F;li&gt;
 &lt;&#x2F;ul&gt;
 &lt;p&gt;So in the end it doesn&#x27;t &lt;em&gt;matter&lt;&#x2F;em&gt; that Passkeys are (mostly) single factor - the issues that affect passwords
-don&#x27;t affect Passkeys making them better even if user verification wasn&#x27;t performed (or checked).&lt;&#x2F;p&gt;
-&lt;p&gt;To also point this out, lots of people store their password and TOTP in the same password manager, so compromise
+don&#x27;t affect Passkeys making them better than a password even if user verification wasn&#x27;t performed or checked.&lt;&#x2F;p&gt;
+&lt;p&gt;To drive this home: many people store their password and TOTP in the same password manager, so compromise
 of the password manager would have the same consequences on the &quot;single factor&quot; Passkey as the &quot;multi factor&quot;
-password and totp - you&#x27;re screwed either way. And I bet that your password manager doesn&#x27;t perform user verification
-when you use that password and totp either.&lt;&#x2F;p&gt;
+password and TOTP - you&#x27;re screwed either way. And I bet that your password manager doesn&#x27;t perform user verification
+when you use that password and TOTP either.&lt;&#x2F;p&gt;
 &lt;h2 id=&quot;but-what-if-it-does-matter&quot;&gt;But What if it Does Matter?&lt;&#x2F;h2&gt;
 &lt;p&gt;Now, I will say as someone whose password manager &lt;em&gt;is&lt;&#x2F;em&gt; one of these naughty naughty ones that lies
 about user verification, there are some times that this does matter.&lt;&#x2F;p&gt;
@@ -143,7 +144,7 @@ you personally (or heck, if it would affect others). If it would be life alterin
 key is best (since it can&#x27;t be remotely used or exfiltrated).&lt;&#x2F;p&gt;
 &lt;p&gt;But hey, I keep plenty of passkeys in my deceptive password manager. Remember to always have a strong
 login to your devices, full disk encryption, etc etc. Just make an informed decision about the damage
-potential of the credential if taken from the password manager.&lt;&#x2F;p&gt;
+potential of the credential if taken from the password manager. Security is a spectrum after all.&lt;&#x2F;p&gt;
 &lt;h3 id=&quot;as-an-organisation&quot;&gt;As an Organisation&lt;&#x2F;h3&gt;
 &lt;p&gt;Enforce attestation on high-value accounts. This forces cryptographic verification of what Passkeys (authenticators) can be
 registered to your identity provider. This lets you audit the devices first to ensure they behave in

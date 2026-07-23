@@ -115,7 +115,7 @@ in addition to our need to touch the key to prove our physical presence with the
 <p>If the PIN is wrong, the key refuses to proceed. If we don't touch the key, then the same refusal.</p>
 <p>This has a few neat properties.</p>
 <ul>
-<li>We can't perform a software-only authentication, because we require the user to touch the key physically.</li>
+<li>We can't perform a software-only authentication, because we require the user to physically touch the key.</li>
 <li>Physical theft of the key can't proceed without the PIN as the attacker doesn't know it.</li>
 <li>Since the PIN is verified by the authenticator, it can implement ratelimits and lockouts.</li>
 <li>Disassembling the device to try and retrieve the key and PIN would be an exercise in suffering.</li>
@@ -161,7 +161,8 @@ exploited to achieve the same.</p>
 falsifies the user verification bit, never asks the user for a PIN or other verification, and proceeds
 happily to sign the challenge.</p>
 <p>This means as the RP when you get that authenticator data back and the user verification bit is set,
-you no longer have a way to trust if it really happened.</p>
+you no longer have a way to trust if it really happened. You only know someone <em>has</em> the private key not that
+they <em>verified</em> to the authenticator since that bit is now untrustworthy.</p>
 <h2 id="this-is-why-passkeys-are-single-factor-and-it-mostly-doesn-t-matter">This is why Passkeys are Single Factor - and it Mostly Doesn't Matter.</h2>
 <p>Between RP's that implement Passkeys incorrectly and authenticators that simply lie about user verification
 it becomes a reasonable assumption that when you receive the user verification bit you just don't know
@@ -181,11 +182,11 @@ a password and TOTP ( <a href="../2025-12-17-yep-passkeys-still-have-problems">u
 <li>Annndddd that public key is unique per website.</li>
 </ul>
 <p>So in the end it doesn't <em>matter</em> that Passkeys are (mostly) single factor - the issues that affect passwords
-don't affect Passkeys making them better even if user verification wasn't performed (or checked).</p>
-<p>To also point this out, lots of people store their password and TOTP in the same password manager, so compromise
+don't affect Passkeys making them better than a password even if user verification wasn't performed or checked.</p>
+<p>To drive this home: many people store their password and TOTP in the same password manager, so compromise
 of the password manager would have the same consequences on the "single factor" Passkey as the "multi factor"
-password and totp - you're screwed either way. And I bet that your password manager doesn't perform user verification
-when you use that password and totp either.</p>
+password and TOTP - you're screwed either way. And I bet that your password manager doesn't perform user verification
+when you use that password and TOTP either.</p>
 <h2 id="but-what-if-it-does-matter">But What if it Does Matter?</h2>
 <p>Now, I will say as someone whose password manager <em>is</em> one of these naughty naughty ones that lies
 about user verification, there are some times that this does matter.</p>
@@ -210,7 +211,7 @@ you personally (or heck, if it would affect others). If it would be life alterin
 key is best (since it can't be remotely used or exfiltrated).</p>
 <p>But hey, I keep plenty of passkeys in my deceptive password manager. Remember to always have a strong
 login to your devices, full disk encryption, etc etc. Just make an informed decision about the damage
-potential of the credential if taken from the password manager.</p>
+potential of the credential if taken from the password manager. Security is a spectrum after all.</p>
 <h3 id="as-an-organisation">As an Organisation</h3>
 <p>Enforce attestation on high-value accounts. This forces cryptographic verification of what Passkeys (authenticators) can be
 registered to your identity provider. This lets you audit the devices first to ensure they behave in
